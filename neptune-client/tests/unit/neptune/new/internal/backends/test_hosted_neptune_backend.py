@@ -18,10 +18,7 @@ import time
 import unittest
 import uuid
 from pathlib import Path
-from unittest.mock import (
-    Mock,
-    call,
-)
+from unittest.mock import Mock, call
 
 import pytest
 from bravado.exception import (
@@ -30,11 +27,10 @@ from bravado.exception import (
     HTTPTooManyRequests,
     HTTPUnprocessableEntity,
 )
-from mock import (
-    MagicMock,
-    patch,
-)
+from mock import MagicMock, patch
 from packaging.version import Version
+from tests.unit.neptune.backend_test_mixin import BackendTestMixin
+from tests.unit.neptune.new.utils import response_mock
 
 from neptune.core.components.operation_storage import OperationStorage
 from neptune.exceptions import (
@@ -67,8 +63,6 @@ from neptune.internal.operation import (
     UploadFileContent,
 )
 from neptune.internal.utils import base64_encode
-from tests.unit.neptune.backend_test_mixin import BackendTestMixin
-from tests.unit.neptune.new.utils import response_mock
 
 API_TOKEN = (
     "eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLnN0YWdlLm5lcHR1bmUuYWkiLCJ"
@@ -262,7 +256,11 @@ class TestHostedNeptuneBackend(unittest.TestCase, BackendTestMixin):
 
         # then
         self.assertEqual(result, (1, []))
-        assert retry_after_seconds <= (result_end_time - result_start_time) <= (retry_after_seconds * 2)
+        assert (
+            retry_after_seconds
+            <= (result_end_time - result_start_time)
+            <= (retry_after_seconds * 2)
+        )
 
     @patch("socket.gethostbyname", MagicMock(return_value="1.1.1.1"))
     def test_execute_operations_retry_request(self, swagger_client_factory):
@@ -311,7 +309,9 @@ class TestHostedNeptuneBackend(unittest.TestCase, BackendTestMixin):
                 **DEFAULT_REQUEST_KWARGS,
             }
         )
-        swagger_client.api.executeOperations.assert_has_calls([execution_operation_call, execution_operation_call])
+        swagger_client.api.executeOperations.assert_has_calls(
+            [execution_operation_call, execution_operation_call]
+        )
 
     @patch("neptune.internal.backends.hosted_neptune_backend.upload_file_attribute")
     @patch("socket.gethostbyname", MagicMock(return_value="1.1.1.1"))
@@ -383,7 +383,9 @@ class TestHostedNeptuneBackend(unittest.TestCase, BackendTestMixin):
 
     @patch("neptune.internal.backends.hosted_neptune_backend.track_to_new_artifact")
     @patch("socket.gethostbyname", MagicMock(return_value="1.1.1.1"))
-    def test_track_to_new_artifact(self, track_to_new_artifact_mock, swagger_client_factory):
+    def test_track_to_new_artifact(
+        self, track_to_new_artifact_mock, swagger_client_factory
+    ):
         # given
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
         backend = HostedNeptuneBackend(credentials)
@@ -392,8 +394,12 @@ class TestHostedNeptuneBackend(unittest.TestCase, BackendTestMixin):
 
         response_error = MagicMock()
         response_error.errorDescription = "error1"
-        swagger_client.api.executeOperations.return_value.response.return_value.result = [response_error]
-        swagger_client.api.getArtifactAttribute.side_effect = HTTPNotFound(response=response_mock())
+        swagger_client.api.executeOperations.return_value.response.return_value.result = [
+            response_error
+        ]
+        swagger_client.api.getArtifactAttribute.side_effect = HTTPNotFound(
+            response=response_mock()
+        )
         swagger_client_wrapper = SwaggerClientWrapper(swagger_client)
 
         for container_type in self.container_types:
@@ -476,9 +482,13 @@ class TestHostedNeptuneBackend(unittest.TestCase, BackendTestMixin):
                     any_order=True,
                 )
 
-    @patch("neptune.internal.backends.hosted_neptune_backend.track_to_existing_artifact")
+    @patch(
+        "neptune.internal.backends.hosted_neptune_backend.track_to_existing_artifact"
+    )
     @patch("socket.gethostbyname", MagicMock(return_value="1.1.1.1"))
-    def test_track_to_existing_artifact(self, track_to_existing_artifact_mock, swagger_client_factory):
+    def test_track_to_existing_artifact(
+        self, track_to_existing_artifact_mock, swagger_client_factory
+    ):
         # given
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
         backend = HostedNeptuneBackend(credentials)
@@ -487,8 +497,12 @@ class TestHostedNeptuneBackend(unittest.TestCase, BackendTestMixin):
 
         response_error = MagicMock()
         response_error.errorDescription = "error1"
-        swagger_client.api.executeOperations.return_value.response.return_value.result = [response_error]
-        swagger_client.api.getArtifactAttribute.return_value.response.return_value.result.hash = "dummyHash"
+        swagger_client.api.executeOperations.return_value.response.return_value.result = [
+            response_error
+        ]
+        swagger_client.api.getArtifactAttribute.return_value.response.return_value.result.hash = (
+            "dummyHash"
+        )
         swagger_client_wrapper = SwaggerClientWrapper(swagger_client)
 
         for container_type in self.container_types:
@@ -647,7 +661,9 @@ class TestHostedNeptuneBackend(unittest.TestCase, BackendTestMixin):
         # when:
         error = response_mock()
         error.json.return_value = {"title": "Maximum storage limit reached"}
-        swagger_client.api.executeOperations.side_effect = HTTPPaymentRequired(response=error)
+        swagger_client.api.executeOperations.side_effect = HTTPPaymentRequired(
+            response=error
+        )
 
         # then:
         for container_type in self.container_types:
@@ -672,7 +688,9 @@ class TestHostedNeptuneBackend(unittest.TestCase, BackendTestMixin):
         # when:
         error = response_mock()
         error.json.return_value = {"title": "Monitoring hours not left"}
-        swagger_client.api.executeOperations.side_effect = HTTPUnprocessableEntity(response=error)
+        swagger_client.api.executeOperations.side_effect = HTTPUnprocessableEntity(
+            response=error
+        )
 
         # then:
         for container_type in self.container_types:
@@ -693,7 +711,9 @@ class TestHostedNeptuneBackend(unittest.TestCase, BackendTestMixin):
         self._get_swagger_client_mock(swagger_client_factory)
         backend = HostedNeptuneBackend(credentials)
         mock_leaderboard_client = MagicMock()
-        mock_leaderboard_client.api.lsFileSetAttribute.side_effect = HTTPNotFound(response_mock())
+        mock_leaderboard_client.api.lsFileSetAttribute.side_effect = HTTPNotFound(
+            response_mock()
+        )
 
         backend.leaderboard_client = mock_leaderboard_client
 

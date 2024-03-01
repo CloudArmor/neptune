@@ -44,11 +44,18 @@ class Datetime(CopiableAtom):
         val = backend.get_datetime_attribute(container_id, container_type, path)
         return val.value
 
-    def assign(self, value: typing.Union[DatetimeVal, datetime, StringifyValue], *, wait: bool = False):
+    def assign(
+        self,
+        value: typing.Union[DatetimeVal, datetime, StringifyValue],
+        *,
+        wait: bool = False
+    ):
         verify_type("value", value, (DatetimeVal, datetime, StringifyValue))
         if isinstance(value, (DatetimeVal, StringifyValue)):
             value = value.value
         else:
             value = value.replace(microsecond=1000 * int(value.microsecond / 1000))
         with self._container.lock():
-            self._enqueue_operation(self.create_assignment_operation(self._path, value), wait=wait)
+            self._enqueue_operation(
+                self.create_assignment_operation(self._path, value), wait=wait
+            )

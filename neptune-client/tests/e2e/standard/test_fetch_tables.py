@@ -19,14 +19,11 @@ import time
 import uuid
 
 import pytest
+from tests.e2e.base import BaseE2ETest, fake
+from tests.e2e.utils import a_key
 
 import neptune
 from neptune.metadata_containers import Model
-from tests.e2e.base import (
-    BaseE2ETest,
-    fake,
-)
-from tests.e2e.utils import a_key
 
 
 class TestFetchTable(BaseE2ETest):
@@ -44,7 +41,9 @@ class TestFetchTable(BaseE2ETest):
         # wait for the cache to fill
         time.sleep(5)
 
-        runs_table = project.fetch_runs_table(tag=[tag1, tag2], progress_bar=False).to_rows()
+        runs_table = project.fetch_runs_table(
+            tag=[tag1, tag2], progress_bar=False
+        ).to_rows()
         assert len(runs_table) == 1
         assert runs_table[0].get_attribute_value("sys/id") == run_id1
 
@@ -54,7 +53,9 @@ class TestFetchTable(BaseE2ETest):
         versions_to_initialize = 5
 
         for _ in range(versions_to_initialize):
-            with neptune.init_model_version(model=model_sys_id, project=environment.project):
+            with neptune.init_model_version(
+                model=model_sys_id, project=environment.project
+            ):
                 pass
 
         # wait for the elasticsearch cache to fill
@@ -66,9 +67,14 @@ class TestFetchTable(BaseE2ETest):
         )
         assert len(versions_table) == versions_to_initialize
         for index in range(versions_to_initialize):
-            assert versions_table[index].get_attribute_value("sys/id") == f"{model_sys_id}-{index + 1}"
+            assert (
+                versions_table[index].get_attribute_value("sys/id")
+                == f"{model_sys_id}-{index + 1}"
+            )
 
-        versions_table_gen = container.fetch_model_versions_table(ascending=True, progress_bar=False)
+        versions_table_gen = container.fetch_model_versions_table(
+            ascending=True, progress_bar=False
+        )
         for te1, te2 in zip(list(versions_table_gen), versions_table):
             assert te1._id == te2._id
             assert te1._container_type == te2._container_type
@@ -95,8 +101,18 @@ class TestFetchTable(BaseE2ETest):
         time.sleep(5)
 
         containers_as_rows = get_containers_as_rows()
-        container1 = next(filter(lambda m: m.get_attribute_value("sys/id") == container_id1, containers_as_rows))
-        container2 = next(filter(lambda m: m.get_attribute_value("sys/id") == container_id2, containers_as_rows))
+        container1 = next(
+            filter(
+                lambda m: m.get_attribute_value("sys/id") == container_id1,
+                containers_as_rows,
+            )
+        )
+        container2 = next(
+            filter(
+                lambda m: m.get_attribute_value("sys/id") == container_id2,
+                containers_as_rows,
+            )
+        )
 
         assert container1.get_attribute_value(key1) == value1
         assert container1.get_attribute_value(key2) == value2
@@ -106,7 +122,12 @@ class TestFetchTable(BaseE2ETest):
 
         def get_container1(**kwargs):
             containers_as_rows = get_containers_as_rows(**kwargs)
-            return next(filter(lambda m: m.get_attribute_value("sys/id") == container_id1, containers_as_rows))
+            return next(
+                filter(
+                    lambda m: m.get_attribute_value("sys/id") == container_id1,
+                    containers_as_rows,
+                )
+            )
 
         non_filtered = get_container1()
         assert non_filtered.get_attribute_value(key1) == value1
@@ -155,10 +176,14 @@ class TestFetchTable(BaseE2ETest):
         model_sys_id = container["sys/id"].fetch()
 
         def init_run():
-            return neptune.init_model_version(model=model_sys_id, project=environment.project)
+            return neptune.init_model_version(
+                model=model_sys_id, project=environment.project
+            )
 
         def get_model_versions_as_rows(**kwargs):
-            return container.fetch_model_versions_table(**kwargs, progress_bar=False).to_rows()
+            return container.fetch_model_versions_table(
+                **kwargs, progress_bar=False
+            ).to_rows()
 
         self._test_fetch_from_container(init_run, get_model_versions_as_rows)
 
@@ -169,14 +194,18 @@ class TestFetchTable(BaseE2ETest):
             run["some_random_val"] = random_val
 
             time.sleep(30)
-            runs = project.fetch_runs_table(state="active", progress_bar=False).to_pandas()
+            runs = project.fetch_runs_table(
+                state="active", progress_bar=False
+            ).to_pandas()
             assert not runs.empty
             assert tag in runs["sys/tags"].values
             assert random_val in runs["some_random_val"].values
 
         time.sleep(30)
 
-        runs = project.fetch_runs_table(state="inactive", progress_bar=False).to_pandas()
+        runs = project.fetch_runs_table(
+            state="inactive", progress_bar=False
+        ).to_pandas()
         assert not runs.empty
         assert tag in runs["sys/tags"].values
         assert random_val in runs["some_random_val"].values
@@ -209,7 +238,9 @@ class TestFetchTable(BaseE2ETest):
             assert run_list == ["run2", "run1"]
 
         # when
-        runs = project.fetch_runs_table(sort_by="metrics/accuracy", ascending=ascending, progress_bar=False).to_pandas()
+        runs = project.fetch_runs_table(
+            sort_by="metrics/accuracy", ascending=ascending, progress_bar=False
+        ).to_pandas()
 
         # then
         assert not runs.empty
@@ -221,7 +252,9 @@ class TestFetchTable(BaseE2ETest):
             assert run_list == ["run1", "run2"]
 
         # when
-        runs = project.fetch_runs_table(sort_by="some_val", ascending=ascending, progress_bar=False).to_pandas()
+        runs = project.fetch_runs_table(
+            sort_by="some_val", ascending=ascending, progress_bar=False
+        ).to_pandas()
 
         # then
         assert not runs.empty
@@ -257,7 +290,9 @@ class TestFetchTable(BaseE2ETest):
         time.sleep(30)
 
         # when
-        runs = project.fetch_runs_table(columns=["sys/creation_time", "some_timestamp"], progress_bar=False).to_pandas()
+        runs = project.fetch_runs_table(
+            columns=["sys/creation_time", "some_timestamp"], progress_bar=False
+        ).to_pandas()
 
         # then
         assert isinstance(runs["sys/creation_time"].iloc[0], datetime.datetime)

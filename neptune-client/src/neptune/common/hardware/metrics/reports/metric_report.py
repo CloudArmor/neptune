@@ -18,4 +18,6 @@ from collections import namedtuple
 
 MetricReport = namedtuple("MetricReport", ["metric", "values"])
 
-MetricValue = namedtuple("MetricValue", ["timestamp", "running_time", "gauge_name", "value"])
+MetricValue = namedtuple(
+    "MetricValue", ["timestamp", "running_time", "gauge_name", "value"]
+)

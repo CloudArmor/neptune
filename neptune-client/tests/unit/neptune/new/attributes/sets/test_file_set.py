@@ -15,17 +15,11 @@
 #
 import os
 
-from mock import (
-    MagicMock,
-    patch,
-)
+from mock import MagicMock, patch
+from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 from neptune.attributes.file_set import FileSet
-from neptune.internal.operation import (
-    DeleteFiles,
-    UploadFileSet,
-)
-from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
+from neptune.internal.operation import DeleteFiles, UploadFileSet
 
 
 class TestFileSet(TestAttributeBase):
@@ -44,7 +38,9 @@ class TestFileSet(TestAttributeBase):
             )
             var = FileSet(exp, path)
             var.assign(globs, wait=wait)
-            processor.enqueue_operation.assert_called_with(UploadFileSet(path, expected, reset=True), wait=wait)
+            processor.enqueue_operation.assert_called_with(
+                UploadFileSet(path, expected, reset=True), wait=wait
+            )
 
     @patch("neptune.metadata_containers.metadata_container.get_operation_processor")
     def test_upload_files(self, get_operation_processor):
@@ -60,7 +56,9 @@ class TestFileSet(TestAttributeBase):
             var = FileSet(exp, path)
             var.upload_files(globs, wait=wait)
             processor.enqueue_operation.assert_called_with(
-                UploadFileSet(path, [os.path.abspath(glob) for glob in globs], reset=False),
+                UploadFileSet(
+                    path, [os.path.abspath(glob) for glob in globs], reset=False
+                ),
                 wait=wait,
             )
 
@@ -76,7 +74,9 @@ class TestFileSet(TestAttributeBase):
             )
             var = FileSet(exp, path)
             var.delete_files(["path1", "dir/"], wait=wait)
-            processor.enqueue_operation.assert_called_with(DeleteFiles(path, {"path1", "dir/"}), wait=wait)
+            processor.enqueue_operation.assert_called_with(
+                DeleteFiles(path, {"path1", "dir/"}), wait=wait
+            )
 
     @patch("neptune.metadata_containers.metadata_container.get_operation_processor")
     def test_list_fileset_files(self, get_operation_processor):

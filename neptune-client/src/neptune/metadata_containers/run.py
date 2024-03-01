@@ -18,13 +18,7 @@ __all__ = ["Run"]
 import os
 import threading
 from platform import node as get_hostname
-from typing import (
-    TYPE_CHECKING,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 from typing_extensions import Literal
 
@@ -35,10 +29,7 @@ from neptune.attributes.constants import (
     SYSTEM_NAME_ATTRIBUTE_PATH,
     SYSTEM_TAGS_ATTRIBUTE_PATH,
 )
-from neptune.common.warnings import (
-    NeptuneWarning,
-    warn_once,
-)
+from neptune.common.warnings import NeptuneWarning, warn_once
 from neptune.envs import (
     CONNECTION_MODE,
     CUSTOM_RUN_ID_ENV_NAME,
@@ -55,7 +46,9 @@ from neptune.exceptions import (
 from neptune.internal.backends.api_model import ApiExperiment
 from neptune.internal.backends.neptune_backend import NeptuneBackend
 from neptune.internal.container_type import ContainerType
-from neptune.internal.hardware.hardware_metric_reporting_job import HardwareMetricReportingJob
+from neptune.internal.hardware.hardware_metric_reporting_job import (
+    HardwareMetricReportingJob,
+)
 from neptune.internal.id_formats import QualifiedName
 from neptune.internal.init.parameters import (
     ASYNC_LAG_THRESHOLD,
@@ -70,34 +63,24 @@ from neptune.internal.streams.std_capture_background_job import (
     StderrCaptureBackgroundJob,
     StdoutCaptureBackgroundJob,
 )
-from neptune.internal.utils import (
-    verify_collection_type,
-    verify_type,
-)
+from neptune.internal.utils import verify_collection_type, verify_type
 from neptune.internal.utils.dependency_tracking import (
     FileDependenciesStrategy,
     InferDependenciesStrategy,
 )
-from neptune.internal.utils.git import (
-    to_git_info,
-    track_uncommitted_changes,
-)
+from neptune.internal.utils.git import to_git_info, track_uncommitted_changes
 from neptune.internal.utils.hashing import generate_hash
 from neptune.internal.utils.limits import custom_run_id_exceeds_length
 from neptune.internal.utils.ping_background_job import PingBackgroundJob
-from neptune.internal.utils.runningmode import (
-    in_interactive,
-    in_notebook,
-)
+from neptune.internal.utils.runningmode import in_interactive, in_notebook
 from neptune.internal.utils.source_code import upload_source_code
 from neptune.internal.utils.traceback_job import TracebackJob
-from neptune.internal.websockets.websocket_signals_background_job import WebsocketSignalsBackgroundJob
+from neptune.internal.websockets.websocket_signals_background_job import (
+    WebsocketSignalsBackgroundJob,
+)
 from neptune.metadata_containers import MetadataContainer
 from neptune.metadata_containers.abstract import NeptuneObjectCallback
-from neptune.types import (
-    GitRef,
-    StringSeries,
-)
+from neptune.types import GitRef, StringSeries
 from neptune.types.atoms.git_ref import GitRefDisabled
 from neptune.types.mode import Mode
 
@@ -311,7 +294,9 @@ class Run(MetadataContainer):
         project: Optional[str] = None,
         api_token: Optional[str] = None,
         custom_run_id: Optional[str] = None,
-        mode: Optional[Literal["async", "sync", "offline", "read-only", "debug"]] = None,
+        mode: Optional[
+            Literal["async", "sync", "offline", "read-only", "debug"]
+        ] = None,
         name: Optional[str] = None,
         description: Optional[str] = None,
         tags: Optional[Union[List[str], str]] = None,
@@ -342,7 +327,9 @@ class Run(MetadataContainer):
         verify_type("description", description, (str, type(None)))
         verify_type("capture_stdout", capture_stdout, (bool, type(None)))
         verify_type("capture_stderr", capture_stderr, (bool, type(None)))
-        verify_type("capture_hardware_metrics", capture_hardware_metrics, (bool, type(None)))
+        verify_type(
+            "capture_hardware_metrics", capture_hardware_metrics, (bool, type(None))
+        )
         verify_type("fail_on_exception", fail_on_exception, bool)
         verify_type("monitoring_namespace", monitoring_namespace, (str, type(None)))
         verify_type("capture_traceback", capture_traceback, bool)
@@ -361,9 +348,15 @@ class Run(MetadataContainer):
                 verify_collection_type("source_files", source_files, str)
 
         self._with_id: Optional[str] = with_id
-        self._name: Optional[str] = DEFAULT_NAME if with_id is None and name is None else name
-        self._description: Optional[str] = "" if with_id is None and description is None else description
-        self._custom_run_id: Optional[str] = custom_run_id or os.getenv(CUSTOM_RUN_ID_ENV_NAME)
+        self._name: Optional[str] = (
+            DEFAULT_NAME if with_id is None and name is None else name
+        )
+        self._description: Optional[str] = (
+            "" if with_id is None and description is None else description
+        )
+        self._custom_run_id: Optional[str] = custom_run_id or os.getenv(
+            CUSTOM_RUN_ID_ENV_NAME
+        )
         self._hostname: str = get_hostname()
         self._pid: int = os.getpid()
         self._tid: int = threading.get_ident()
@@ -426,7 +419,9 @@ class Run(MetadataContainer):
 
         if self._with_id:
             return self._backend.get_metadata_container(
-                container_id=QualifiedName(project_qualified_name + "/" + self._with_id),
+                container_id=QualifiedName(
+                    project_qualified_name + "/" + self._with_id
+                ),
                 expected_container_type=Run.container_type,
             )
         else:
@@ -439,7 +434,9 @@ class Run(MetadataContainer):
             if custom_run_id_exceeds_length(self._custom_run_id):
                 custom_run_id = None
 
-            notebook_id, checkpoint_id = create_notebook_checkpoint(backend=self._backend)
+            notebook_id, checkpoint_id = create_notebook_checkpoint(
+                backend=self._backend
+            )
 
             return self._backend.create_run(
                 project_id=self._project_api_object.id,
@@ -452,22 +449,35 @@ class Run(MetadataContainer):
     def _get_background_jobs(self) -> List["BackgroundJob"]:
         background_jobs = [PingBackgroundJob()]
 
-        websockets_factory = self._backend.websockets_factory(self._project_api_object.id, self._id)
+        websockets_factory = self._backend.websockets_factory(
+            self._project_api_object.id, self._id
+        )
         if websockets_factory:
             background_jobs.append(WebsocketSignalsBackgroundJob(websockets_factory))
 
         if self._capture_stdout:
-            background_jobs.append(StdoutCaptureBackgroundJob(attribute_name=self._stdout_path))
+            background_jobs.append(
+                StdoutCaptureBackgroundJob(attribute_name=self._stdout_path)
+            )
 
         if self._capture_stderr:
-            background_jobs.append(StderrCaptureBackgroundJob(attribute_name=self._stderr_path))
+            background_jobs.append(
+                StderrCaptureBackgroundJob(attribute_name=self._stderr_path)
+            )
 
         if self._capture_hardware_metrics:
-            background_jobs.append(HardwareMetricReportingJob(attribute_namespace=self._monitoring_namespace))
+            background_jobs.append(
+                HardwareMetricReportingJob(
+                    attribute_namespace=self._monitoring_namespace
+                )
+            )
 
         if self._capture_traceback:
             background_jobs.append(
-                TracebackJob(path=f"{self._monitoring_namespace}/traceback", fail_on_exception=self._fail_on_exception)
+                TracebackJob(
+                    path=f"{self._monitoring_namespace}/traceback",
+                    fail_on_exception=self._fail_on_exception,
+                )
             )
 
         return background_jobs
@@ -491,7 +501,14 @@ class Run(MetadataContainer):
         if self._description is not None:
             self[SYSTEM_DESCRIPTION_ATTRIBUTE_PATH] = self._description
 
-        if any((self._capture_stderr, self._capture_stdout, self._capture_traceback, self._capture_hardware_metrics)):
+        if any(
+            (
+                self._capture_stderr,
+                self._capture_stdout,
+                self._capture_traceback,
+                self._capture_hardware_metrics,
+            )
+        ):
             self._write_initial_monitoring_attributes()
 
         if self._tags is not None:
@@ -516,7 +533,9 @@ class Run(MetadataContainer):
                     dependency_strategy = InferDependenciesStrategy()
 
                 else:
-                    dependency_strategy = FileDependenciesStrategy(path=self._dependencies)
+                    dependency_strategy = FileDependenciesStrategy(
+                        path=self._dependencies
+                    )
 
                 dependency_strategy.log_dependencies(run=self)
             except Exception as e:
@@ -587,15 +606,21 @@ def check_for_extra_kwargs(caller_name: str, kwargs: dict):
 
     if kwargs:
         first_key = next(iter(kwargs.keys()))
-        raise TypeError(f"{caller_name}() got an unexpected keyword argument '{first_key}'")
+        raise TypeError(
+            f"{caller_name}() got an unexpected keyword argument '{first_key}'"
+        )
 
 
-def create_notebook_checkpoint(backend: NeptuneBackend) -> Tuple[Optional[str], Optional[str]]:
+def create_notebook_checkpoint(
+    backend: NeptuneBackend,
+) -> Tuple[Optional[str], Optional[str]]:
     notebook_id = os.getenv(NEPTUNE_NOTEBOOK_ID, None)
     notebook_path = os.getenv(NEPTUNE_NOTEBOOK_PATH, None)
 
     checkpoint_id = None
     if notebook_id is not None and notebook_path is not None:
-        checkpoint_id = create_checkpoint(backend=backend, notebook_id=notebook_id, notebook_path=notebook_path)
+        checkpoint_id = create_checkpoint(
+            backend=backend, notebook_id=notebook_id, notebook_path=notebook_path
+        )
 
     return notebook_id, checkpoint_id

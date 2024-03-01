@@ -18,10 +18,7 @@ import threading
 import time
 from collections import namedtuple
 from itertools import groupby
-from queue import (
-    Empty,
-    Queue,
-)
+from queue import Empty, Queue
 
 from bravado.exception import HTTPUnprocessableEntity
 
@@ -81,7 +78,9 @@ class ChannelsValuesSender(object):
         if channel_name in namespaced_channel_map:
             channel_id = namespaced_channel_map[channel_name]
         else:
-            response = self._experiment._create_channel(channel_name, channel_type, channel_namespace)
+            response = self._experiment._create_channel(
+                channel_name, channel_type, channel_namespace
+            )
             channel_id = response.id
             namespaced_channel_map[channel_name] = channel_id
 
@@ -104,11 +103,17 @@ class ChannelsValuesSender(object):
                 self._values_queue = None
 
     def _is_running(self):
-        return self._values_queue is not None and self._sending_thread is not None and self._sending_thread.is_alive()
+        return (
+            self._values_queue is not None
+            and self._sending_thread is not None
+            and self._sending_thread.is_alive()
+        )
 
     def _start(self):
         self._values_queue = Queue()
-        self._sending_thread = ChannelsValuesSendingThread(self._experiment, self._values_queue)
+        self._sending_thread = ChannelsValuesSendingThread(
+            self._experiment, self._values_queue
+        )
         self._sending_thread.start()
 
 
@@ -128,7 +133,9 @@ class ChannelsValuesSendingThread(NeptuneThread):
         while self.should_continue_running() or not self._values_queue.empty():
             try:
                 sleep_start = time.time()
-                self._values_batch.append(self._values_queue.get(timeout=max(self._sleep_time, 0)))
+                self._values_batch.append(
+                    self._values_queue.get(timeout=max(self._sleep_time, 0))
+                )
                 self._values_queue.task_done()
                 self._sleep_time -= time.time() - sleep_start
             except Empty:
@@ -187,7 +194,9 @@ class ChannelsValuesSendingThread(NeptuneThread):
                         y=queued_value.channel_value.y,
                     )
                 )
-            channels_with_values.append(ChannelIdWithValues(*channel_metadata, channel_values))
+            channels_with_values.append(
+                ChannelIdWithValues(*channel_metadata, channel_values)
+            )
 
         try:
             self._experiment._send_channels_values(channels_with_values)

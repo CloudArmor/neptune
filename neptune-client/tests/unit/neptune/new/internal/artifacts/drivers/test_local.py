@@ -20,6 +20,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from tests.unit.neptune.new.internal.artifacts.utils import md5
+
 from neptune.exceptions import (
     NeptuneLocalStorageAccessException,
     NeptuneUnsupportedArtifactFunctionalityException,
@@ -30,7 +32,6 @@ from neptune.internal.artifacts.types import (
     ArtifactFileData,
     ArtifactFileType,
 )
-from tests.unit.neptune.new.internal.artifacts.utils import md5
 
 
 class TestLocalArtifactDrivers(unittest.TestCase):
@@ -39,7 +40,9 @@ class TestLocalArtifactDrivers(unittest.TestCase):
     def setUp(self):
         self.test_sources_dir = Path(str(tempfile.mktemp()))
         self.test_dir = Path(str(tempfile.mktemp()))
-        test_source_data = Path(__file__).parents[5] / "data" / "local_artifact_drivers_data"
+        test_source_data = (
+            Path(__file__).parents[5] / "data" / "local_artifact_drivers_data"
+        )
         test_data = self.test_dir / "data"
 
         # copy source data to temp dir (to prevent e.g. inter-fs symlinks)
@@ -55,10 +58,14 @@ class TestLocalArtifactDrivers(unittest.TestCase):
             src=str(self.test_sources_dir / "file_to_link.txt"),
             dst=str(test_data / "hardlinked_file.txt"),
         )
-        (test_data / "symlinked_file.txt").symlink_to(self.test_sources_dir / "file_to_link.txt")
+        (test_data / "symlinked_file.txt").symlink_to(
+            self.test_sources_dir / "file_to_link.txt"
+        )
 
         # symlink dir - content of this file won't be discovered
-        (test_data / "symlinked_dir").symlink_to(self.test_sources_dir / "dir_to_link", target_is_directory=True)
+        (test_data / "symlinked_dir").symlink_to(
+            self.test_sources_dir / "dir_to_link", target_is_directory=True
+        )
 
     def tearDown(self) -> None:
         # clean tmp directories
@@ -66,8 +73,12 @@ class TestLocalArtifactDrivers(unittest.TestCase):
         shutil.rmtree(self.test_sources_dir, ignore_errors=True)
 
     def test_match_by_path(self):
-        self.assertEqual(ArtifactDriversMap.match_path("file:///path/to/"), LocalArtifactDriver)
-        self.assertEqual(ArtifactDriversMap.match_path("/path/to/"), LocalArtifactDriver)
+        self.assertEqual(
+            ArtifactDriversMap.match_path("file:///path/to/"), LocalArtifactDriver
+        )
+        self.assertEqual(
+            ArtifactDriversMap.match_path("/path/to/"), LocalArtifactDriver
+        )
 
     def test_match_by_type(self):
         self.assertEqual(ArtifactDriversMap.match_type("Local"), LocalArtifactDriver)
@@ -84,21 +95,31 @@ class TestLocalArtifactDrivers(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             downloaded_file = Path(temporary) / "downloaded_file.ext"
 
-            LocalArtifactDriver.download_file(destination=downloaded_file, file_definition=artifact_file)
+            LocalArtifactDriver.download_file(
+                destination=downloaded_file, file_definition=artifact_file
+            )
 
             self.assertTrue(Path(downloaded_file).is_symlink())
             self.assertEqual("ad62f265e5b1a2dc51f531e44e748aa0", md5(downloaded_file))
 
     def test_non_existing_file_download(self):
         path = "/wrong/path"
-        artifact_file = ArtifactFileData(file_path=path, file_hash="??", type="??", metadata={"file_path": path})
+        artifact_file = ArtifactFileData(
+            file_path=path, file_hash="??", type="??", metadata={"file_path": path}
+        )
 
-        with self.assertRaises(NeptuneLocalStorageAccessException), tempfile.TemporaryDirectory() as temporary:
+        with self.assertRaises(
+            NeptuneLocalStorageAccessException
+        ), tempfile.TemporaryDirectory() as temporary:
             local_destination = Path(temporary)
-            LocalArtifactDriver.download_file(destination=local_destination, file_definition=artifact_file)
+            LocalArtifactDriver.download_file(
+                destination=local_destination, file_definition=artifact_file
+            )
 
     def test_single_retrieval(self):
-        files = LocalArtifactDriver.get_tracked_files(str(self.test_dir / "data/file1.txt"))
+        files = LocalArtifactDriver.get_tracked_files(
+            str(self.test_dir / "data/file1.txt")
+        )
 
         self.assertEqual(1, len(files))
         self.assertIsInstance(files[0], ArtifactFileData)
@@ -152,7 +173,9 @@ class TestLocalArtifactDrivers(unittest.TestCase):
         )
 
     def test_multiple_retrieval_prefix(self):
-        files = LocalArtifactDriver.get_tracked_files((self.test_dir / "data").as_posix(), "my/custom_path")
+        files = LocalArtifactDriver.get_tracked_files(
+            (self.test_dir / "data").as_posix(), "my/custom_path"
+        )
         files = sorted(files, key=lambda file: file.file_path)
 
         self.assertEqual(4, len(files))
@@ -173,7 +196,9 @@ class TestLocalArtifactDrivers(unittest.TestCase):
             files[1].metadata["file_path"],
         )
 
-        self.assertEqual("my/custom_path/sub_dir/file_in_subdir.txt", files[2].file_path)
+        self.assertEqual(
+            "my/custom_path/sub_dir/file_in_subdir.txt", files[2].file_path
+        )
         self.assertEqual("98181b1a4c880a462fcfa96b92c84b8e945ac335", files[2].file_hash)
         self.assertEqual(24, files[2].size)
         self.assertEqual(

@@ -17,20 +17,20 @@
 import unittest
 from typing import List
 
+from tests.unit.neptune.new.client.abstract_tables_test import AbstractTablesTestMixin
+
 from neptune import init_project
 from neptune.internal.container_type import ContainerType
-from neptune.table import (
-    Table,
-    TableEntry,
-)
-from tests.unit.neptune.new.client.abstract_tables_test import AbstractTablesTestMixin
+from neptune.table import Table, TableEntry
 
 
 class TestModelTables(AbstractTablesTestMixin, unittest.TestCase):
     expected_container_type = ContainerType.MODEL
 
     def get_table(self, **kwargs) -> Table:
-        return init_project(project="organization/project", mode="read-only").fetch_models_table(**kwargs)
+        return init_project(
+            project="organization/project", mode="read-only"
+        ).fetch_models_table(**kwargs)
 
     def get_table_entries(self, table) -> List[TableEntry]:
         return table.to_rows()

@@ -16,14 +16,7 @@
 __all__ = ["ContainerStructure"]
 
 from collections import deque
-from typing import (
-    Callable,
-    Generic,
-    List,
-    Optional,
-    TypeVar,
-    Union,
-)
+from typing import Callable, Generic, List, Optional, TypeVar, Union
 
 from neptune.exceptions import MetadataInconsistency
 from neptune.internal.utils.paths import path_to_str
@@ -71,7 +64,9 @@ class ContainerStructure(Generic[T, Node]):
             if not isinstance(ref, self._node_type):
                 raise MetadataInconsistency(
                     "Cannot access path '{}': '{}' is already defined as an attribute, "
-                    "not a namespace".format(path_to_str(path), path_to_str(path[:index]))
+                    "not a namespace".format(
+                        path_to_str(path), path_to_str(path[:index])
+                    )
                 )
             if part not in ref:
                 return None
@@ -97,7 +92,9 @@ class ContainerStructure(Generic[T, Node]):
             if isinstance(attr, self._node_type):
                 # in-between nodes are auto-created, so ignore it's OK unless we want to change the type
                 return
-            raise MetadataInconsistency("Cannot set attribute '{}'. It's a namespace".format(path_to_str(path)))
+            raise MetadataInconsistency(
+                "Cannot set attribute '{}'. It's a namespace".format(path_to_str(path))
+            )
 
         ref[attribute_name] = attr
 
@@ -110,12 +107,16 @@ class ContainerStructure(Generic[T, Node]):
 
         head, tail = sub_path[0], sub_path[1:]
         if head not in ref:
-            raise MetadataInconsistency("Cannot delete {}. Attribute not found.".format(path_to_str(attr_path)))
+            raise MetadataInconsistency(
+                "Cannot delete {}. Attribute not found.".format(path_to_str(attr_path))
+            )
 
         if not tail:
             if isinstance(ref[head], self._node_type):
                 raise MetadataInconsistency(
-                    "Cannot delete {}. It's a namespace, not an attribute.".format(path_to_str(attr_path))
+                    "Cannot delete {}. It's a namespace, not an attribute.".format(
+                        path_to_str(attr_path)
+                    )
                 )
             del ref[head]
         else:

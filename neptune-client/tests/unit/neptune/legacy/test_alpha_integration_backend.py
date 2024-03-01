@@ -21,6 +21,9 @@ from typing import List
 import mock
 from freezegun import freeze_time
 from mock import MagicMock
+from tests.unit.neptune.backend_test_mixin import (
+    BackendTestMixin as AlphaBackendTestMixin,
+)
 
 from neptune.legacy.internal.api_clients import HostedNeptuneBackendApiClient
 from neptune.legacy.internal.api_clients.hosted_api_clients.hosted_alpha_leaderboard_api_client import (
@@ -32,7 +35,6 @@ from neptune.legacy.internal.channels.channels import (
     ChannelType,
     ChannelValue,
 )
-from tests.unit.neptune.backend_test_mixin import BackendTestMixin as AlphaBackendTestMixin
 
 API_TOKEN = (
     "eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYWxwaGEuc3RhZ2UubmVwdHVuZS5haSIsImFwaV91cmwiOiJodHRwczovL2FscG"
@@ -108,9 +110,13 @@ class TestAlphaIntegrationNeptuneBackend(unittest.TestCase, AlphaBackendTestMixi
                 }
             ],
         }
-        execute_operations = self.leaderboard.leaderboard_swagger_client.api.executeOperations
+        execute_operations = (
+            self.leaderboard.leaderboard_swagger_client.api.executeOperations
+        )
         self.assertEqual(len(execute_operations.call_args_list), 1)
-        self.assertDictEqual(execute_operations.call_args_list[0][1], expected_call_args)
+        self.assertDictEqual(
+            execute_operations.call_args_list[0][1], expected_call_args
+        )
 
     def test_send_channels_text_values(self):
         channel_y_elements = [

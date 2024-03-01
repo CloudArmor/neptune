@@ -15,13 +15,7 @@
 #
 __all__ = ["Table"]
 
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Generator,
-    List,
-    Optional,
-)
+from typing import TYPE_CHECKING, Any, Generator, List, Optional
 
 from neptune.exceptions import MetadataInconsistency
 from neptune.integrations.pandas import to_pandas
@@ -33,10 +27,7 @@ from neptune.internal.backends.api_model import (
 from neptune.internal.backends.neptune_backend import NeptuneBackend
 from neptune.internal.container_type import ContainerType
 from neptune.internal.utils.logger import get_logger
-from neptune.internal.utils.paths import (
-    join_paths,
-    parse_path,
-)
+from neptune.internal.utils.paths import join_paths, parse_path
 from neptune.internal.utils.run_state import RunState
 from neptune.typing import ProgressBarType
 
@@ -83,14 +74,21 @@ class TableEntry:
                     AttributeType.DATETIME,
                 ):
                     return attr.properties.get("value")
-                if _type == AttributeType.FLOAT_SERIES or _type == AttributeType.STRING_SERIES:
+                if (
+                    _type == AttributeType.FLOAT_SERIES
+                    or _type == AttributeType.STRING_SERIES
+                ):
                     return attr.properties.get("last")
                 if _type == AttributeType.IMAGE_SERIES:
                     raise MetadataInconsistency("Cannot get value for image series.")
                 if _type == AttributeType.FILE:
-                    raise MetadataInconsistency("Cannot get value for file attribute. Use download() instead.")
+                    raise MetadataInconsistency(
+                        "Cannot get value for file attribute. Use download() instead."
+                    )
                 if _type == AttributeType.FILE_SET:
-                    raise MetadataInconsistency("Cannot get value for file set attribute. Use download() instead.")
+                    raise MetadataInconsistency(
+                        "Cannot get value for file set attribute. Use download() instead."
+                    )
                 if _type == AttributeType.STRING_SET:
                     return set(attr.properties.get("values"))
                 if _type == AttributeType.GIT_REF:
@@ -124,7 +122,9 @@ class TableEntry:
                         progress_bar=progress_bar,
                     )
                     return
-                raise MetadataInconsistency("Cannot download file from attribute of type {}".format(_type))
+                raise MetadataInconsistency(
+                    "Cannot download file from attribute of type {}".format(_type)
+                )
         raise ValueError("Could not find {} attribute".format(path))
 
     def download_file_set_attribute(
@@ -145,7 +145,11 @@ class TableEntry:
                         progress_bar=progress_bar,
                     )
                     return
-                raise MetadataInconsistency("Cannot download ZIP archive from attribute of type {}".format(_type))
+                raise MetadataInconsistency(
+                    "Cannot download ZIP archive from attribute of type {}".format(
+                        _type
+                    )
+                )
         raise ValueError("Could not find {} attribute".format(path))
 
 
@@ -155,7 +159,9 @@ class LeaderboardHandler:
         self._path = path
 
     def __getitem__(self, path: str) -> "LeaderboardHandler":
-        return LeaderboardHandler(table_entry=self._table_entry, path=join_paths(self._path, path))
+        return LeaderboardHandler(
+            table_entry=self._table_entry, path=join_paths(self._path, path)
+        )
 
     def get(self) -> Any:
         return self._table_entry.get_attribute_value(path=self._path)
@@ -165,8 +171,12 @@ class LeaderboardHandler:
         if attr_type == AttributeType.FILE:
             return self._table_entry.download_file_attribute(self._path, destination)
         elif attr_type == AttributeType.FILE_SET:
-            return self._table_entry.download_file_set_attribute(path=self._path, destination=destination)
-        raise MetadataInconsistency("Cannot download file from attribute of type {}".format(attr_type))
+            return self._table_entry.download_file_set_attribute(
+                path=self._path, destination=destination
+            )
+        raise MetadataInconsistency(
+            "Cannot download file from attribute of type {}".format(attr_type)
+        )
 
 
 class Table:

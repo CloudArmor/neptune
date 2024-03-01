@@ -15,34 +15,19 @@
 #
 import os
 import unittest
-from io import (
-    BytesIO,
-    StringIO,
-)
+from io import BytesIO, StringIO
 from pathlib import Path
 from unittest.mock import PropertyMock
 
-from mock import (
-    MagicMock,
-    patch,
-)
-
-from neptune.attributes.atoms.file import (
-    File,
-    FileVal,
-)
-from neptune.attributes.file_set import (
-    FileSet,
-    FileSetVal,
-)
-from neptune.common.utils import IS_WINDOWS
-from neptune.internal.operation import (
-    UploadFile,
-    UploadFileSet,
-)
-from neptune.internal.types.file_types import FileType
+from mock import MagicMock, patch
 from tests.e2e.utils import tmp_context
 from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
+
+from neptune.attributes.atoms.file import File, FileVal
+from neptune.attributes.file_set import FileSet, FileSetVal
+from neptune.common.utils import IS_WINDOWS
+from neptune.internal.operation import UploadFile, UploadFileSet
+from neptune.internal.types.file_types import FileType
 
 
 class TestFile(TestAttributeBase):
@@ -82,7 +67,9 @@ class TestFile(TestAttributeBase):
         for value, operation_factory in value_and_operation_factory:
             with tmp_context() as tmp_upload_dir:
                 processor = MagicMock()
-                processor.operation_storage = PropertyMock(upload_path=Path(tmp_upload_dir))
+                processor.operation_storage = PropertyMock(
+                    upload_path=Path(tmp_upload_dir)
+                )
                 get_operation_processor.return_value = processor
 
                 with self._exp() as exp:
@@ -145,7 +132,9 @@ class TestFile(TestAttributeBase):
                 )
                 var = FileSet(exp, path)
                 var.upload_files(value, wait=wait)
-                processor.enqueue_operation.assert_called_with(UploadFileSet(path, expected, False), wait=wait)
+                processor.enqueue_operation.assert_called_with(
+                    UploadFileSet(path, expected, False), wait=wait
+                )
 
     def test_save_type_error(self):
         values = [55, None, [], FileVal]

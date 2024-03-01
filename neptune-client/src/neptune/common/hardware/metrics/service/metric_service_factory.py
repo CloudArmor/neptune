@@ -16,9 +16,13 @@
 from neptune.common.hardware.gauges.gauge_factory import GaugeFactory
 from neptune.common.hardware.gpu.gpu_monitor import GPUMonitor
 from neptune.common.hardware.metrics.metrics_factory import MetricsFactory
-from neptune.common.hardware.metrics.reports.metric_reporter_factory import MetricReporterFactory
+from neptune.common.hardware.metrics.reports.metric_reporter_factory import (
+    MetricReporterFactory,
+)
 from neptune.common.hardware.metrics.service.metric_service import MetricService
-from neptune.common.hardware.resources.system_resource_info_factory import SystemResourceInfoFactory
+from neptune.common.hardware.resources.system_resource_info_factory import (
+    SystemResourceInfoFactory,
+)
 from neptune.common.hardware.system.system_monitor import SystemMonitor
 
 
@@ -35,13 +39,19 @@ class MetricServiceFactory(object):
         ).create(gauge_mode=gauge_mode)
 
         gauge_factory = GaugeFactory(gauge_mode=gauge_mode)
-        metrics_factory = MetricsFactory(gauge_factory=gauge_factory, system_resource_info=system_resource_info)
+        metrics_factory = MetricsFactory(
+            gauge_factory=gauge_factory, system_resource_info=system_resource_info
+        )
         metrics_container = metrics_factory.create_metrics_container()
 
         for metric in metrics_container.metrics():
-            metric.internal_id = self.__backend.create_hardware_metric(experiment, metric)
+            metric.internal_id = self.__backend.create_hardware_metric(
+                experiment, metric
+            )
 
-        metric_reporter = MetricReporterFactory(reference_timestamp).create(metrics=metrics_container.metrics())
+        metric_reporter = MetricReporterFactory(reference_timestamp).create(
+            metrics=metrics_container.metrics()
+        )
 
         return MetricService(
             backend=self.__backend,

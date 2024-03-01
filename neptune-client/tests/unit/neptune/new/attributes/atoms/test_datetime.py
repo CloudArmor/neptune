@@ -16,17 +16,11 @@
 
 from datetime import datetime
 
-from mock import (
-    MagicMock,
-    patch,
-)
-
-from neptune.attributes.atoms.datetime import (
-    Datetime,
-    DatetimeVal,
-)
-from neptune.internal.operation import AssignDatetime
+from mock import MagicMock, patch
 from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
+
+from neptune.attributes.atoms.datetime import Datetime, DatetimeVal
+from neptune.internal.operation import AssignDatetime
 
 
 class TestDatetime(TestAttributeBase):
@@ -51,7 +45,9 @@ class TestDatetime(TestAttributeBase):
             with self._exp() as exp:
                 var = Datetime(exp, path)
                 var.assign(value, wait=wait)
-                processor.enqueue_operation.assert_called_with(AssignDatetime(path, expected), wait=wait)
+                processor.enqueue_operation.assert_called_with(
+                    AssignDatetime(path, expected), wait=wait
+                )
 
     def test_assign_type_error(self):
         values = [55, None]

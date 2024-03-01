@@ -19,17 +19,12 @@ import random
 import unittest
 import uuid
 from collections import namedtuple
-from tempfile import (
-    NamedTemporaryFile,
-    TemporaryDirectory,
-)
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 
 import mock
-from mock import (
-    MagicMock,
-    call,
-    patch,
-)
+from mock import MagicMock, call, patch
+from tests.unit.neptune.backend_test_mixin import BackendTestMixin
+from tests.unit.neptune.new.utils.file_helpers import create_file
 
 from neptune.common.utils import IS_WINDOWS
 from neptune.internal.backends.api_model import ClientConfig
@@ -40,12 +35,12 @@ from neptune.internal.backends.hosted_file_operations import (
     upload_file_attribute,
     upload_file_set_attribute,
 )
-from tests.unit.neptune.backend_test_mixin import BackendTestMixin
-from tests.unit.neptune.new.utils.file_helpers import create_file
 
 
 def set_expected_result(endpoint: MagicMock, value: dict):
-    endpoint.return_value.response.return_value.result = namedtuple(endpoint.__class__.__name__, value.keys())(**value)
+    endpoint.return_value.response.return_value.result = namedtuple(
+        endpoint.__class__.__name__, value.keys()
+    )(**value)
 
 
 class HostedFileOperationsHelper(unittest.TestCase):
@@ -58,19 +53,35 @@ class HostedFileOperationsHelper(unittest.TestCase):
         swagger_mock = MagicMock()
         swagger_mock.swagger_spec.http_client = MagicMock()
         swagger_mock.swagger_spec.api_url = "ui.neptune.ai"
-        swagger_mock.api.uploadFileSetAttributeChunk.operation.path_name = "/uploadFileSetChunk"
-        swagger_mock.api.uploadFileSetAttributeTar.operation.path_name = "/uploadFileSetTar"
+        swagger_mock.api.uploadFileSetAttributeChunk.operation.path_name = (
+            "/uploadFileSetChunk"
+        )
+        swagger_mock.api.uploadFileSetAttributeTar.operation.path_name = (
+            "/uploadFileSetTar"
+        )
         swagger_mock.api.uploadPath.operation.path_name = "/uploadPath"
         swagger_mock.api.uploadAttribute.operation.path_name = "/attributes/upload"
         swagger_mock.api.downloadAttribute.operation.path_name = "/attributes/download"
-        swagger_mock.api.downloadFileSetAttributeZip.operation.path_name = "/attributes/downloadFileSetZip"
-        swagger_mock.api.downloadFileSetAttributeZip.operation.path_name = "/attributes/downloadFileSetZip"
+        swagger_mock.api.downloadFileSetAttributeZip.operation.path_name = (
+            "/attributes/downloadFileSetZip"
+        )
+        swagger_mock.api.downloadFileSetAttributeZip.operation.path_name = (
+            "/attributes/downloadFileSetZip"
+        )
         swagger_mock.api.download.operation.path_name = "/download"
 
-        swagger_mock.api.fileAtomMultipartUploadStart.operation.path_name = "/attributes/storage/file/upload/start"
-        swagger_mock.api.fileAtomMultipartUploadFinish.operation.path_name = "/attributes/storage/file/upload/finish"
-        swagger_mock.api.fileAtomMultipartUploadPart.operation.path_name = "/attributes/storage/file/upload/part"
-        swagger_mock.api.fileAtomUpload.operation.path_name = "/attributes/storage/file/upload"
+        swagger_mock.api.fileAtomMultipartUploadStart.operation.path_name = (
+            "/attributes/storage/file/upload/start"
+        )
+        swagger_mock.api.fileAtomMultipartUploadFinish.operation.path_name = (
+            "/attributes/storage/file/upload/finish"
+        )
+        swagger_mock.api.fileAtomMultipartUploadPart.operation.path_name = (
+            "/attributes/storage/file/upload/part"
+        )
+        swagger_mock.api.fileAtomUpload.operation.path_name = (
+            "/attributes/storage/file/upload"
+        )
 
         swagger_mock.api.fileSetFileMultipartUploadStart.operation.path_name = (
             "/attributes/storage/fileset/upload/start"
@@ -78,8 +89,12 @@ class HostedFileOperationsHelper(unittest.TestCase):
         swagger_mock.api.fileSetFileMultipartUploadFinish.operation.path_name = (
             "/attributes/storage/fileset/upload/finish"
         )
-        swagger_mock.api.fileSetFileMultipartUploadPart.operation.path_name = "/attributes/storage/fileset/upload/part"
-        swagger_mock.api.fileSetFileUpload.operation.path_name = "/attributes/storage/fileset/upload"
+        swagger_mock.api.fileSetFileMultipartUploadPart.operation.path_name = (
+            "/attributes/storage/fileset/upload/part"
+        )
+        swagger_mock.api.fileSetFileUpload.operation.path_name = (
+            "/attributes/storage/fileset/upload"
+        )
         return swagger_mock
 
 
@@ -87,7 +102,9 @@ class TestCommonHostedFileOperations(HostedFileOperationsHelper):
     def test_get_content_disposition_filename(self):
         # given
         response_mock = MagicMock()
-        response_mock.headers = {"Content-Disposition": 'attachment; filename="sample.file"'}
+        response_mock.headers = {
+            "Content-Disposition": 'attachment; filename="sample.file"'
+        }
 
         # when
         filename = _get_content_disposition_filename(response_mock)
@@ -158,7 +175,9 @@ class TestNewUploadFileOperations(HostedFileOperationsHelper, BackendTestMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         config_swagger_client = self._get_swagger_client_mock(MagicMock())
-        client_config = ClientConfig.from_api_response(config_swagger_client.api.getClientConfig().response().result)
+        client_config = ClientConfig.from_api_response(
+            config_swagger_client.api.getClientConfig().response().result
+        )
         self.multipart_config = client_config.multipart_config
 
     @unittest.skipIf(IS_WINDOWS, "Windows behaves strangely")
@@ -264,7 +283,9 @@ class TestNewUploadFileOperations(HostedFileOperationsHelper, BackendTestMixin):
                 "errors": [],
             }
         )
-        data = self.get_random_bytes(201 * 2**10)  # 201 KB (200KB is multipart upload config)
+        data = self.get_random_bytes(
+            201 * 2**10
+        )  # 201 KB (200KB is multipart upload config)
         chunk_size = self.multipart_config.min_chunk_size
 
         # when
@@ -313,7 +334,9 @@ class TestNewUploadFileOperations(HostedFileOperationsHelper, BackendTestMixin):
                     data=data[chunk_size:],
                     http_client=swagger_mock.swagger_spec.http_client,
                     url="https://ui.neptune.ai/attributes/storage/file/upload/part",
-                    headers={"X-Range": f"bytes={chunk_size}-{len(data) - 1}/{len(data)}"},
+                    headers={
+                        "X-Range": f"bytes={chunk_size}-{len(data) - 1}/{len(data)}"
+                    },
                     query_params={
                         "uploadPartIdx": 1,
                         "uploadId": upload_id,
@@ -395,7 +418,9 @@ class TestNewUploadFileOperations(HostedFileOperationsHelper, BackendTestMixin):
                 "errors": [],
             }
         )
-        data = self.get_random_bytes(201 * 2**10)  # 201 KB (200KB is multipart upload config)
+        data = self.get_random_bytes(
+            201 * 2**10
+        )  # 201 KB (200KB is multipart upload config)
         chunk_size = self.multipart_config.min_chunk_size
 
         # when
@@ -447,7 +472,9 @@ class TestNewUploadFileOperations(HostedFileOperationsHelper, BackendTestMixin):
                     data=data[chunk_size:],
                     http_client=swagger_mock.swagger_spec.http_client,
                     url="https://ui.neptune.ai/attributes/storage/fileset/upload/part",
-                    headers={"X-Range": f"bytes={chunk_size}-{len(data) - 1}/{len(data)}"},
+                    headers={
+                        "X-Range": f"bytes={chunk_size}-{len(data) - 1}/{len(data)}"
+                    },
                     query_params={
                         "uploadPartIdx": 1,
                         "uploadId": upload_id,
@@ -470,7 +497,9 @@ class TestNewUploadFileOperations(HostedFileOperationsHelper, BackendTestMixin):
         exp_uuid = str(uuid.uuid4())
         swagger_mock = self._get_swagger_mock()
         upload_raw_data_mock.return_value = b"null"
-        swagger_mock.api.getUploadConfig.return_value.response.return_value.result.chunkSize = 10
+        swagger_mock.api.getUploadConfig.return_value.response.return_value.result.chunkSize = (
+            10
+        )
 
         # when
         with NamedTemporaryFile("w") as temp_file_1:

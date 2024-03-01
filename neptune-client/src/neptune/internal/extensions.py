@@ -16,26 +16,22 @@
 __all__ = ["load_extensions"]
 
 import sys
-from typing import (
-    Callable,
-    List,
-    Tuple,
-)
+from typing import Callable, List, Tuple
 
 if sys.version_info >= (3, 8):
     from importlib.metadata import entry_points
 else:
     from importlib_metadata import entry_points
 
-from neptune.common.warnings import (
-    NeptuneWarning,
-    warn_once,
-)
+from neptune.common.warnings import NeptuneWarning, warn_once
 
 
 def get_entry_points(name: str) -> List[Tuple[str, Callable[[], None]]]:
     if (3, 8) <= sys.version_info < (3, 10):
-        return [(entry_point.name, entry_point.load()) for entry_point in entry_points().get(name, tuple())]
+        return [
+            (entry_point.name, entry_point.load())
+            for entry_point in entry_points().get(name, tuple())
+        ]
     return [
         (entry_point.name, entry_point.load())  # type: ignore[unused-ignore, attr-defined]
         for entry_point in entry_points(group=name)  # type: ignore[unused-ignore, call-arg]
@@ -43,7 +39,9 @@ def get_entry_points(name: str) -> List[Tuple[str, Callable[[], None]]]:
 
 
 def load_extensions() -> None:
-    for entry_point_name, loaded_extension in get_entry_points(name="neptune.extensions"):
+    for entry_point_name, loaded_extension in get_entry_points(
+        name="neptune.extensions"
+    ):
         try:
             _ = loaded_extension()
         except Exception as e:

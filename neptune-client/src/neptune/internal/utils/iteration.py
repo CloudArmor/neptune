@@ -15,15 +15,8 @@
 #
 __all__ = ["get_batches"]
 
-from itertools import (
-    chain,
-    islice,
-)
-from typing import (
-    Iterable,
-    List,
-    TypeVar,
-)
+from itertools import chain, islice
+from typing import Iterable, List, TypeVar
 
 T = TypeVar("T")
 

@@ -47,7 +47,9 @@ class TestArtifactDriversMap(unittest.TestCase):
                 return []
 
             @classmethod
-            def download_file(cls, destination: pathlib.Path, file_definition: ArtifactFileData):
+            def download_file(
+                cls, destination: pathlib.Path, file_definition: ArtifactFileData
+            ):
                 pass
 
         self.test_driver_instance = TestArtifactDriver
@@ -71,7 +73,9 @@ class TestArtifactDriversMap(unittest.TestCase):
                 return []
 
             @classmethod
-            def download_file(cls, destination: pathlib.Path, file_definition: ArtifactFileData):
+            def download_file(
+                cls, destination: pathlib.Path, file_definition: ArtifactFileData
+            ):
                 pass
 
         self.assertIn(

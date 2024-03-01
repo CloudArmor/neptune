@@ -18,10 +18,7 @@ __all__ = ["Integer"]
 import typing
 
 from neptune.attributes.atoms.copiable_atom import CopiableAtom
-from neptune.constants import (
-    MAX_32_BIT_INT,
-    MIN_32_BIT_INT,
-)
+from neptune.constants import MAX_32_BIT_INT, MIN_32_BIT_INT
 from neptune.internal.container_type import ContainerType
 from neptune.internal.operation import AssignInt
 from neptune.internal.utils.logger import get_logger
@@ -48,7 +45,9 @@ class Integer(CopiableAtom):
         val = backend.get_int_attribute(container_id, container_type, path)
         return val.value
 
-    def assign(self, value: typing.Union[IntegerVal, float, int], *, wait: bool = False):
+    def assign(
+        self, value: typing.Union[IntegerVal, float, int], *, wait: bool = False
+    ):
         if not isinstance(value, IntegerVal):
             value = IntegerVal(value)
 
@@ -65,4 +64,6 @@ class Integer(CopiableAtom):
             return
 
         with self._container.lock():
-            self._enqueue_operation(self.create_assignment_operation(self._path, value.value), wait=wait)
+            self._enqueue_operation(
+                self.create_assignment_operation(self._path, value.value), wait=wait
+            )

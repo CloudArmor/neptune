@@ -25,7 +25,11 @@ def test__split_dir_name():
     # given
     random_id = UniqueId(str(uuid.uuid4()))
 
-    assert detect_async_dir(f"{random_id}") == (ContainerType.RUN, random_id, StructureVersion.LEGACY)
+    assert detect_async_dir(f"{random_id}") == (
+        ContainerType.RUN,
+        random_id,
+        StructureVersion.LEGACY,
+    )
     assert detect_async_dir(f"run__{random_id}") == (
         ContainerType.RUN,
         random_id,

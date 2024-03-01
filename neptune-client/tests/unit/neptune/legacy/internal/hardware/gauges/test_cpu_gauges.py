@@ -16,10 +16,7 @@
 import time
 import unittest
 
-from neptune.common.hardware.gauges.cpu import (
-    CGroupCpuUsageGauge,
-    SystemCpuUsageGauge,
-)
+from neptune.common.hardware.gauges.cpu import CGroupCpuUsageGauge, SystemCpuUsageGauge
 
 
 class TestCpuGauges(unittest.TestCase):

@@ -16,10 +16,7 @@
 __all__ = ["Integer"]
 
 from dataclasses import dataclass
-from typing import (
-    TYPE_CHECKING,
-    TypeVar,
-)
+from typing import TYPE_CHECKING, TypeVar
 
 from neptune.internal.types.stringify_value import extract_if_stringify_value
 from neptune.types.atoms.atom import Atom

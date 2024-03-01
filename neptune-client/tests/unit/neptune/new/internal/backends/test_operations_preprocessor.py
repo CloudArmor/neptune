@@ -16,6 +16,8 @@
 
 import uuid
 
+from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
+
 from neptune.exceptions import MetadataInconsistency
 from neptune.internal.backends.operations_preprocessor import OperationsPreprocessor
 from neptune.internal.operation import (
@@ -34,7 +36,6 @@ from neptune.internal.operation import (
     TrackFilesToArtifact,
     UploadFileSet,
 )
-from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 FLog = LogFloats.ValueType
 SLog = LogStrings.ValueType
@@ -122,7 +123,11 @@ class TestOperationsPreprocessor(TestAttributeBase):
         )
         self.assertEqual(
             result.errors,
-            [MetadataInconsistency("Cannot perform AssignString operation on c: Attribute is not a String")],
+            [
+                MetadataInconsistency(
+                    "Cannot perform AssignString operation on c: Attribute is not a String"
+                )
+            ],
         )
         self.assertEqual(processor.processed_ops_count, len(operations))
 
@@ -174,7 +179,9 @@ class TestOperationsPreprocessor(TestAttributeBase):
                 LogStrings(["a"], [FLog("111", 3, 4)]),
                 DeleteAttribute(["b"]),
                 LogStrings(["b"], [SLog("222", None, 6)]),
-                LogFloats(["c"], [FLog(1, 2, 3), FLog(10, 20, 30), FLog(100, 200, 300)]),
+                LogFloats(
+                    ["c"], [FLog(1, 2, 3), FLog(10, 20, 30), FLog(100, 200, 300)]
+                ),
                 LogStrings(["d"], [SLog("4", 111, 222)]),
                 ClearFloatLog(["e"]),
                 ClearImageLog(["f"]),
@@ -197,7 +204,11 @@ class TestOperationsPreprocessor(TestAttributeBase):
         )
         self.assertEqual(
             result.errors,
-            [MetadataInconsistency("Cannot perform LogFloats operation on h: Attribute is not a Float Series")],
+            [
+                MetadataInconsistency(
+                    "Cannot perform LogFloats operation on h: Attribute is not a Float Series"
+                )
+            ],
         )
         self.assertEqual(processor.processed_ops_count, len(operations))
 
@@ -260,8 +271,12 @@ class TestOperationsPreprocessor(TestAttributeBase):
         self.assertEqual(
             result.errors,
             [
-                MetadataInconsistency("Cannot perform RemoveStrings operation on h: Attribute is not a String Set"),
-                MetadataInconsistency("Cannot perform AddStrings operation on i: Attribute is not a String Set"),
+                MetadataInconsistency(
+                    "Cannot perform RemoveStrings operation on h: Attribute is not a String Set"
+                ),
+                MetadataInconsistency(
+                    "Cannot perform AddStrings operation on i: Attribute is not a String Set"
+                ),
             ],
         )
         self.assertEqual(processor.processed_ops_count, len(operations))
@@ -307,7 +322,11 @@ class TestOperationsPreprocessor(TestAttributeBase):
         )
         self.assertEqual(
             result.errors,
-            [MetadataInconsistency("Cannot perform UploadFileSet operation on e: Attribute is not a File Set")],
+            [
+                MetadataInconsistency(
+                    "Cannot perform UploadFileSet operation on e: Attribute is not a File Set"
+                )
+            ],
         )
         self.assertEqual(processor.processed_ops_count, len(operations))
 
@@ -389,8 +408,12 @@ class TestOperationsPreprocessor(TestAttributeBase):
                     project_uuid,
                     [("dir1/", None), ("dir2/dir3/", "dir2/"), ("dir4/dir5/", "dir4/")],
                 ),
-                TrackFilesToArtifact(["d"], project_uuid, [("dir2/dir3/", "dir2/"), ("dir4/", None)]),
-                TrackFilesToArtifact(["e"], project_uuid, [("dir1/", None), ("dir2/dir3/", "dir2/")]),
+                TrackFilesToArtifact(
+                    ["d"], project_uuid, [("dir2/dir3/", "dir2/"), ("dir4/", None)]
+                ),
+                TrackFilesToArtifact(
+                    ["e"], project_uuid, [("dir1/", None), ("dir2/dir3/", "dir2/")]
+                ),
                 TrackFilesToArtifact(
                     ["f"],
                     project_uuid,

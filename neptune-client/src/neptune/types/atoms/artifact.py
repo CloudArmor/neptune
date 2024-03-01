@@ -16,12 +16,7 @@
 __all__ = ["Artifact"]
 
 from dataclasses import dataclass
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Optional, TypeVar, Union
 
 from neptune.internal.artifacts.file_hasher import FileHasher
 from neptune.internal.types.stringify_value import (

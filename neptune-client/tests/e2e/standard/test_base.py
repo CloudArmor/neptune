@@ -14,24 +14,19 @@
 # limitations under the License.
 #
 import random
-from datetime import (
-    datetime,
-    timezone,
-)
+from datetime import datetime, timezone
 
 import pytest
+from tests.e2e.base import AVAILABLE_CONTAINERS, BaseE2ETest, fake
 
 from neptune.metadata_containers import MetadataContainer
-from tests.e2e.base import (
-    AVAILABLE_CONTAINERS,
-    BaseE2ETest,
-    fake,
-)
 
 
 class TestAtoms(BaseE2ETest):
     @pytest.mark.parametrize("container", AVAILABLE_CONTAINERS, indirect=True)
-    @pytest.mark.parametrize("value", [random.randint(0, 100), random.random(), fake.boolean(), fake.word()])
+    @pytest.mark.parametrize(
+        "value", [random.randint(0, 100), random.random(), fake.boolean(), fake.word()]
+    )
     def test_simple_assign_and_fetch(self, container: MetadataContainer, value):
         key = self.gen_key()
 
@@ -48,7 +43,9 @@ class TestAtoms(BaseE2ETest):
         container.sync()
 
         # expect truncate to milliseconds and add UTC timezone
-        expected_now = now.astimezone(timezone.utc).replace(microsecond=int(now.microsecond / 1000) * 1000)
+        expected_now = now.astimezone(timezone.utc).replace(
+            microsecond=int(now.microsecond / 1000) * 1000
+        )
         assert container[key].fetch() == expected_now
 
     @pytest.mark.parametrize("container", AVAILABLE_CONTAINERS, indirect=True)
@@ -164,7 +161,9 @@ class TestStringSet(BaseE2ETest):
         container[self.neptune_tags_path].add(remaining_tag1)
         container[self.neptune_tags_path].add([to_remove_tag1, remaining_tag2])
         container[self.neptune_tags_path].remove(to_remove_tag1)
-        container[self.neptune_tags_path].remove(to_remove_tag2)  # remove non existing tag
+        container[self.neptune_tags_path].remove(
+            to_remove_tag2
+        )  # remove non existing tag
         container.sync()
 
         assert container[self.neptune_tags_path].fetch() == {

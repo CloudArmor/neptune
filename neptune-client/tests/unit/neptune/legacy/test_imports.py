@@ -18,92 +18,62 @@
 # flake8: noqa
 import unittest
 
-from neptune.legacy.api_exceptions import (
-    ChannelAlreadyExists,
-    ChannelDoesNotExist,
-    ChannelNotFound,
-    ChannelsValuesSendBatchError,
-    ConnectionLost,
-    ExperimentAlreadyFinished,
-    ExperimentLimitReached,
-    ExperimentNotFound,
-    ExperimentOperationErrors,
-    ExperimentValidationError,
-    Forbidden,
-    InvalidApiKey,
-    NeptuneApiException,
-    NeptuneSSLVerificationError,
-    NotebookNotFound,
-    PathInExperimentNotFound,
-    PathInProjectNotFound,
-    ProjectNotFound,
-    ServerError,
-    StorageLimitReached,
-    Unauthorized,
-    WorkspaceNotFound,
-)
-from neptune.legacy.backend import (
-    ApiClient,
-    BackendApiClient,
-    LeaderboardApiClient,
-)
+from neptune.legacy.api_exceptions import (ChannelAlreadyExists,
+                                           ChannelDoesNotExist,
+                                           ChannelNotFound,
+                                           ChannelsValuesSendBatchError,
+                                           ConnectionLost,
+                                           ExperimentAlreadyFinished,
+                                           ExperimentLimitReached,
+                                           ExperimentNotFound,
+                                           ExperimentOperationErrors,
+                                           ExperimentValidationError,
+                                           Forbidden, InvalidApiKey,
+                                           NeptuneApiException,
+                                           NeptuneSSLVerificationError,
+                                           NotebookNotFound,
+                                           PathInExperimentNotFound,
+                                           PathInProjectNotFound,
+                                           ProjectNotFound, ServerError,
+                                           StorageLimitReached, Unauthorized,
+                                           WorkspaceNotFound)
+from neptune.legacy.backend import (ApiClient, BackendApiClient,
+                                    LeaderboardApiClient)
 from neptune.legacy.checkpoint import Checkpoint
 from neptune.legacy.exceptions import (
-    CannotResolveHostname,
-    DeleteArtifactUnsupportedInAlphaException,
-    DeprecatedApiToken,
-    DownloadArtifactsUnsupportedException,
-    DownloadArtifactUnsupportedException,
-    DownloadSourcesException,
-    FileNotFound,
-    InvalidChannelValue,
-    InvalidNeptuneBackend,
-    InvalidNotebookPath,
-    NeptuneException,
-    NeptuneIncorrectImportException,
+    CannotResolveHostname, DeleteArtifactUnsupportedInAlphaException,
+    DeprecatedApiToken, DownloadArtifactsUnsupportedException,
+    DownloadArtifactUnsupportedException, DownloadSourcesException,
+    FileNotFound, InvalidChannelValue, InvalidNeptuneBackend,
+    InvalidNotebookPath, NeptuneException, NeptuneIncorrectImportException,
     NeptuneIncorrectProjectQualifiedNameException,
-    NeptuneLibraryNotInstalledException,
-    NeptuneMissingApiTokenException,
+    NeptuneLibraryNotInstalledException, NeptuneMissingApiTokenException,
     NeptuneMissingProjectQualifiedNameException,
-    NeptuneNoExperimentContextException,
-    NeptuneUninitializedException,
-    NoChannelValue,
-    NotADirectory,
-    NotAFile,
-    UnsupportedClientVersion,
-    UnsupportedInAlphaException,
-)
+    NeptuneNoExperimentContextException, NeptuneUninitializedException,
+    NoChannelValue, NotADirectory, NotAFile, UnsupportedClientVersion,
+    UnsupportedInAlphaException)
 from neptune.legacy.experiments import Experiment
 from neptune.legacy.git_info import GitInfo
-from neptune.legacy.model import (
-    ChannelWithLastValue,
-    LeaderboardEntry,
-    Point,
-    Points,
-)
+from neptune.legacy.model import (ChannelWithLastValue, LeaderboardEntry,
+                                  Point, Points)
 from neptune.legacy.notebook import Notebook
-from neptune.legacy.oauth import (
-    NeptuneAuth,
-    NeptuneAuthenticator,
-)
+from neptune.legacy.oauth import NeptuneAuth, NeptuneAuthenticator
 from neptune.legacy.projects import Project
 from neptune.legacy.sessions import Session
-from neptune.management.exceptions import (
-    AccessRevokedOnDeletion,
-    AccessRevokedOnMemberRemoval,
-    BadRequestException,
-    ConflictingWorkspaceName,
-    InvalidProjectName,
-    ManagementOperationFailure,
-    MissingWorkspaceName,
-    ProjectAlreadyExists,
-    ProjectNotFound,
-    ProjectsLimitReached,
-    UnsupportedValue,
-    UserAlreadyHasAccess,
-    UserNotExistsOrWithoutAccess,
-    WorkspaceNotFound,
-)
+from neptune.management.exceptions import (AccessRevokedOnDeletion,
+                                           AccessRevokedOnMemberRemoval,
+                                           BadRequestException,
+                                           ConflictingWorkspaceName,
+                                           InvalidProjectName,
+                                           ManagementOperationFailure,
+                                           MissingWorkspaceName,
+                                           ProjectAlreadyExists,
+                                           ProjectNotFound,
+                                           ProjectsLimitReached,
+                                           UnsupportedValue,
+                                           UserAlreadyHasAccess,
+                                           UserNotExistsOrWithoutAccess,
+                                           WorkspaceNotFound)
 
 
 class TestImports(unittest.TestCase):

@@ -19,12 +19,7 @@ from __future__ import annotations
 __all__ = ("LazyOperationProcessorWrapper",)
 
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Optional,
-    TypeVar,
-)
+from typing import Any, Callable, Optional, TypeVar
 
 from neptune.core.components.abstract import Resource
 from neptune.core.components.operation_storage import OperationStorage

@@ -19,10 +19,7 @@ import time
 import unittest
 from pathlib import Path
 
-from mock import (
-    Mock,
-    patch,
-)
+from mock import Mock, patch
 
 from neptune.internal.artifacts.file_hasher import FileHasher
 from neptune.internal.artifacts.types import ArtifactFileData
@@ -62,9 +59,13 @@ class TestFileHasher(unittest.TestCase):
             ),
         ]
 
-        expected_hash = "56e64245b1d4915ff27b306c8077cd4f9ce1b31233c690a93ebc38a1b737a9ea"
+        expected_hash = (
+            "56e64245b1d4915ff27b306c8077cd4f9ce1b31233c690a93ebc38a1b737a9ea"
+        )
         self.assertEqual(expected_hash, FileHasher.get_artifact_hash(artifacts))
-        self.assertEqual(expected_hash, FileHasher.get_artifact_hash(reversed(artifacts)))
+        self.assertEqual(
+            expected_hash, FileHasher.get_artifact_hash(reversed(artifacts))
+        )
 
     def test_artifact_hash_without_metadata(self):
         # do not change this test case without coordinating with Artifact API's ArtifactHashComputer
@@ -90,9 +91,16 @@ class TestFileHasher(unittest.TestCase):
             ),
         ]
 
-        expected_hash = "e6d96bccc12db43acc6e24e2e79052ecaee52307470e44f93d74ecfebc119128"
-        self.assertEqual(expected_hash, FileHasher.get_artifact_hash_without_metadata(artifacts))
-        self.assertEqual(expected_hash, FileHasher.get_artifact_hash_without_metadata(reversed(artifacts)))
+        expected_hash = (
+            "e6d96bccc12db43acc6e24e2e79052ecaee52307470e44f93d74ecfebc119128"
+        )
+        self.assertEqual(
+            expected_hash, FileHasher.get_artifact_hash_without_metadata(artifacts)
+        )
+        self.assertEqual(
+            expected_hash,
+            FileHasher.get_artifact_hash_without_metadata(reversed(artifacts)),
+        )
 
     @patch("pathlib.Path.home")
     def test_local_file_hash(self, home):

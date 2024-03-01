@@ -14,10 +14,7 @@
 # limitations under the License.
 #
 
-from neptune.common.warnings import (
-    NeptuneWarning,
-    warn_once,
-)
+from neptune.common.warnings import NeptuneWarning, warn_once
 from neptune.vendor.pynvml import (
     NVMLError,
     nvmlDeviceGetCount,
@@ -37,17 +34,25 @@ class GPUMonitor(object):
 
     def get_card_usage_percent(self, card_index):
         return self.__nvml_get_or_else(
-            lambda: float(nvmlDeviceGetUtilizationRates(nvmlDeviceGetHandleByIndex(card_index)).gpu)
+            lambda: float(
+                nvmlDeviceGetUtilizationRates(
+                    nvmlDeviceGetHandleByIndex(card_index)
+                ).gpu
+            )
         )
 
     def get_card_used_memory_in_bytes(self, card_index):
-        return self.__nvml_get_or_else(lambda: nvmlDeviceGetMemoryInfo(nvmlDeviceGetHandleByIndex(card_index)).used)
+        return self.__nvml_get_or_else(
+            lambda: nvmlDeviceGetMemoryInfo(nvmlDeviceGetHandleByIndex(card_index)).used
+        )
 
     def get_top_card_memory_in_bytes(self):
         def read_top_card_memory_in_bytes():
             return self.__nvml_get_or_else(
                 lambda: [
-                    nvmlDeviceGetMemoryInfo(nvmlDeviceGetHandleByIndex(card_index)).total
+                    nvmlDeviceGetMemoryInfo(
+                        nvmlDeviceGetHandleByIndex(card_index)
+                    ).total
                     for card_index in range(nvmlDeviceGetCount())
                 ],
                 default=0,

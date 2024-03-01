@@ -16,18 +16,23 @@
 from unittest.mock import MagicMock
 
 import pytest
-
-from neptune.cli.status import StatusRunner
-from neptune.cli.utils import get_qualified_name
-from neptune.internal.container_type import ContainerType
-from neptune.internal.operation import Operation
 from tests.unit.neptune.new.cli.utils import (
     generate_get_metadata_container,
     prepare_v1_container,
     prepare_v2_container,
 )
 
-AVAILABLE_CONTAINERS = [ContainerType.RUN, ContainerType.MODEL_VERSION, ContainerType.MODEL, ContainerType.PROJECT]
+from neptune.cli.status import StatusRunner
+from neptune.cli.utils import get_qualified_name
+from neptune.internal.container_type import ContainerType
+from neptune.internal.operation import Operation
+
+AVAILABLE_CONTAINERS = [
+    ContainerType.RUN,
+    ContainerType.MODEL_VERSION,
+    ContainerType.MODEL,
+    ContainerType.PROJECT,
+]
 
 
 @pytest.fixture(name="backend")
@@ -39,14 +44,24 @@ def backend_fixture():
 def test_list_v2_containers(tmp_path, mocker, capsys, backend, container_type):
     # given
     unsynced_container = prepare_v2_container(
-        container_type=container_type, path=tmp_path, last_ack_version=1, pid=2501, key="a1b2c3"
+        container_type=container_type,
+        path=tmp_path,
+        last_ack_version=1,
+        pid=2501,
+        key="a1b2c3",
     )
     synced_container = prepare_v2_container(
-        container_type=container_type, path=tmp_path, last_ack_version=3, pid=2502, key="d4e5f6"
+        container_type=container_type,
+        path=tmp_path,
+        last_ack_version=3,
+        pid=2502,
+        key="d4e5f6",
     )
 
     # and
-    get_container_impl = generate_get_metadata_container(registered_containers=(unsynced_container, synced_container))
+    get_container_impl = generate_get_metadata_container(
+        registered_containers=(unsynced_container, synced_container)
+    )
 
     # and
     mocker.patch.object(backend, "get_metadata_container", get_container_impl)
@@ -68,7 +83,11 @@ def test_list_v2_containers(tmp_path, mocker, capsys, backend, container_type):
 def test_list_offline_v2_runs(tmp_path, mocker, capsys, backend):
     # given
     offline_run = prepare_v2_container(
-        container_type=ContainerType.RUN, path=tmp_path, last_ack_version=None, pid=2501, key="a1b2c3"
+        container_type=ContainerType.RUN,
+        path=tmp_path,
+        last_ack_version=None,
+        pid=2501,
+        key="a1b2c3",
     )
 
     # and
@@ -80,20 +99,34 @@ def test_list_offline_v2_runs(tmp_path, mocker, capsys, backend):
     # then
     captured = capsys.readouterr()
     assert captured.err == ""
-    assert f"Unsynchronized offline objects:\n- offline/{offline_run.id}" in captured.out
+    assert (
+        f"Unsynchronized offline objects:\n- offline/{offline_run.id}" in captured.out
+    )
 
 
 def test_list_trashed_v2_containers(tmp_path, mocker, capsys, backend):
     # given
     unsynced_container = prepare_v2_container(
-        container_type=ContainerType.RUN, path=tmp_path, last_ack_version=1, trashed=True, pid=2501, key="a1b2c3"
+        container_type=ContainerType.RUN,
+        path=tmp_path,
+        last_ack_version=1,
+        trashed=True,
+        pid=2501,
+        key="a1b2c3",
     )
     synced_container = prepare_v2_container(
-        container_type=ContainerType.RUN, path=tmp_path, last_ack_version=3, trashed=True, pid=2502, key="d4e5f6"
+        container_type=ContainerType.RUN,
+        path=tmp_path,
+        last_ack_version=3,
+        trashed=True,
+        pid=2502,
+        key="d4e5f6",
     )
 
     # and
-    get_container_impl = generate_get_metadata_container(registered_containers=(unsynced_container, synced_container))
+    get_container_impl = generate_get_metadata_container(
+        registered_containers=(unsynced_container, synced_container)
+    )
 
     # and
     mocker.patch.object(backend, "get_metadata_container", get_container_impl)
@@ -115,11 +148,17 @@ def test_list_trashed_v2_containers(tmp_path, mocker, capsys, backend):
 @pytest.mark.parametrize("container_type", AVAILABLE_CONTAINERS)
 def test_list_v1_containers(tmp_path, mocker, capsys, backend, container_type):
     # given
-    unsynced_container = prepare_v1_container(container_type=container_type, path=tmp_path, last_ack_version=1)
-    synced_container = prepare_v1_container(container_type=container_type, path=tmp_path, last_ack_version=3)
+    unsynced_container = prepare_v1_container(
+        container_type=container_type, path=tmp_path, last_ack_version=1
+    )
+    synced_container = prepare_v1_container(
+        container_type=container_type, path=tmp_path, last_ack_version=3
+    )
 
     # and
-    get_container_impl = generate_get_metadata_container(registered_containers=(unsynced_container, synced_container))
+    get_container_impl = generate_get_metadata_container(
+        registered_containers=(unsynced_container, synced_container)
+    )
 
     # and
     mocker.patch.object(backend, "get_metadata_container", get_container_impl)
@@ -155,20 +194,31 @@ def test_list_offline_v1_runs(tmp_path, mocker, capsys, backend):
     # then
     captured = capsys.readouterr()
     assert captured.err == ""
-    assert "Unsynchronized offline objects:\n- offline/{}".format(offline_run.id) in captured.out
+    assert (
+        "Unsynchronized offline objects:\n- offline/{}".format(offline_run.id)
+        in captured.out
+    )
 
 
 def test_list_trashed_v1_containers(tmp_path, mocker, capsys, backend):
     # given
     unsynced_container = prepare_v1_container(
-        container_type=ContainerType.RUN, path=tmp_path, last_ack_version=1, trashed=True
+        container_type=ContainerType.RUN,
+        path=tmp_path,
+        last_ack_version=1,
+        trashed=True,
     )
     synced_container = prepare_v1_container(
-        container_type=ContainerType.RUN, path=tmp_path, last_ack_version=3, trashed=True
+        container_type=ContainerType.RUN,
+        path=tmp_path,
+        last_ack_version=3,
+        trashed=True,
     )
 
     # and
-    get_container_impl = generate_get_metadata_container(registered_containers=(unsynced_container, synced_container))
+    get_container_impl = generate_get_metadata_container(
+        registered_containers=(unsynced_container, synced_container)
+    )
 
     # and
     mocker.patch.object(backend, "get_metadata_container", get_container_impl)

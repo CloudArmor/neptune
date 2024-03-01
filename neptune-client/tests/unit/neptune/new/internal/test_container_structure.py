@@ -67,7 +67,9 @@ class TestRunStructure(unittest.TestCase):
         exp.pop(["some", "path", "val2"])
         self.assertEqual(exp.get(["some", "path", "val1"]), 3)
         self.assertEqual(exp.get(["some", "path", "val2"]), None)
-        self.assertTrue("some" in exp.get_structure() and "path" in exp.get_structure()["some"])
+        self.assertTrue(
+            "some" in exp.get_structure() and "path" in exp.get_structure()["some"]
+        )
 
     def test_pop_whole_ns(self):
         exp = ContainerStructure[int, dict]()
@@ -128,7 +130,9 @@ class TestIterateSubpaths(unittest.TestCase):
             "attributes/node/three",
         ]
 
-        self.assertListEqual(list(self.structure.iterate_subpaths(prefix)), expected_subpaths)
+        self.assertListEqual(
+            list(self.structure.iterate_subpaths(prefix)), expected_subpaths
+        )
 
     def test_iterate_prefix(self):
         prefix = ["sys"]
@@ -143,7 +147,9 @@ class TestIterateSubpaths(unittest.TestCase):
             "sys/failed",
         ]
 
-        self.assertListEqual(list(self.structure.iterate_subpaths(prefix)), expected_subpaths)
+        self.assertListEqual(
+            list(self.structure.iterate_subpaths(prefix)), expected_subpaths
+        )
 
     def test_iterate_long_prefix(self):
         prefix = ["attributes", "node"]
@@ -153,10 +159,14 @@ class TestIterateSubpaths(unittest.TestCase):
             "attributes/node/three",
         ]
 
-        self.assertListEqual(list(self.structure.iterate_subpaths(prefix)), expected_subpaths)
+        self.assertListEqual(
+            list(self.structure.iterate_subpaths(prefix)), expected_subpaths
+        )
 
     def test_iterate_nonexistent_prefix(self):
         prefix = ["argh"]
         expected_subpaths = []
 
-        self.assertListEqual(list(self.structure.iterate_subpaths(prefix)), expected_subpaths)
+        self.assertListEqual(
+            list(self.structure.iterate_subpaths(prefix)), expected_subpaths
+        )

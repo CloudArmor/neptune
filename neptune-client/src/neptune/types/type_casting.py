@@ -17,12 +17,7 @@ __all__ = ["cast_value", "cast_value_for_extend"]
 
 import argparse
 from datetime import datetime
-from typing import (
-    Any,
-    Collection,
-    Optional,
-    Union,
-)
+from typing import Any, Collection, Optional, Union
 
 from neptune.internal.types.stringify_value import StringifyValue
 from neptune.internal.utils import (
@@ -34,20 +29,12 @@ from neptune.internal.utils import (
     is_string,
     is_stringify_value,
 )
-from neptune.types import (
-    Boolean,
-    File,
-    Integer,
-)
+from neptune.types import Boolean, File, Integer
 from neptune.types.atoms.datetime import Datetime
 from neptune.types.atoms.float import Float
 from neptune.types.atoms.string import String
 from neptune.types.namespace import Namespace
-from neptune.types.series import (
-    FileSeries,
-    FloatSeries,
-    StringSeries,
-)
+from neptune.types.series import FileSeries, FloatSeries, StringSeries
 from neptune.types.series.series import Series
 from neptune.types.value import Value
 from neptune.types.value_copy import ValueCopy

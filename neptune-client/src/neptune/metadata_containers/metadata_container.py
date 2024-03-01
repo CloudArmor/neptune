@@ -24,20 +24,9 @@ import threading
 import time
 import traceback
 from contextlib import AbstractContextManager
-from functools import (
-    partial,
-    wraps,
-)
+from functools import partial, wraps
 from queue import Queue
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Union
 
 from neptune.attributes import create_attribute_from_type
 from neptune.attributes.attribute import Attribute
@@ -55,11 +44,7 @@ from neptune.exceptions import (
     NeptunePossibleLegacyUsageException,
 )
 from neptune.handler import Handler
-from neptune.internal.backends.api_model import (
-    ApiExperiment,
-    AttributeType,
-    Project,
-)
+from neptune.internal.backends.api_model import ApiExperiment, AttributeType, Project
 from neptune.internal.backends.factory import get_backend
 from neptune.internal.backends.neptune_backend import NeptuneBackend
 from neptune.internal.backends.nql import NQLQuery
@@ -68,12 +53,7 @@ from neptune.internal.backgroud_job_list import BackgroundJobList
 from neptune.internal.background_job import BackgroundJob
 from neptune.internal.container_structure import ContainerStructure
 from neptune.internal.container_type import ContainerType
-from neptune.internal.id_formats import (
-    QualifiedName,
-    SysId,
-    UniqueId,
-    conform_optional,
-)
+from neptune.internal.id_formats import QualifiedName, SysId, UniqueId, conform_optional
 from neptune.internal.init.parameters import (
     ASYNC_LAG_THRESHOLD,
     ASYNC_NO_PROGRESS_THRESHOLD,
@@ -81,22 +61,20 @@ from neptune.internal.init.parameters import (
 )
 from neptune.internal.operation import DeleteAttribute
 from neptune.internal.operation_processors.factory import get_operation_processor
-from neptune.internal.operation_processors.lazy_operation_processor_wrapper import LazyOperationProcessorWrapper
+from neptune.internal.operation_processors.lazy_operation_processor_wrapper import (
+    LazyOperationProcessorWrapper,
+)
 from neptune.internal.operation_processors.operation_processor import OperationProcessor
 from neptune.internal.signals_processing.background_job import CallbacksMonitor
 from neptune.internal.state import ContainerState
-from neptune.internal.utils import (
-    verify_optional_callable,
-    verify_type,
-)
+from neptune.internal.utils import verify_optional_callable, verify_type
 from neptune.internal.utils.logger import get_logger
 from neptune.internal.utils.paths import parse_path
-from neptune.internal.utils.uncaught_exception_handler import instance as uncaught_exception_handler
-from neptune.internal.value_to_attribute_visitor import ValueToAttributeVisitor
-from neptune.metadata_containers.abstract import (
-    NeptuneObject,
-    NeptuneObjectCallback,
+from neptune.internal.utils.uncaught_exception_handler import (
+    instance as uncaught_exception_handler,
 )
+from neptune.internal.value_to_attribute_visitor import ValueToAttributeVisitor
+from neptune.metadata_containers.abstract import NeptuneObject, NeptuneObjectCallback
 from neptune.metadata_containers.utils import parse_dates
 from neptune.table import Table
 from neptune.types.mode import Mode
@@ -142,8 +120,12 @@ class MetadataContainer(AbstractContextManager, NeptuneObject):
         verify_type("proxies", proxies, (dict, type(None)))
         verify_type("async_lag_threshold", async_lag_threshold, (int, float))
         verify_optional_callable("async_lag_callback", async_lag_callback)
-        verify_type("async_no_progress_threshold", async_no_progress_threshold, (int, float))
-        verify_optional_callable("async_no_progress_callback", async_no_progress_callback)
+        verify_type(
+            "async_no_progress_threshold", async_no_progress_threshold, (int, float)
+        )
+        verify_optional_callable(
+            "async_no_progress_callback", async_no_progress_callback
+        )
 
         self._mode: Mode = mode
         self._flush_period = flush_period
@@ -154,9 +136,13 @@ class MetadataContainer(AbstractContextManager, NeptuneObject):
         self._signals_queue: "Queue[Signal]" = Queue()
         self._logger: logging.Logger = get_logger()
 
-        self._backend: NeptuneBackend = get_backend(mode=mode, api_token=api_token, proxies=proxies)
+        self._backend: NeptuneBackend = get_backend(
+            mode=mode, api_token=api_token, proxies=proxies
+        )
 
-        self._project_qualified_name: Optional[str] = conform_optional(project, QualifiedName)
+        self._project_qualified_name: Optional[str] = conform_optional(
+            project, QualifiedName
+        )
         self._project_api_object: Project = project_name_lookup(
             backend=self._backend, name=self._project_qualified_name
         )
@@ -189,8 +175,12 @@ class MetadataContainer(AbstractContextManager, NeptuneObject):
             queue=self._signals_queue,
         )
 
-        self._bg_job: BackgroundJobList = self._prepare_background_jobs_if_non_read_only()
-        self._structure: ContainerStructure[Attribute, NamespaceAttr] = ContainerStructure(NamespaceBuilder(self))
+        self._bg_job: BackgroundJobList = (
+            self._prepare_background_jobs_if_non_read_only()
+        )
+        self._structure: ContainerStructure[
+            Attribute, NamespaceAttr
+        ] = ContainerStructure(NamespaceBuilder(self))
 
         if self._mode != Mode.OFFLINE:
             self.sync(wait=False)
@@ -219,7 +209,9 @@ class MetadataContainer(AbstractContextManager, NeptuneObject):
     """
 
     @staticmethod
-    def _get_callback(provided: Optional[NeptuneObjectCallback], env_name: str) -> Optional[NeptuneObjectCallback]:
+    def _get_callback(
+        provided: Optional[NeptuneObjectCallback], env_name: str
+    ) -> Optional[NeptuneObjectCallback]:
         if provided is not None:
             return provided
         if os.getenv(env_name, "") == "TRUE":
@@ -320,15 +312,21 @@ class MetadataContainer(AbstractContextManager, NeptuneObject):
     def __getattr__(self, item):
         if item in self.LEGACY_METHODS:
             raise NeptunePossibleLegacyUsageException()
-        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute '{item}'"
+        )
 
     @abc.abstractmethod
     def _raise_if_stopped(self):
         raise NotImplementedError
 
-    def _get_subpath_suggestions(self, path_prefix: str = None, limit: int = 1000) -> List[str]:
+    def _get_subpath_suggestions(
+        self, path_prefix: str = None, limit: int = 1000
+    ) -> List[str]:
         parsed_path = parse_path(path_prefix or "")
-        return list(itertools.islice(self._structure.iterate_subpaths(parsed_path), limit))
+        return list(
+            itertools.islice(self._structure.iterate_subpaths(parsed_path), limit)
+        )
 
     def _ipython_key_completions_(self):
         return self._get_subpath_suggestions()
@@ -463,7 +461,9 @@ class MetadataContainer(AbstractContextManager, NeptuneObject):
 
         if self._mode not in {Mode.OFFLINE, Mode.DEBUG}:
             metadata_url = self.get_url().rstrip("/") + "/metadata"
-            self._logger.info(f"Explore the metadata in the Neptune app: {metadata_url}")
+            self._logger.info(
+                f"Explore the metadata in the Neptune app: {metadata_url}"
+            )
         self._backend.close()
 
         with self._forking_cond:
@@ -510,7 +510,11 @@ class MetadataContainer(AbstractContextManager, NeptuneObject):
         for key in sorted(struct.keys()):
             print("    " * indent, end="")
             if isinstance(struct[key], dict):
-                print("{blue}'{key}'{end}:".format(blue=UNIX_STYLES["blue"], key=key, end=UNIX_STYLES["end"]))
+                print(
+                    "{blue}'{key}'{end}:".format(
+                        blue=UNIX_STYLES["blue"], key=key, end=UNIX_STYLES["end"]
+                    )
+                )
                 self._print_structure_impl(struct[key], indent=indent + 1)
             else:
                 print(
@@ -532,7 +536,9 @@ class MetadataContainer(AbstractContextManager, NeptuneObject):
         with self._lock:
             old_attr = self.get_attribute(path)
             if old_attr is not None:
-                raise MetadataInconsistency("Attribute or namespace {} is already defined".format(path))
+                raise MetadataInconsistency(
+                    "Attribute or namespace {} is already defined".format(path)
+                )
 
             neptune_value = cast_value(value)
             if neptune_value is None:

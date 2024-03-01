@@ -13,18 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from random import (
-    randint,
-    uniform,
-)
+from random import randint, uniform
 
 from mock import MagicMock
-
-from tests.unit.neptune.legacy.random_utils import (
-    a_string,
-    a_timestamp,
-    a_uuid_string,
-)
+from tests.unit.neptune.legacy.random_utils import a_string, a_timestamp, a_uuid_string
 
 
 def a_project():

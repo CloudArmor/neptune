@@ -26,13 +26,17 @@ from neptune.metadata_containers import MetadataContainer
 
 
 class StdStreamCaptureLogger:
-    def __init__(self, container: MetadataContainer, attribute_name: str, stream: TextIO):
+    def __init__(
+        self, container: MetadataContainer, attribute_name: str, stream: TextIO
+    ):
         self._logger = NeptuneLogger(container, attribute_name)
         self.stream = stream
         self._thread_local = threading.local()
         self.enabled = True
         self._log_data_queue = Queue()
-        self._logging_thread = self.ReportingThread(self, "NeptuneThread_" + attribute_name)
+        self._logging_thread = self.ReportingThread(
+            self, "NeptuneThread_" + attribute_name
+        )
         self._logging_thread.start()
 
     def pause(self):
@@ -61,7 +65,9 @@ class StdStreamCaptureLogger:
             super().__init__(sleep_time=0, name=name)
             self._logger = logger
 
-        @Daemon.ConnectionRetryWrapper(kill_message="Killing Neptune STD capturing thread.")
+        @Daemon.ConnectionRetryWrapper(
+            kill_message="Killing Neptune STD capturing thread."
+        )
         def work(self) -> None:
             while True:
                 data = self._logger._log_data_queue.get()

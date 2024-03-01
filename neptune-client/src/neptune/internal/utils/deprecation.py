@@ -26,7 +26,11 @@ def deprecated(*, alternative: Optional[str] = None):
     def deco(func):
         @wraps(func)
         def inner(*args, **kwargs):
-            additional_info = f", use `{alternative}` instead" if alternative else " and will be removed"
+            additional_info = (
+                f", use `{alternative}` instead"
+                if alternative
+                else " and will be removed"
+            )
 
             warn_once(
                 message=f"`{func.__name__}` is deprecated{additional_info}."
@@ -46,7 +50,11 @@ def deprecated_parameter(*, deprecated_kwarg_name, required_kwarg_name):
         def inner(*args, **kwargs):
             if deprecated_kwarg_name in kwargs:
                 if required_kwarg_name in kwargs:
-                    raise NeptuneParametersCollision(required_kwarg_name, deprecated_kwarg_name, method_name=f.__name__)
+                    raise NeptuneParametersCollision(
+                        required_kwarg_name,
+                        deprecated_kwarg_name,
+                        method_name=f.__name__,
+                    )
 
                 warn_once(
                     message=f"Parameter `{deprecated_kwarg_name}` is deprecated, use `{required_kwarg_name}` instead."

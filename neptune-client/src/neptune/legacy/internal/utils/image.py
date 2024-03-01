@@ -20,10 +20,7 @@ import numpy
 import six
 from PIL import Image
 
-from neptune.legacy.exceptions import (
-    FileNotFound,
-    InvalidChannelValue,
-)
+from neptune.legacy.exceptions import FileNotFound, InvalidChannelValue
 
 
 def get_image_content(image):

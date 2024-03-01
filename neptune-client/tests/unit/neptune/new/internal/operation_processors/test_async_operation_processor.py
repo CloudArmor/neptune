@@ -16,21 +16,22 @@
 from pathlib import Path
 from uuid import uuid4
 
-from mock import (
-    MagicMock,
-    patch,
-)
+from mock import MagicMock, patch
 
 from neptune.constants import NEPTUNE_DATA_DIRECTORY
 from neptune.internal.container_type import ContainerType
 from neptune.internal.id_formats import UniqueId
-from neptune.internal.operation_processors.async_operation_processor import AsyncOperationProcessor
+from neptune.internal.operation_processors.async_operation_processor import (
+    AsyncOperationProcessor,
+)
 
 
 @patch("neptune.internal.operation_processors.utils.random.choice")
 @patch("neptune.internal.operation_processors.async_operation_processor.Path.mkdir")
 @patch("neptune.internal.operation_processors.async_operation_processor.DiskQueue")
-@patch("neptune.internal.operation_processors.async_operation_processor.OperationStorage")
+@patch(
+    "neptune.internal.operation_processors.async_operation_processor.OperationStorage"
+)
 @patch("neptune.internal.operation_processors.async_operation_processor.MetadataFile")
 @patch("neptune.internal.operation_processors.utils.os.getpid", return_value=42)
 def test_setup(_, __, ___, ____, mkdir_mock, random_choice_mock):
@@ -56,12 +57,16 @@ def test_setup(_, __, ___, ____, mkdir_mock, random_choice_mock):
     # and
     assert (
         processor.data_path
-        == Path(NEPTUNE_DATA_DIRECTORY) / "async" / f"{container_type.value}__{container_id}__42__abcdefgh"
+        == Path(NEPTUNE_DATA_DIRECTORY)
+        / "async"
+        / f"{container_type.value}__{container_id}__42__abcdefgh"
     )
 
 
 @patch("neptune.internal.operation_processors.async_operation_processor.DiskQueue")
-@patch("neptune.internal.operation_processors.async_operation_processor.OperationStorage")
+@patch(
+    "neptune.internal.operation_processors.async_operation_processor.OperationStorage"
+)
 @patch("neptune.internal.operation_processors.async_operation_processor.MetadataFile")
 def test_flush(metadata_file_mock, operation_storage_mock, disk_queue_mock):
     # given
@@ -92,7 +97,9 @@ def test_flush(metadata_file_mock, operation_storage_mock, disk_queue_mock):
 
 
 @patch("neptune.internal.operation_processors.async_operation_processor.DiskQueue")
-@patch("neptune.internal.operation_processors.async_operation_processor.OperationStorage")
+@patch(
+    "neptune.internal.operation_processors.async_operation_processor.OperationStorage"
+)
 @patch("neptune.internal.operation_processors.async_operation_processor.MetadataFile")
 def test_close(metadata_file_mock, operation_storage_mock, disk_queue_mock):
     # given
@@ -123,7 +130,9 @@ def test_close(metadata_file_mock, operation_storage_mock, disk_queue_mock):
 
 
 @patch("neptune.internal.operation_processors.async_operation_processor.DiskQueue")
-@patch("neptune.internal.operation_processors.async_operation_processor.OperationStorage")
+@patch(
+    "neptune.internal.operation_processors.async_operation_processor.OperationStorage"
+)
 @patch("neptune.internal.operation_processors.async_operation_processor.MetadataFile")
 def test_stop_if_empty(metadata_file_mock, operation_storage_mock, disk_queue_mock):
     # given
@@ -170,7 +179,9 @@ def test_stop_if_empty(metadata_file_mock, operation_storage_mock, disk_queue_mo
 
 
 @patch("neptune.internal.operation_processors.async_operation_processor.DiskQueue")
-@patch("neptune.internal.operation_processors.async_operation_processor.OperationStorage")
+@patch(
+    "neptune.internal.operation_processors.async_operation_processor.OperationStorage"
+)
 @patch("neptune.internal.operation_processors.async_operation_processor.MetadataFile")
 def test_stop_if_not_empty(metadata_file_mock, operation_storage_mock, disk_queue_mock):
     # given
@@ -217,7 +228,9 @@ def test_stop_if_not_empty(metadata_file_mock, operation_storage_mock, disk_queu
 
 
 @patch("neptune.internal.operation_processors.async_operation_processor.DiskQueue")
-@patch("neptune.internal.operation_processors.async_operation_processor.OperationStorage")
+@patch(
+    "neptune.internal.operation_processors.async_operation_processor.OperationStorage"
+)
 @patch("neptune.internal.operation_processors.async_operation_processor.MetadataFile")
 def test_metadata(metadata_file_mock, _, __):
     # given

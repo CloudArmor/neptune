@@ -15,23 +15,13 @@
 #
 import os
 import tempfile
-from pathlib import (
-    Path,
-    PurePosixPath,
-)
+from pathlib import Path, PurePosixPath
 
 import pytest
+from tests.e2e.base import AVAILABLE_CONTAINERS, BaseE2ETest, fake
+from tests.e2e.utils import tmp_context, with_check_if_file_appears
 
 from neptune.metadata_containers import MetadataContainer
-from tests.e2e.base import (
-    AVAILABLE_CONTAINERS,
-    BaseE2ETest,
-    fake,
-)
-from tests.e2e.utils import (
-    tmp_context,
-    with_check_if_file_appears,
-)
 
 
 class TestArtifacts(BaseE2ETest):
@@ -50,7 +40,9 @@ class TestArtifacts(BaseE2ETest):
             container.sync()
 
         assert container[first].fetch_hash() == container[second].fetch_hash()
-        assert container[first].fetch_files_list() == container[second].fetch_files_list()
+        assert (
+            container[first].fetch_files_list() == container[second].fetch_files_list()
+        )
 
     @pytest.mark.parametrize("container", AVAILABLE_CONTAINERS, indirect=True)
     def test_assignment(self, container: MetadataContainer):
@@ -67,12 +59,16 @@ class TestArtifacts(BaseE2ETest):
             container.sync()
 
         assert container[first].fetch_hash() == container[second].fetch_hash()
-        assert container[first].fetch_files_list() == container[second].fetch_files_list()
+        assert (
+            container[first].fetch_files_list() == container[second].fetch_files_list()
+        )
 
     @pytest.mark.parametrize("container", AVAILABLE_CONTAINERS, indirect=True)
     def test_local_download(self, container: MetadataContainer):
         first, second = self.gen_key(), self.gen_key()
-        filename, filepath = fake.unique.file_name(), fake.unique.file_path(depth=3, absolute=False)
+        filename, filepath = fake.unique.file_name(), fake.unique.file_path(
+            depth=3, absolute=False
+        )
 
         with tmp_context() as tmp:
             with open(filename, "w", encoding="utf-8") as handler:
@@ -112,7 +108,9 @@ class TestArtifacts(BaseE2ETest):
             with open(filename, "w", encoding="utf-8") as handler:
                 handler.write(fake.paragraph(nb_sentences=5))
 
-            s3_client.meta.client.upload_file(filename, bucket_name, f"{prefix}/{filename}")
+            s3_client.meta.client.upload_file(
+                filename, bucket_name, f"{prefix}/{filename}"
+            )
 
         container[first].track_files(f"s3://{bucket_name}/{prefix}/{filename}")
         container[second].track_files(f"s3://{bucket_name}/{prefix}")
@@ -120,14 +118,18 @@ class TestArtifacts(BaseE2ETest):
         container.sync()
 
         assert container[first].fetch_hash() == container[second].fetch_hash()
-        assert container[first].fetch_files_list() == container[second].fetch_files_list()
+        assert (
+            container[first].fetch_files_list() == container[second].fetch_files_list()
+        )
 
     @pytest.mark.s3
     @pytest.mark.parametrize("container", AVAILABLE_CONTAINERS, indirect=True)
     def test_s3_download(self, container: MetadataContainer, bucket, environment):
         first = self.gen_key()
         prefix = f"{environment.project}/{self.gen_key()}/{type(container).__name__}"
-        filename, filepath = fake.unique.file_name(), fake.unique.file_path(depth=3, absolute=False)
+        filename, filepath = fake.unique.file_name(), fake.unique.file_path(
+            depth=3, absolute=False
+        )
 
         bucket_name, s3_client = bucket
 
@@ -139,8 +141,12 @@ class TestArtifacts(BaseE2ETest):
             with open(filepath, "w", encoding="utf-8") as handler:
                 handler.write(fake.paragraph(nb_sentences=5))
 
-            s3_client.meta.client.upload_file(filename, bucket_name, f"{prefix}/{filename}")
-            s3_client.meta.client.upload_file(filepath, bucket_name, f"{prefix}/{filepath}")
+            s3_client.meta.client.upload_file(
+                filename, bucket_name, f"{prefix}/{filename}"
+            )
+            s3_client.meta.client.upload_file(
+                filepath, bucket_name, f"{prefix}/{filepath}"
+            )
 
         container[first].track_files(f"s3://{bucket_name}/{prefix}")
 
@@ -174,8 +180,12 @@ class TestArtifacts(BaseE2ETest):
             with open(filepath, "w", encoding="utf-8") as handler:
                 handler.write(fake.paragraph(nb_sentences=5))
 
-            s3_client.meta.client.upload_file(filename, bucket_name, f"{prefix}/{filename}")
-            s3_client.meta.client.upload_file(filepath, bucket_name, f"{prefix}/{filepath}")
+            s3_client.meta.client.upload_file(
+                filename, bucket_name, f"{prefix}/{filename}"
+            )
+            s3_client.meta.client.upload_file(
+                filepath, bucket_name, f"{prefix}/{filepath}"
+            )
 
         # Track all files - "a" and "b" to first artifact
         container[first].track_files(f"s3://{bucket_name}/{prefix}/")
@@ -193,7 +203,9 @@ class TestArtifacts(BaseE2ETest):
         container.sync()
 
         assert container[first].fetch_hash() == container[second].fetch_hash()
-        assert container[first].fetch_files_list() == container[second].fetch_files_list()
+        assert (
+            container[first].fetch_files_list() == container[second].fetch_files_list()
+        )
 
     @pytest.mark.parametrize("container", AVAILABLE_CONTAINERS, indirect=True)
     def test_local_existing(self, container: MetadataContainer):
@@ -217,8 +229,12 @@ class TestArtifacts(BaseE2ETest):
 
             # Add "b" file to existing second artifact
             # so it should be now identical as first
-            container[second].track_files(filepath, destination=str(Path(filepath).parent))
+            container[second].track_files(
+                filepath, destination=str(Path(filepath).parent)
+            )
             container.sync()
 
         assert container[first].fetch_hash() == container[second].fetch_hash()
-        assert container[first].fetch_files_list() == container[second].fetch_files_list()
+        assert (
+            container[first].fetch_files_list() == container[second].fetch_files_list()
+        )

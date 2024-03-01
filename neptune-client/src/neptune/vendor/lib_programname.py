@@ -138,7 +138,9 @@ def get_valid_executable_path_or_empty_path(arg_string: str) -> pathlib.Path:
     path = pathlib.Path(arg_string)
     try:
         if path.is_file():
-            path = path.resolve()  # .resolve does not work on a non existing file in python 3.5
+            path = (
+                path.resolve()
+            )  # .resolve does not work on a non existing file in python 3.5
             return path
         else:
             return empty_path

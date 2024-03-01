@@ -16,10 +16,7 @@
 __all__ = ["Value"]
 
 import abc
-from typing import (
-    TYPE_CHECKING,
-    TypeVar,
-)
+from typing import TYPE_CHECKING, TypeVar
 
 if TYPE_CHECKING:
     from neptune.types.value_visitor import ValueVisitor

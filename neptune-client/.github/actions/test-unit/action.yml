@@ -27,7 +27,6 @@ runs:
 
     - name: Test
       run: |
-        cd neptune-client
         pytest --cov=neptune --cov-report xml \
         -v -n 2 ./tests/unit/ \
         --timeout=120 --timeout_method=thread \

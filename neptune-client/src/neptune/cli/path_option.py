@@ -33,7 +33,11 @@ def get_neptune_path(ctx: Any, param: Any, path: str) -> Path:
     elif local_path.name == NEPTUNE_DATA_DIRECTORY and local_path.is_dir():
         return local_path
     else:
-        raise click.BadParameter("Path {} does not contain a '{}' folder.".format(local_path, NEPTUNE_DATA_DIRECTORY))
+        raise click.BadParameter(
+            "Path {} does not contain a '{}' folder.".format(
+                local_path, NEPTUNE_DATA_DIRECTORY
+            )
+        )
 
 
 path_option = click.option(

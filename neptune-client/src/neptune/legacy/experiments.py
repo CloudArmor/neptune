@@ -22,15 +22,8 @@ import six
 from pandas.errors import EmptyDataError
 
 from neptune.common.experiments import LegacyExperiment
-from neptune.common.utils import (
-    align_channels_on_x,
-    is_float,
-    is_nan_or_inf,
-)
-from neptune.legacy.api_exceptions import (
-    ChannelDoesNotExist,
-    ExperimentAlreadyFinished,
-)
+from neptune.common.utils import align_channels_on_x, is_float, is_nan_or_inf
+from neptune.legacy.api_exceptions import ChannelDoesNotExist, ExperimentAlreadyFinished
 from neptune.legacy.exceptions import (
     InvalidChannelValue,
     NeptuneIncorrectImportException,
@@ -239,7 +232,9 @@ class Experiment(LegacyExperiment):
             tags_list = tag
         else:
             tags_list = [tag] + list(tags)
-        self._backend.update_tags(experiment=self, tags_to_add=tags_list, tags_to_delete=[])
+        self._backend.update_tags(
+            experiment=self, tags_to_add=tags_list, tags_to_delete=[]
+        )
 
     def append_tags(self, tag, *tags):
         """Append tag(s) to the current experiment.
@@ -286,9 +281,16 @@ class Experiment(LegacyExperiment):
         """
 
         def get_channel_value(ch):
-            return float(ch.y) if ch.y is not None and ch.channelType == "numeric" else ch.y
+            return (
+                float(ch.y)
+                if ch.y is not None and ch.channelType == "numeric"
+                else ch.y
+            )
 
-        return {key: get_channel_value(ch) for key, ch in self._backend.get_channels(self).items()}
+        return {
+            key: get_channel_value(ch)
+            for key, ch in self._backend.get_channels(self).items()
+        }
 
     def _get_system_channels(self):
         return self._backend.get_system_channels(self)
@@ -357,7 +359,9 @@ class Experiment(LegacyExperiment):
         x, y = self._get_valid_x_y(x, y)
 
         if not is_float(y):
-            raise InvalidChannelValue(expected_type="float", actual_type=type(y).__name__)
+            raise InvalidChannelValue(
+                expected_type="float", actual_type=type(y).__name__
+            )
 
         if is_nan_or_inf(y):
             _logger.warning(
@@ -375,7 +379,9 @@ class Experiment(LegacyExperiment):
             )
         else:
             value = ChannelValue(x, dict(numeric_value=y), timestamp)
-            self._channels_values_sender.send(log_name, ChannelType.NUMERIC.value, value)
+            self._channels_values_sender.send(
+                log_name, ChannelType.NUMERIC.value, value
+            )
 
     def send_text(self, channel_name, x, y=None, timestamp=None):
         """Log text data in Neptune.
@@ -442,14 +448,18 @@ class Experiment(LegacyExperiment):
             value = ChannelValue(x, dict(text_value=y), timestamp)
             self._channels_values_sender.send(log_name, ChannelType.TEXT.value, value)
 
-    def send_image(self, channel_name, x, y=None, name=None, description=None, timestamp=None):
+    def send_image(
+        self, channel_name, x, y=None, name=None, description=None, timestamp=None
+    ):
         """Log image data in Neptune.
 
         Alias for :meth:`~neptune.experiments.Experiment.log_image`
         """
         return self.log_image(channel_name, x, y, name, description, timestamp)
 
-    def log_image(self, log_name, x, y=None, image_name=None, description=None, timestamp=None):
+    def log_image(
+        self, log_name, x, y=None, image_name=None, description=None, timestamp=None
+    ):
         """Log image data in Neptune
 
         | If a log with provided ``log_name`` does not exist, it is created automatically.
@@ -790,7 +800,10 @@ class Experiment(LegacyExperiment):
                 exp_params = experiment.get_parameters()
         """
         experiment = self._backend.get_experiment(self.internal_id)
-        return dict((p.name, self._convert_parameter_value(p.value, p.parameterType)) for p in experiment.parameters)
+        return dict(
+            (p.name, self._convert_parameter_value(p.value, p.parameterType))
+            for p in experiment.parameters
+        )
 
     def get_properties(self):
         """Retrieve User-defined properties for this experiment.
@@ -929,7 +942,9 @@ class Experiment(LegacyExperiment):
             channel_id = channels_by_name[channel_name].id
             try:
                 channels_data[channel_name] = pd.read_csv(
-                    self._backend.get_channel_points_csv(self, channel_id, channel_name),
+                    self._backend.get_channel_points_csv(
+                        self, channel_id, channel_name
+                    ),
                     header=None,
                     names=["x_{}".format(channel_name), "y_{}".format(channel_name)],
                     dtype=float,
@@ -940,7 +955,9 @@ class Experiment(LegacyExperiment):
                     dtype=float,
                 )
 
-        return align_channels_on_x(pd.concat(channels_data.values(), axis=1, sort=False))
+        return align_channels_on_x(
+            pd.concat(channels_data.values(), axis=1, sort=False)
+        )
 
     def _start(
         self,
@@ -1013,7 +1030,11 @@ class Experiment(LegacyExperiment):
         return str(self)
 
     def __eq__(self, o):
-        return self._id == o._id and self._internal_id == o._internal_id and self._project == o._project
+        return (
+            self._id == o._id
+            and self._internal_id == o._internal_id
+            and self._project == o._project
+        )
 
     def __ne__(self, o):
         return not self.__eq__(o)
@@ -1045,7 +1066,9 @@ class Experiment(LegacyExperiment):
 
         if x is not None and y is not None:
             if not is_float(x):
-                raise InvalidChannelValue(expected_type="float", actual_type=type(x).__name__)
+                raise InvalidChannelValue(
+                    expected_type="float", actual_type=type(x).__name__
+                )
             return x, y
 
     def _send_channels_values(self, channels_with_values):
@@ -1061,10 +1084,14 @@ class Experiment(LegacyExperiment):
             channels_by_name[channel.name] = channel
         return channels_by_name
 
-    def _get_channel(self, channel_name, channel_type, channel_namespace=ChannelNamespace.USER):
+    def _get_channel(
+        self, channel_name, channel_type, channel_namespace=ChannelNamespace.USER
+    ):
         channel = self._find_channel(channel_name, channel_namespace)
         if channel is None:
-            channel = self._create_channel(channel_name, channel_type, channel_namespace)
+            channel = self._create_channel(
+                channel_name, channel_type, channel_namespace
+            )
         return channel
 
     def _find_channel(self, channel_name, channel_namespace):
@@ -1075,7 +1102,9 @@ class Experiment(LegacyExperiment):
         else:
             raise RuntimeError("Unknown channel namespace {}".format(channel_namespace))
 
-    def _create_channel(self, channel_name, channel_type, channel_namespace=ChannelNamespace.USER):
+    def _create_channel(
+        self, channel_name, channel_type, channel_namespace=ChannelNamespace.USER
+    ):
         if channel_namespace == ChannelNamespace.USER:
             return self._backend.create_channel(self, channel_name, channel_type)
         elif channel_namespace == ChannelNamespace.SYSTEM:

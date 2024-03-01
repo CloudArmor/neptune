@@ -15,16 +15,17 @@
 #
 import unittest
 
-from mock import (
-    MagicMock,
-    patch,
-)
+from mock import MagicMock, patch
 
-from neptune.internal.websockets.websocket_signals_background_job import WebsocketSignalsBackgroundJob
+from neptune.internal.websockets.websocket_signals_background_job import (
+    WebsocketSignalsBackgroundJob,
+)
 
 
 class TestClient(unittest.TestCase):
-    @patch("neptune.internal.websockets.websocket_signals_background_job.process_killer")
+    @patch(
+        "neptune.internal.websockets.websocket_signals_background_job.process_killer"
+    )
     def test_listener_stop(self, process_killer):
         # given
         run, ws = MagicMock(), MagicMock()
@@ -40,7 +41,9 @@ class TestClient(unittest.TestCase):
         run.stop.assert_called_once_with(seconds=5)
         process_killer.kill_me.assert_called_once_with()
 
-    @patch("neptune.internal.websockets.websocket_signals_background_job.process_killer")
+    @patch(
+        "neptune.internal.websockets.websocket_signals_background_job.process_killer"
+    )
     def test_listener_abort(self, process_killer):
         # given
         run, ws = MagicMock(), MagicMock()

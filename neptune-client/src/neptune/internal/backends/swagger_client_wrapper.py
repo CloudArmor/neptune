@@ -16,10 +16,7 @@
 __all__ = ["ApiMethodWrapper", "SwaggerClientWrapper"]
 
 from collections.abc import Callable
-from typing import (
-    Dict,
-    Optional,
-)
+from typing import Dict, Optional
 
 from bravado.client import SwaggerClient
 from bravado.exception import HTTPError
@@ -57,7 +54,9 @@ class ApiMethodWrapper:
             "ATTRIBUTES_PER_EXPERIMENT_LIMIT_EXCEEDED": lambda response_body: NeptuneFieldCountLimitExceedException(
                 limit=response_body.get("limit", "<unknown limit>"),
                 container_type=response_body.get("experimentType", "object"),
-                identifier=response_body.get("experimentQualifiedName", "<unknown identifier>"),
+                identifier=response_body.get(
+                    "experimentQualifiedName", "<unknown identifier>"
+                ),
             ),
             "AUTHORIZATION_TOKEN_EXPIRED": lambda _: NeptuneAuthTokenExpired(),
             "EXPERIMENT_NOT_FOUND": lambda _: ObjectNotFound(),

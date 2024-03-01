@@ -57,10 +57,7 @@ from neptune.internal.utils import (
     verify_collection_type,
     verify_type,
 )
-from neptune.internal.utils.paths import (
-    join_paths,
-    parse_path,
-)
+from neptune.internal.utils.paths import join_paths, parse_path
 from neptune.internal.value_to_attribute_visitor import ValueToAttributeVisitor
 from neptune.metadata_containers.abstract import SupportsNamespaces
 from neptune.types.atoms.file import File as FileVal
@@ -119,11 +116,19 @@ class Handler(SupportsNamespaces):
         self[key].assign(value)
 
     def __getattr__(self, item: str):
-        run_level_methods = {"exists", "get_structure", "print_structure", "stop", "sync", "wait"}
+        run_level_methods = {
+            "exists",
+            "get_structure",
+            "print_structure",
+            "stop",
+            "sync",
+            "wait",
+        }
 
         if item in run_level_methods:
             raise AttributeError(
-                "You're invoking an object-level method on a handler for a namespace" "inside the object.",
+                "You're invoking an object-level method on a handler for a namespace"
+                "inside the object.",
                 f"""
                                  For example: You're trying run[{self._path}].{item}()
                                  but you probably want run.{item}().
@@ -256,7 +261,9 @@ class Handler(SupportsNamespaces):
             attr.upload(value, wait=wait)
 
     @check_protected_paths
-    def upload_files(self, value: Union[str, Iterable[str]], *, wait: bool = False) -> None:
+    def upload_files(
+        self, value: Union[str, Iterable[str]], *, wait: bool = False
+    ) -> None:
         if is_collection(value):
             verify_collection_type("value", value, str)
         else:
@@ -318,7 +325,9 @@ class Handler(SupportsNamespaces):
                     if value:
                         first_value = next(iter(value))
                     else:
-                        raise ValueError("Cannot deduce value type: `value` cannot be empty")
+                        raise ValueError(
+                            "Cannot deduce value type: `value` cannot be empty"
+                        )
                 else:
                     first_value = value
 
@@ -442,7 +451,9 @@ class Handler(SupportsNamespaces):
                     warn_about_unsupported_type(type_str=str(type(values)))
                     return None
 
-                attr = ValueToAttributeVisitor(self._container, parse_path(self._path)).visit(neptune_value)
+                attr = ValueToAttributeVisitor(
+                    self._container, parse_path(self._path)
+                ).visit(neptune_value)
                 self._container.set_attribute(self._path, attr)
 
             attr.extend(values, steps=steps, timestamps=timestamps, wait=wait, **kwargs)
@@ -557,7 +568,12 @@ class Handler(SupportsNamespaces):
         """
         return self._pass_call_to_attr(function_name="fetch_last")
 
-    def fetch_values(self, *, include_timestamp: Optional[bool] = True, progress_bar: Optional[ProgressBarType] = None):
+    def fetch_values(
+        self,
+        *,
+        include_timestamp: Optional[bool] = True,
+        progress_bar: Optional[ProgressBarType] = None,
+    ):
         """Fetches all values stored in the series from Neptune.
 
         Available for the following field types:
@@ -587,7 +603,9 @@ class Handler(SupportsNamespaces):
         )
 
     @check_protected_paths
-    def delete_files(self, paths: Union[str, Iterable[str]], *, wait: bool = False) -> None:
+    def delete_files(
+        self, paths: Union[str, Iterable[str]], *, wait: bool = False
+    ) -> None:
         """Deletes the files specified by the paths from the `FileSet` stored on the Neptune servers.
 
         Args:
@@ -602,7 +620,9 @@ class Handler(SupportsNamespaces):
         For more information, see the docs:
             https://docs.neptune.ai/api/field_types#delete_files
         """
-        return self._pass_call_to_attr(function_name="delete_files", paths=paths, wait=wait)
+        return self._pass_call_to_attr(
+            function_name="delete_files", paths=paths, wait=wait
+        )
 
     @check_protected_paths
     def download(
@@ -635,7 +655,9 @@ class Handler(SupportsNamespaces):
         For more information, see the docs:
            https://docs.neptune.ai/api-reference/field-types
         """
-        return self._pass_call_to_attr(function_name="download", destination=destination, progress_bar=progress_bar)
+        return self._pass_call_to_attr(
+            function_name="download", destination=destination, progress_bar=progress_bar
+        )
 
     def download_last(self, destination: str = None) -> None:
         """Downloads the stored files to the working directory or to the specified destination.
@@ -651,7 +673,9 @@ class Handler(SupportsNamespaces):
         For more information, see the docs:
            https://docs.neptune.ai/api/field_types#download_last
         """
-        return self._pass_call_to_attr(function_name="download_last", destination=destination)
+        return self._pass_call_to_attr(
+            function_name="download_last", destination=destination
+        )
 
     def fetch_hash(self) -> str:
         """Fetches the hash of an artifact.
@@ -718,7 +742,9 @@ class Handler(SupportsNamespaces):
         return getattr(self._get_attribute(), function_name)(**kwargs)
 
     @check_protected_paths
-    def track_files(self, path: str, *, destination: str = None, wait: bool = False) -> None:
+    def track_files(
+        self, path: str, *, destination: str = None, wait: bool = False
+    ) -> None:
         """Creates an artifact tracking some files.
 
         You may also want to check the docs:
@@ -743,7 +769,9 @@ class ExtendUtils:
         but replaces all other values with single-element lists,
         so the work can be delegated to `extend` method."""
         if isinstance(value, Namespace) or is_dict_like(value):
-            return {k: ExtendUtils.transform_to_extend_format(v) for k, v in value.items()}
+            return {
+                k: ExtendUtils.transform_to_extend_format(v) for k, v in value.items()
+            }
 
         if isinstance(value, StringifyValue):
             return stringify_unsupported([value.value])
@@ -758,15 +786,23 @@ class ExtendUtils:
 
         if len(collections_lengths) > 1:
             if steps is not None:
-                raise NeptuneUserApiInputException("Number of steps must be equal to the number of values")
+                raise NeptuneUserApiInputException(
+                    "Number of steps must be equal to the number of values"
+                )
             if timestamps is not None:
-                raise NeptuneUserApiInputException("Number of timestamps must be equal to the number of values")
+                raise NeptuneUserApiInputException(
+                    "Number of timestamps must be equal to the number of values"
+                )
         else:
             common_collections_length = next(iter(collections_lengths))
             if steps is not None and common_collections_length != len(steps):
-                raise NeptuneUserApiInputException("Number of steps must be equal to the number of values")
+                raise NeptuneUserApiInputException(
+                    "Number of steps must be equal to the number of values"
+                )
             if timestamps is not None and common_collections_length != len(timestamps):
-                raise NeptuneUserApiInputException("Number of timestamps must be equal to the number of values")
+                raise NeptuneUserApiInputException(
+                    "Number of timestamps must be equal to the number of values"
+                )
 
     @staticmethod
     def generate_leaf_collection_lengths(values) -> Iterator[int]:
@@ -779,4 +815,6 @@ class ExtendUtils:
         elif is_collection(values):
             yield len(values)
         else:
-            raise NeptuneUserApiInputException("Values must be a collection or namespace leafs must be collections")
+            raise NeptuneUserApiInputException(
+                "Values must be a collection or namespace leafs must be collections"
+            )

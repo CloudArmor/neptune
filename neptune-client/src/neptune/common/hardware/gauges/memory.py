@@ -46,7 +46,9 @@ class CGroupMemoryUsageGauge(Gauge):
         return "ram"
 
     def value(self):
-        return self.__cgroup_monitor.get_memory_usage_in_bytes() / float(BYTES_IN_ONE_GB)
+        return self.__cgroup_monitor.get_memory_usage_in_bytes() / float(
+            BYTES_IN_ONE_GB
+        )
 
     def __eq__(self, other):
         return self.__class__ == other.__class__

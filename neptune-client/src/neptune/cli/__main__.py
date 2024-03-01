@@ -19,11 +19,7 @@ import warnings
 import click
 import pkg_resources
 
-from neptune.cli.commands import (
-    clear,
-    status,
-    sync,
-)
+from neptune.cli.commands import clear, status, sync
 
 
 @click.group()
@@ -35,7 +31,10 @@ main.add_command(sync)
 main.add_command(status)
 main.add_command(clear)
 
-plugins = {entry_point.name: entry_point for entry_point in pkg_resources.iter_entry_points("neptune.plugins")}
+plugins = {
+    entry_point.name: entry_point
+    for entry_point in pkg_resources.iter_entry_points("neptune.plugins")
+}
 
 for name, entry_point in plugins.items():
     # loading an entry_point may fail and this

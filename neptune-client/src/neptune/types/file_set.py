@@ -17,18 +17,9 @@ __all__ = [
     "FileSet",
 ]
 
-from typing import (
-    TYPE_CHECKING,
-    Iterable,
-    List,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Iterable, List, TypeVar, Union
 
-from neptune.internal.utils import (
-    verify_collection_type,
-    verify_type,
-)
+from neptune.internal.utils import verify_collection_type, verify_type
 from neptune.types.value import Value
 
 if TYPE_CHECKING:

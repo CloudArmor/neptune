@@ -15,11 +15,7 @@
 #
 __all__ = ["StringSet"]
 
-from typing import (
-    TYPE_CHECKING,
-    Iterable,
-    TypeVar,
-)
+from typing import TYPE_CHECKING, Iterable, TypeVar
 
 from neptune.types.sets.set import Set
 

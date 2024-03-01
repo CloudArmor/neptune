@@ -19,14 +19,8 @@ import warnings
 from io import UnsupportedOperation
 
 import pytest
-from mock import (
-    MagicMock,
-    patch,
-)
-from psutil import (
-    AccessDenied,
-    Error,
-)
+from mock import MagicMock, patch
+from psutil import AccessDenied, Error
 
 from neptune.envs import (
     NEPTUNE_MAX_DISK_USAGE,
@@ -51,7 +45,10 @@ class TestDiskUtilization(unittest.TestCase):
                     wrapped_func()
 
                     assert len(warns) == 1
-                    assert f"invalid value of '{NEPTUNE_MAX_DISK_USAGE}': '{value}" in str(warns[-1].message)
+                    assert (
+                        f"invalid value of '{NEPTUNE_MAX_DISK_USAGE}': '{value}"
+                        in str(warns[-1].message)
+                    )
                     mocked_func.assert_called_once()
 
     # Catching OSError that's base error for all OS and IO errors. More info here: https://peps.python.org/pep-3151
@@ -145,7 +142,9 @@ class TestDiskErrorHandler(unittest.TestCase):
     @patch("neptune.internal.utils.disk_utilization.RaisingErrorHandler")
     @patch("neptune.internal.utils.disk_utilization.NonRaisingErrorHandler")
     @patch.dict(os.environ, {NEPTUNE_RAISE_ERROR_ON_DISK_USAGE_EXCEEDED: "True"})
-    def test_raising_handler_used_if_env_var_true(self, mock_non_raising_handler, mock_raising_handler):
+    def test_raising_handler_used_if_env_var_true(
+        self, mock_non_raising_handler, mock_raising_handler
+    ):
         decorated = ensure_disk_not_overutilize(MagicMock())
         decorated()
         mock_raising_handler.assert_called_once()
@@ -154,7 +153,9 @@ class TestDiskErrorHandler(unittest.TestCase):
     @patch("neptune.internal.utils.disk_utilization.RaisingErrorHandler")
     @patch("neptune.internal.utils.disk_utilization.NonRaisingErrorHandler")
     @patch.dict(os.environ, {NEPTUNE_RAISE_ERROR_ON_DISK_USAGE_EXCEEDED: "False"})
-    def test_non_raising_handler_used_if_env_var_false(self, mock_non_raising_handler, mock_raising_handler):
+    def test_non_raising_handler_used_if_env_var_false(
+        self, mock_non_raising_handler, mock_raising_handler
+    ):
         decorated = ensure_disk_not_overutilize(MagicMock())
         decorated()
         mock_non_raising_handler.assert_called_once()
@@ -200,6 +201,9 @@ class TestDiskErrorHandler(unittest.TestCase):
             handler.run()
 
         func.side_effect = None
-        with patch("neptune.internal.utils.disk_utilization.get_disk_utilization_percent", return_value=95):
+        with patch(
+            "neptune.internal.utils.disk_utilization.get_disk_utilization_percent",
+            return_value=95,
+        ):
             with pytest.raises(NeptuneMaxDiskUtilizationExceeded):
                 handler.run()

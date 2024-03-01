@@ -57,7 +57,9 @@ class TestLocalFileHashStorage(unittest.TestCase):
     def test_update_for_presented(self):
         new_datetime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S%f")
 
-        self.sut.update(Path(f"{self.tempDir.name}/test.file"), "new_test_hash", new_datetime)
+        self.sut.update(
+            Path(f"{self.tempDir.name}/test.file"), "new_test_hash", new_datetime
+        )
         returned = self.sut.fetch_one(Path(f"{self.tempDir.name}/test.file"))
 
         self.assertEqual(returned.file_hash, "new_test_hash")
@@ -66,7 +68,9 @@ class TestLocalFileHashStorage(unittest.TestCase):
     def test_insert(self):
         modification_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S%f")
 
-        self.sut.insert(Path(f"{self.tempDir.name}/test23.file"), "test_hash", modification_date)
+        self.sut.insert(
+            Path(f"{self.tempDir.name}/test23.file"), "test_hash", modification_date
+        )
         returned = self.sut.fetch_one(Path(f"{self.tempDir.name}/test23.file"))
 
         self.assertEqual(returned.file_hash, "test_hash")

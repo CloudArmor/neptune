@@ -15,17 +15,11 @@
 #
 __all__ = ["signal_batch_processed", "signal_batch_started", "signal_batch_lag"]
 
-from queue import (
-    Full,
-    Queue,
-)
+from queue import Full, Queue
 from time import monotonic
 from typing import Optional
 
-from neptune.common.warnings import (
-    NeptuneWarning,
-    warn_once,
-)
+from neptune.common.warnings import NeptuneWarning, warn_once
 from neptune.internal.signals_processing.signals import (
     BatchLagSignal,
     BatchProcessedSignal,
@@ -38,16 +32,26 @@ def signal(*, queue: "Queue[Signal]", obj: "Signal") -> None:
     try:
         queue.put_nowait(item=obj)
     except Full:
-        warn_once("Signal queue is full. Some signals will be lost.", exception=NeptuneWarning)
+        warn_once(
+            "Signal queue is full. Some signals will be lost.", exception=NeptuneWarning
+        )
 
 
-def signal_batch_started(*, queue: "Queue[Signal]", occured_at: Optional[float] = None) -> None:
+def signal_batch_started(
+    *, queue: "Queue[Signal]", occured_at: Optional[float] = None
+) -> None:
     signal(queue=queue, obj=BatchStartedSignal(occured_at=occured_at or monotonic()))
 
 
-def signal_batch_processed(*, queue: "Queue[Signal]", occured_at: Optional[float] = None) -> None:
+def signal_batch_processed(
+    *, queue: "Queue[Signal]", occured_at: Optional[float] = None
+) -> None:
     signal(queue=queue, obj=BatchProcessedSignal(occured_at=occured_at or monotonic()))
 
 
-def signal_batch_lag(*, queue: "Queue[Signal]", lag: float, occured_at: Optional[float] = None) -> None:
-    signal(queue=queue, obj=BatchLagSignal(occured_at=occured_at or monotonic(), lag=lag))
+def signal_batch_lag(
+    *, queue: "Queue[Signal]", lag: float, occured_at: Optional[float] = None
+) -> None:
+    signal(
+        queue=queue, obj=BatchLagSignal(occured_at=occured_at or monotonic(), lag=lag)
+    )

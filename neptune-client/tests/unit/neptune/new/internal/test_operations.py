@@ -64,7 +64,9 @@ class TestOperations(unittest.TestCase):
         for obj in self._list_objects():
             if obj.__class__ in classes:
                 classes.remove(obj.__class__)
-            deserialized_obj = Operation.from_dict(json.loads(json.dumps(obj.to_dict())))
+            deserialized_obj = Operation.from_dict(
+                json.loads(json.dumps(obj.to_dict()))
+            )
             self.assertEqual(obj.__dict__, deserialized_obj.__dict__)
 
         # expect no Operation subclass left
@@ -87,10 +89,19 @@ class TestOperations(unittest.TestCase):
                 TestOperations._random_path(),
                 "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             ),
-            UploadFile(TestOperations._random_path(), "txt", file_path="file/path/f.txt"),
-            UploadFile(TestOperations._random_path(), "txt", file_path="file/path/f.txt", clean_after_upload=True),
+            UploadFile(
+                TestOperations._random_path(), "txt", file_path="file/path/f.txt"
+            ),
+            UploadFile(
+                TestOperations._random_path(),
+                "txt",
+                file_path="file/path/f.txt",
+                clean_after_upload=True,
+            ),
             UploadFile(TestOperations._random_path(), "txt", tmp_file_name="f.txt"),
-            UploadFileContent(TestOperations._random_path(), "stream.txt", "some base64"),
+            UploadFileContent(
+                TestOperations._random_path(), "stream.txt", "some base64"
+            ),
             UploadFileSet(
                 TestOperations._random_path(),
                 ["file/path/*.txt", "another/file/path/*.txt"],
@@ -101,7 +112,9 @@ class TestOperations(unittest.TestCase):
                 ["file/path/*.txt", "another/file/path/*.txt"],
                 False,
             ),
-            DeleteFiles(TestOperations._random_path(), {"file/path/*.txt", "dir/path/"}),
+            DeleteFiles(
+                TestOperations._random_path(), {"file/path/*.txt", "dir/path/"}
+            ),
             LogFloats(
                 TestOperations._random_path(),
                 [
@@ -122,14 +135,20 @@ class TestOperations(unittest.TestCase):
             LogImages(
                 TestOperations._random_path(),
                 [
-                    LogImages.ValueType(ImageValue("base64_image_1", "name1", "description1"), None, 2),
-                    LogImages.ValueType(ImageValue("base64_image_2", "name2", "description2"), 0, 5),
+                    LogImages.ValueType(
+                        ImageValue("base64_image_1", "name1", "description1"), None, 2
+                    ),
+                    LogImages.ValueType(
+                        ImageValue("base64_image_2", "name2", "description2"), 0, 5
+                    ),
                 ],
             ),
             ClearFloatLog(TestOperations._random_path()),
             ClearStringLog(TestOperations._random_path()),
             ClearImageLog(TestOperations._random_path()),
-            ConfigFloatSeries(TestOperations._random_path(), min=11, max=600, unit="kg/h"),
+            ConfigFloatSeries(
+                TestOperations._random_path(), min=11, max=600, unit="kg/h"
+            ),
             AddStrings(TestOperations._random_path(), {"asef", "asrge4"}),
             RemoveStrings(TestOperations._random_path(), {"a\ne", "aeg\t4ger", "agrg"}),
             ClearStringSet(TestOperations._random_path()),

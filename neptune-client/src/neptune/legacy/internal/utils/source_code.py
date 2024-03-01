@@ -17,17 +17,10 @@
 import os
 import os.path
 import sys
-from typing import (
-    List,
-    Optional,
-    Tuple,
-)
+from typing import List, Optional, Tuple
 
 from neptune.common.storage.storage_utils import normalize_file_name
-from neptune.common.utils import (
-    glob,
-    is_ipython,
-)
+from neptune.common.utils import glob, is_ipython
 
 
 def get_source_code_to_upload(
@@ -53,11 +46,17 @@ def get_source_code_to_upload(
         expanded_source_files = set()
         for filepath in upload_source_files:
             expanded_source_files |= set(glob(filepath))
-        if sys.version_info.major < 3 or (sys.version_info.major == 3 and sys.version_info.minor < 5):
+        if sys.version_info.major < 3 or (
+            sys.version_info.major == 3 and sys.version_info.minor < 5
+        ):
             for filepath in expanded_source_files:
                 if filepath.startswith(".."):
-                    raise ValueError("You need to have Python 3.5 or later to use paths outside current directory.")
-                source_target_pairs.append((os.path.abspath(filepath), normalize_file_name(filepath)))
+                    raise ValueError(
+                        "You need to have Python 3.5 or later to use paths outside current directory."
+                    )
+                source_target_pairs.append(
+                    (os.path.abspath(filepath), normalize_file_name(filepath))
+                )
         else:
             absolute_paths = []
             for filepath in expanded_source_files:
@@ -66,7 +65,9 @@ def get_source_code_to_upload(
                 common_source_root = os.path.commonpath(absolute_paths)
             except ValueError:
                 for absolute_path in absolute_paths:
-                    source_target_pairs.append((absolute_path, normalize_file_name(absolute_path)))
+                    source_target_pairs.append(
+                        (absolute_path, normalize_file_name(absolute_path))
+                    )
             else:
                 if os.path.isfile(common_source_root):
                     common_source_root = os.path.dirname(common_source_root)
@@ -76,7 +77,9 @@ def get_source_code_to_upload(
                     source_target_pairs.append(
                         (
                             absolute_path,
-                            normalize_file_name(os.path.relpath(absolute_path, common_source_root)),
+                            normalize_file_name(
+                                os.path.relpath(absolute_path, common_source_root)
+                            ),
                         )
                     )
     return entrypoint, source_target_pairs

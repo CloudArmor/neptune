@@ -14,36 +14,33 @@
 # limitations under the License.
 #
 import pytest
-
-import neptune
-from neptune.exceptions import NeptuneModelKeyAlreadyExistsError
-from neptune.metadata_containers import (
-    Model,
-    Project,
-)
-from neptune.types import GitRef
-from tests.e2e.base import (
-    AVAILABLE_CONTAINERS,
-    BaseE2ETest,
-    fake,
-)
+from tests.e2e.base import AVAILABLE_CONTAINERS, BaseE2ETest, fake
 from tests.e2e.utils import (
     initialize_container,
     reinitialize_container,
     with_check_if_file_appears,
 )
 
+import neptune
+from neptune.exceptions import NeptuneModelKeyAlreadyExistsError
+from neptune.metadata_containers import Model, Project
+from neptune.types import GitRef
+
 
 class TestInitRun(BaseE2ETest):
     def test_custom_run_id(self, environment):
         custom_run_id = "-".join((fake.word() for _ in range(3)))
-        with neptune.init_run(custom_run_id=custom_run_id, project=environment.project) as run:
+        with neptune.init_run(
+            custom_run_id=custom_run_id, project=environment.project
+        ) as run:
             key = self.gen_key()
             val = fake.word()
             run[key] = val
             run.sync()
 
-        with neptune.init_run(custom_run_id=custom_run_id, project=environment.project) as exp2:
+        with neptune.init_run(
+            custom_run_id=custom_run_id, project=environment.project
+        ) as exp2:
             assert exp2[key].fetch() == val
 
     def test_send_source_code(self, environment):
@@ -91,7 +88,9 @@ class TestInitRun(BaseE2ETest):
             exp.sync()
             assert not exp.exists("source_code/git")
 
-        assert len(recwarn) == 0  # upload was not skipped due to an exception that would raise a warning
+        assert (
+            len(recwarn) == 0
+        )  # upload was not skipped due to an exception that would raise a warning
 
     def test_infer_dependencies(self, environment):
         with neptune.init_run(
@@ -119,7 +118,9 @@ class TestInitRun(BaseE2ETest):
             assert file.read() == "some-dependency==1.0.0"
 
     def test_warning_raised_if_dependency_file_non_existent(self, capsys, environment):
-        with neptune.init_run(dependencies="some_non_existent_file", project=environment.project):
+        with neptune.init_run(
+            dependencies="some_non_existent_file", project=environment.project
+        ):
             ...
 
         captured = capsys.readouterr()
@@ -133,7 +134,10 @@ class TestInitRun(BaseE2ETest):
 
         repo.git.add(file)
 
-        with neptune.init_run(project=environment.project, git_ref=GitRef(repository_path=repo.working_dir)) as run:
+        with neptune.init_run(
+            project=environment.project,
+            git_ref=GitRef(repository_path=repo.working_dir),
+        ) as run:
             run.sync()
             assert run.exists("source_code/diff")
             run["source_code/diff"].download()
@@ -164,7 +168,9 @@ class TestInitProject(BaseE2ETest):
         project.sync()
         project.stop()
 
-        read_only_project = neptune.init_project(mode="read-only", project=environment.project)
+        read_only_project = neptune.init_project(
+            mode="read-only", project=environment.project
+        )
         read_only_project.sync()
 
         assert set(read_only_project.get_structure()["sys"]) == {
@@ -194,7 +200,9 @@ class TestInitModel(BaseE2ETest):
 class TestReinitialization(BaseE2ETest):
     @pytest.mark.parametrize("container_type", AVAILABLE_CONTAINERS)
     def test_resuming_container(self, container_type, environment):
-        container = initialize_container(container_type=container_type, project=environment.project)
+        container = initialize_container(
+            container_type=container_type, project=environment.project
+        )
         sys_id = container["sys/id"].fetch()
 
         key = self.gen_key()

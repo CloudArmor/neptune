@@ -57,7 +57,6 @@ runs:
     - name: Upload Pull Request coverage report do Codecov
       uses: codecov/codecov-action@v3
       with:
-        path: neptune-client
         token: ${{ inputs.codecov-token }}
         files: ./coverage.xml
         flags: e2e,e2e-${{ inputs.name }},${{ inputs.os }},py${{ inputs.python-version }}

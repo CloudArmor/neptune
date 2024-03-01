@@ -23,10 +23,7 @@ import pytest
 from mock import patch
 
 from neptune import ANONYMOUS_API_TOKEN
-from neptune.envs import (
-    API_TOKEN_ENV_NAME,
-    PROJECT_ENV_NAME,
-)
+from neptune.envs import API_TOKEN_ENV_NAME, PROJECT_ENV_NAME
 from neptune.exceptions import MetadataInconsistency
 from neptune.internal.backends.api_model import (
     Attribute,
@@ -35,10 +32,7 @@ from neptune.internal.backends.api_model import (
     LeaderboardEntry,
 )
 from neptune.internal.backends.neptune_backend_mock import NeptuneBackendMock
-from neptune.table import (
-    Table,
-    TableEntry,
-)
+from neptune.table import Table, TableEntry
 
 
 @patch(
@@ -69,13 +63,37 @@ class AbstractTablesTestMixin:
     @staticmethod
     def build_attributes_leaderboard(now: datetime):
         attributes = []
-        attributes.append(AttributeWithProperties("run/state", AttributeType.RUN_STATE, {"value": "idle"}))
-        attributes.append(AttributeWithProperties("float", AttributeType.FLOAT, {"value": 12.5}))
-        attributes.append(AttributeWithProperties("string", AttributeType.STRING, {"value": "some text"}))
-        attributes.append(AttributeWithProperties("datetime", AttributeType.DATETIME, {"value": now}))
-        attributes.append(AttributeWithProperties("float/series", AttributeType.FLOAT_SERIES, {"last": 8.7}))
-        attributes.append(AttributeWithProperties("string/series", AttributeType.STRING_SERIES, {"last": "last text"}))
-        attributes.append(AttributeWithProperties("string/set", AttributeType.STRING_SET, {"values": ["a", "b"]}))
+        attributes.append(
+            AttributeWithProperties(
+                "run/state", AttributeType.RUN_STATE, {"value": "idle"}
+            )
+        )
+        attributes.append(
+            AttributeWithProperties("float", AttributeType.FLOAT, {"value": 12.5})
+        )
+        attributes.append(
+            AttributeWithProperties(
+                "string", AttributeType.STRING, {"value": "some text"}
+            )
+        )
+        attributes.append(
+            AttributeWithProperties("datetime", AttributeType.DATETIME, {"value": now})
+        )
+        attributes.append(
+            AttributeWithProperties(
+                "float/series", AttributeType.FLOAT_SERIES, {"last": 8.7}
+            )
+        )
+        attributes.append(
+            AttributeWithProperties(
+                "string/series", AttributeType.STRING_SERIES, {"last": "last text"}
+            )
+        )
+        attributes.append(
+            AttributeWithProperties(
+                "string/set", AttributeType.STRING_SET, {"values": ["a", "b"]}
+            )
+        )
         attributes.append(
             AttributeWithProperties(
                 "git/ref",
@@ -84,8 +102,12 @@ class AbstractTablesTestMixin:
             )
         )
         attributes.append(AttributeWithProperties("file", AttributeType.FILE, None))
-        attributes.append(AttributeWithProperties("file/set", AttributeType.FILE_SET, None))
-        attributes.append(AttributeWithProperties("image/series", AttributeType.IMAGE_SERIES, None))
+        attributes.append(
+            AttributeWithProperties("file/set", AttributeType.FILE_SET, None)
+        )
+        attributes.append(
+            AttributeWithProperties("image/series", AttributeType.IMAGE_SERIES, None)
+        )
         return attributes
 
     @patch.object(NeptuneBackendMock, "search_leaderboard_entries")
@@ -96,7 +118,9 @@ class AbstractTablesTestMixin:
         # then
         self.assertEqual(1, search_leaderboard_entries.call_count)
         parameters = search_leaderboard_entries.call_args[1]
-        self.assertEqual({"sys/id", "sys/creation_time", "datetime"}, parameters.get("columns"))
+        self.assertEqual(
+            {"sys/id", "sys/creation_time", "datetime"}, parameters.get("columns")
+        )
 
     @patch.object(NeptuneBackendMock, "search_leaderboard_entries")
     def test_get_table_as_pandas(self, search_leaderboard_entries):

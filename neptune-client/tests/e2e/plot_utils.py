@@ -18,12 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import plotly.express as px
 import seaborn as sns
-from bokeh import (
-    models,
-    palettes,
-    plotting,
-    sampledata,
-)
+from bokeh import models, palettes, plotting, sampledata
 from PIL import Image
 from vega_datasets import data
 
@@ -54,7 +49,9 @@ def generate_altair_chart():
         alt.Chart(source)
         .mark_point()
         .encode(
-            x="Horsepower:Q", y="Miles_per_Gallon:Q", color=alt.condition(brush, "Origin:N", alt.value("lightgray"))
+            x="Horsepower:Q",
+            y="Miles_per_Gallon:Q",
+            color=alt.condition(brush, "Origin:N", alt.value("lightgray")),
         )
         .add_selection(brush)
     )
@@ -77,7 +74,9 @@ def generate_brokeh_figure():
 
     palette2 = tuple(reversed(palettes.Viridis6))
 
-    cnts = {code: county for code, county in counties.items() if county["state"] == "tx"}
+    cnts = {
+        code: county for code, county in counties.items() if county["state"] == "tx"
+    }
 
     county_xs = [county["lons"] for county in cnts.values()]
     county_ys = [county["lats"] for county in cnts.values()]
@@ -100,7 +99,11 @@ def generate_brokeh_figure():
         tools=TOOLS,
         x_axis_location=None,
         y_axis_location=None,
-        tooltips=[("Name", "@name"), ("Unemployment rate", "@rate%"), ("(Long, Lat)", "($x, $y)")],
+        tooltips=[
+            ("Name", "@name"),
+            ("Unemployment rate", "@rate%"),
+            ("(Long, Lat)", "($x, $y)"),
+        ],
     )
     bokeh_figure.grid.grid_line_color = None
     bokeh_figure.hover.point_policy = "follow_mouse"
@@ -120,7 +123,9 @@ def generate_brokeh_figure():
 
 def generate_plotly_figure():
     df = px.data.tips()
-    plotly_fig = px.histogram(df, x="total_bill", y="tip", color="sex", marginal="rug", hover_data=df.columns)
+    plotly_fig = px.histogram(
+        df, x="total_bill", y="tip", color="sex", marginal="rug", hover_data=df.columns
+    )
 
     return plotly_fig
 
@@ -128,6 +133,11 @@ def generate_plotly_figure():
 def generate_seaborn_figure():
     sample_size = 30
     x = np.random.rand(sample_size) * 2 * np.pi
-    data = {"x": x, "y": np.sin(x), "c": np.random.randint(0, 2, sample_size), "arch": x > np.pi}
+    data = {
+        "x": x,
+        "y": np.sin(x),
+        "c": np.random.randint(0, 2, sample_size),
+        "arch": x > np.pi,
+    }
     seaborn_fig = sns.relplot(data=data, x="x", y="y", hue="c", col="arch")
     return seaborn_fig

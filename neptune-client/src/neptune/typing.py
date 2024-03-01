@@ -13,16 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-__all__ = ["SupportsNamespaces", "NeptuneObject", "NeptuneObjectCallback", "ProgressBarCallback", "ProgressBarType"]
+__all__ = [
+    "SupportsNamespaces",
+    "NeptuneObject",
+    "NeptuneObjectCallback",
+    "ProgressBarCallback",
+    "ProgressBarType",
+]
 
 import abc
 import contextlib
-from typing import (
-    Any,
-    Optional,
-    Type,
-    Union,
-)
+from typing import Any, Optional, Type, Union
 
 from typing_extensions import TypeAlias
 

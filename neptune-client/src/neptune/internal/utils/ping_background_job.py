@@ -15,10 +15,7 @@
 #
 __all__ = ["PingBackgroundJob"]
 
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import TYPE_CHECKING, Optional
 
 from neptune.internal.background_job import BackgroundJob
 from neptune.internal.threading.daemon import Daemon

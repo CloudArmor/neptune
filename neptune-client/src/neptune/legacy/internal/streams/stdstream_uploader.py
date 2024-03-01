@@ -21,8 +21,12 @@ from neptune.legacy.internal.streams.channel_writer import ChannelWriter
 
 class StdStreamWithUpload(object):
     def __init__(self, experiment, channel_name, stream):
-        self._channel = experiment._get_channel(channel_name, "text", ChannelNamespace.SYSTEM)
-        self._channel_writer = ChannelWriter(experiment, channel_name, ChannelNamespace.SYSTEM)
+        self._channel = experiment._get_channel(
+            channel_name, "text", ChannelNamespace.SYSTEM
+        )
+        self._channel_writer = ChannelWriter(
+            experiment, channel_name, ChannelNamespace.SYSTEM
+        )
         self._stream = stream
 
     def write(self, data):

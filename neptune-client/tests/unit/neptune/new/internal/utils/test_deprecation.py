@@ -14,25 +14,18 @@
 # limitations under the License.
 #
 import warnings
-from unittest.mock import (
-    ANY,
-    patch,
-)
+from unittest.mock import ANY, patch
 
 import pytest
 
-from neptune.common.warnings import (
-    NeptuneDeprecationWarning,
-    warn_once,
-)
+from neptune.common.warnings import NeptuneDeprecationWarning, warn_once
 from neptune.exceptions import NeptuneParametersCollision
-from neptune.internal.utils.deprecation import (
-    deprecated,
-    deprecated_parameter,
+from neptune.internal.utils.deprecation import deprecated, deprecated_parameter
+
+
+@deprecated_parameter(
+    deprecated_kwarg_name="deprecated_param", required_kwarg_name="new_param"
 )
-
-
-@deprecated_parameter(deprecated_kwarg_name="deprecated_param", required_kwarg_name="new_param")
 def fun_with_deprecated_param(*, new_param):
     return new_param
 
@@ -94,5 +87,7 @@ class TestDeprecatedParameter:
         warn_once(message="Deprecation message 1")
 
         warn.assert_called_once_with(
-            message="Deprecation message 1", category=NeptuneDeprecationWarning, stacklevel=ANY
+            message="Deprecation message 1",
+            category=NeptuneDeprecationWarning,
+            stacklevel=ANY,
         )

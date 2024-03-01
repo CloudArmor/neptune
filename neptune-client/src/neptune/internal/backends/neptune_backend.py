@@ -16,14 +16,7 @@
 __all__ = ["NeptuneBackend"]
 
 import abc
-from typing import (
-    Any,
-    Generator,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Any, Generator, List, Optional, Tuple, Union
 
 from neptune.api.dtos import FileEntry
 from neptune.common.exceptions import NeptuneException
@@ -52,10 +45,7 @@ from neptune.internal.backends.api_model import (
 )
 from neptune.internal.backends.nql import NQLQuery
 from neptune.internal.container_type import ContainerType
-from neptune.internal.id_formats import (
-    QualifiedName,
-    UniqueId,
-)
+from neptune.internal.id_formats import QualifiedName, UniqueId
 from neptune.internal.operation import Operation
 from neptune.internal.utils.git import GitInfo
 from neptune.internal.websockets.websockets_factory import WebsocketsFactory
@@ -76,7 +66,9 @@ class NeptuneBackend:
         it makes sure that a feature is supported in the backend version client interacts with
         """
 
-    def websockets_factory(self, project_id: str, run_id: str) -> Optional[WebsocketsFactory]:
+    def websockets_factory(
+        self, project_id: str, run_id: str
+    ) -> Optional[WebsocketsFactory]:
         return None
 
     @abc.abstractmethod
@@ -146,7 +138,9 @@ class NeptuneBackend:
         pass
 
     @abc.abstractmethod
-    def get_attributes(self, container_id: str, container_type: ContainerType) -> List[Attribute]:
+    def get_attributes(
+        self, container_id: str, container_type: ContainerType
+    ) -> List[Attribute]:
         pass
 
     @abc.abstractmethod
@@ -172,19 +166,27 @@ class NeptuneBackend:
         pass
 
     @abc.abstractmethod
-    def get_float_attribute(self, container_id: str, container_type: ContainerType, path: List[str]) -> FloatAttribute:
+    def get_float_attribute(
+        self, container_id: str, container_type: ContainerType, path: List[str]
+    ) -> FloatAttribute:
         pass
 
     @abc.abstractmethod
-    def get_int_attribute(self, container_id: str, container_type: ContainerType, path: List[str]) -> IntAttribute:
+    def get_int_attribute(
+        self, container_id: str, container_type: ContainerType, path: List[str]
+    ) -> IntAttribute:
         pass
 
     @abc.abstractmethod
-    def get_bool_attribute(self, container_id: str, container_type: ContainerType, path: List[str]) -> BoolAttribute:
+    def get_bool_attribute(
+        self, container_id: str, container_type: ContainerType, path: List[str]
+    ) -> BoolAttribute:
         pass
 
     @abc.abstractmethod
-    def get_file_attribute(self, container_id: str, container_type: ContainerType, path: List[str]) -> FileAttribute:
+    def get_file_attribute(
+        self, container_id: str, container_type: ContainerType, path: List[str]
+    ) -> FileAttribute:
         pass
 
     @abc.abstractmethod
@@ -206,7 +208,9 @@ class NeptuneBackend:
         pass
 
     @abc.abstractmethod
-    def list_artifact_files(self, project_id: str, artifact_hash: str) -> List[ArtifactFileData]:
+    def list_artifact_files(
+        self, project_id: str, artifact_hash: str
+    ) -> List[ArtifactFileData]:
         pass
 
     @abc.abstractmethod
@@ -273,15 +277,21 @@ class NeptuneBackend:
         pass
 
     @abc.abstractmethod
-    def get_run_url(self, run_id: str, workspace: str, project_name: str, sys_id: str) -> str:
+    def get_run_url(
+        self, run_id: str, workspace: str, project_name: str, sys_id: str
+    ) -> str:
         pass
 
     @abc.abstractmethod
-    def get_project_url(self, project_id: str, workspace: str, project_name: str) -> str:
+    def get_project_url(
+        self, project_id: str, workspace: str, project_name: str
+    ) -> str:
         pass
 
     @abc.abstractmethod
-    def get_model_url(self, model_id: str, workspace: str, project_name: str, sys_id: str) -> str:
+    def get_model_url(
+        self, model_id: str, workspace: str, project_name: str, sys_id: str
+    ) -> str:
         pass
 
     @abc.abstractmethod
@@ -316,5 +326,7 @@ class NeptuneBackend:
         pass
 
     @abc.abstractmethod
-    def list_fileset_files(self, attribute: List[str], container_id: str, path: str) -> List[FileEntry]:
+    def list_fileset_files(
+        self, attribute: List[str], container_id: str, path: str
+    ) -> List[FileEntry]:
         pass

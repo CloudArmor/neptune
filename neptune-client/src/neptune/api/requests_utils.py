@@ -15,11 +15,7 @@
 #
 __all__ = ["ensure_json_response"]
 
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-)
+from typing import TYPE_CHECKING, Any, Dict
 
 from simplejson.errors import JSONDecodeError
 

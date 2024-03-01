@@ -15,10 +15,7 @@
 #
 __all__ = ["OfflineNeptuneBackend"]
 
-from typing import (
-    List,
-    Optional,
-)
+from typing import List, Optional
 
 from neptune.api.dtos import FileEntry
 from neptune.exceptions import NeptuneOfflineModeFetchException
@@ -47,19 +44,29 @@ from neptune.typing import ProgressBarType
 class OfflineNeptuneBackend(NeptuneBackendMock):
     WORKSPACE_NAME = "offline"
 
-    def get_attributes(self, container_id: str, container_type: ContainerType) -> List[Attribute]:
+    def get_attributes(
+        self, container_id: str, container_type: ContainerType
+    ) -> List[Attribute]:
         raise NeptuneOfflineModeFetchException
 
-    def get_float_attribute(self, container_id: str, container_type: ContainerType, path: List[str]) -> FloatAttribute:
+    def get_float_attribute(
+        self, container_id: str, container_type: ContainerType, path: List[str]
+    ) -> FloatAttribute:
         raise NeptuneOfflineModeFetchException
 
-    def get_int_attribute(self, container_id: str, container_type: ContainerType, path: List[str]) -> IntAttribute:
+    def get_int_attribute(
+        self, container_id: str, container_type: ContainerType, path: List[str]
+    ) -> IntAttribute:
         raise NeptuneOfflineModeFetchException
 
-    def get_bool_attribute(self, container_id: str, container_type: ContainerType, path: List[str]) -> BoolAttribute:
+    def get_bool_attribute(
+        self, container_id: str, container_type: ContainerType, path: List[str]
+    ) -> BoolAttribute:
         raise NeptuneOfflineModeFetchException
 
-    def get_file_attribute(self, container_id: str, container_type: ContainerType, path: List[str]) -> FileAttribute:
+    def get_file_attribute(
+        self, container_id: str, container_type: ContainerType, path: List[str]
+    ) -> FileAttribute:
         raise NeptuneOfflineModeFetchException
 
     def get_string_attribute(
@@ -77,7 +84,9 @@ class OfflineNeptuneBackend(NeptuneBackendMock):
     ) -> ArtifactAttribute:
         raise NeptuneOfflineModeFetchException
 
-    def list_artifact_files(self, project_id: str, artifact_hash: str) -> List[ArtifactFileData]:
+    def list_artifact_files(
+        self, project_id: str, artifact_hash: str
+    ) -> List[ArtifactFileData]:
         raise NeptuneOfflineModeFetchException
 
     def get_float_series_attribute(
@@ -136,5 +145,7 @@ class OfflineNeptuneBackend(NeptuneBackendMock):
     ):
         raise NeptuneOfflineModeFetchException
 
-    def list_fileset_files(self, attribute: List[str], container_id: str, path: str) -> List[FileEntry]:
+    def list_fileset_files(
+        self, attribute: List[str], container_id: str, path: str
+    ) -> List[FileEntry]:
         raise NeptuneOfflineModeFetchException

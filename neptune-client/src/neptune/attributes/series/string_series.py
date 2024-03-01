@@ -15,21 +15,12 @@
 #
 __all__ = ["StringSeries"]
 
-from typing import (
-    TYPE_CHECKING,
-    Iterable,
-    List,
-    Union,
-)
+from typing import TYPE_CHECKING, Iterable, List, Union
 
 from neptune.attributes.series.fetchable_series import FetchableSeries
 from neptune.attributes.series.series import Series
 from neptune.internal.backends.api_model import StringSeriesValues
-from neptune.internal.operation import (
-    ClearStringLog,
-    LogStrings,
-    Operation,
-)
+from neptune.internal.operation import ClearStringLog, LogStrings, Operation
 from neptune.internal.utils import is_collection
 from neptune.internal.utils.logger import get_logger
 from neptune.internal.utils.paths import path_to_str
@@ -47,7 +38,10 @@ logger = get_logger()
 
 
 class StringSeries(
-    Series[Val, Data, LogOperation], FetchableSeries[StringSeriesValues], max_batch_size=10, operation_cls=LogOperation
+    Series[Val, Data, LogOperation],
+    FetchableSeries[StringSeriesValues],
+    max_batch_size=10,
+    operation_cls=LogOperation,
 ):
     def __init__(self, container: "MetadataContainer", path: List[str]):
         super().__init__(container, path)
@@ -91,7 +85,9 @@ class StringSeries(
         return str(value.value)
 
     def fetch_last(self) -> str:
-        val = self._backend.get_string_series_attribute(self._container_id, self._container_type, self._path)
+        val = self._backend.get_string_series_attribute(
+            self._container_id, self._container_type, self._path
+        )
         return val.last
 
     def _fetch_values_from_backend(self, offset, limit) -> StringSeriesValues:

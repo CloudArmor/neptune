@@ -17,23 +17,24 @@ import os
 from unittest.mock import MagicMock
 
 import pytest
-
-from neptune.cli.clear import ClearRunner
-from neptune.cli.utils import get_qualified_name
-from neptune.constants import (
-    ASYNC_DIRECTORY,
-    OFFLINE_DIRECTORY,
-    SYNC_DIRECTORY,
-)
-from neptune.internal.container_type import ContainerType
-from neptune.internal.operation import Operation
 from tests.unit.neptune.new.cli.utils import (
     generate_get_metadata_container,
     prepare_v1_container,
     prepare_v2_container,
 )
 
-AVAILABLE_CONTAINERS = [ContainerType.RUN, ContainerType.MODEL_VERSION, ContainerType.MODEL, ContainerType.PROJECT]
+from neptune.cli.clear import ClearRunner
+from neptune.cli.utils import get_qualified_name
+from neptune.constants import ASYNC_DIRECTORY, OFFLINE_DIRECTORY, SYNC_DIRECTORY
+from neptune.internal.container_type import ContainerType
+from neptune.internal.operation import Operation
+
+AVAILABLE_CONTAINERS = [
+    ContainerType.RUN,
+    ContainerType.MODEL_VERSION,
+    ContainerType.MODEL,
+    ContainerType.PROJECT,
+]
 
 
 @pytest.fixture(name="backend")
@@ -45,30 +46,50 @@ def backend_fixture():
 def test_clean_v2_containers(tmp_path, mocker, capsys, backend, container_type):
     # given
     unsynced_container = prepare_v2_container(
-        container_type=container_type, path=tmp_path, last_ack_version=1, pid=1234, key="a1b2c3"
+        container_type=container_type,
+        path=tmp_path,
+        last_ack_version=1,
+        pid=1234,
+        key="a1b2c3",
     )
     synced_container = prepare_v2_container(
-        container_type=container_type, path=tmp_path, last_ack_version=3, pid=1235, key="d4e5f6"
+        container_type=container_type,
+        path=tmp_path,
+        last_ack_version=3,
+        pid=1235,
+        key="d4e5f6",
     )
     offline_containers = prepare_v2_container(
-        container_type=container_type, path=tmp_path, last_ack_version=None, pid=1236, key="g7h8j9"
+        container_type=container_type,
+        path=tmp_path,
+        last_ack_version=None,
+        pid=1236,
+        key="g7h8j9",
     )
 
     # and
-    get_container_impl = generate_get_metadata_container(registered_containers=(unsynced_container, synced_container))
+    get_container_impl = generate_get_metadata_container(
+        registered_containers=(unsynced_container, synced_container)
+    )
 
     # and
     mocker.patch.object(backend, "get_metadata_container", get_container_impl)
     mocker.patch.object(Operation, "from_dict")
 
     assert os.path.exists(
-        tmp_path / ASYNC_DIRECTORY / f"{container_type.create_dir_name(unsynced_container.id)}__1234__a1b2c3"
+        tmp_path
+        / ASYNC_DIRECTORY
+        / f"{container_type.create_dir_name(unsynced_container.id)}__1234__a1b2c3"
     )
     assert os.path.exists(
-        tmp_path / ASYNC_DIRECTORY / f"{container_type.create_dir_name(synced_container.id)}__1235__d4e5f6"
+        tmp_path
+        / ASYNC_DIRECTORY
+        / f"{container_type.create_dir_name(synced_container.id)}__1235__d4e5f6"
     )
     assert os.path.exists(
-        tmp_path / OFFLINE_DIRECTORY / f"{container_type.create_dir_name(offline_containers.id)}__1236__g7h8j9"
+        tmp_path
+        / OFFLINE_DIRECTORY
+        / f"{container_type.create_dir_name(offline_containers.id)}__1236__g7h8j9"
     )
 
     # when
@@ -76,13 +97,19 @@ def test_clean_v2_containers(tmp_path, mocker, capsys, backend, container_type):
 
     # then
     assert not os.path.exists(
-        tmp_path / ASYNC_DIRECTORY / f"{container_type.create_dir_name(unsynced_container.id)}__1234__a1b2c3"
+        tmp_path
+        / ASYNC_DIRECTORY
+        / f"{container_type.create_dir_name(unsynced_container.id)}__1234__a1b2c3"
     )
     assert not os.path.exists(
-        tmp_path / ASYNC_DIRECTORY / f"{container_type.create_dir_name(synced_container.id)}__1235__d4e5f6"
+        tmp_path
+        / ASYNC_DIRECTORY
+        / f"{container_type.create_dir_name(synced_container.id)}__1235__d4e5f6"
     )
     assert not os.path.exists(
-        tmp_path / OFFLINE_DIRECTORY / f"{container_type.create_dir_name(offline_containers.id)}__1236__g7h8j9"
+        tmp_path
+        / OFFLINE_DIRECTORY
+        / f"{container_type.create_dir_name(offline_containers.id)}__1236__g7h8j9"
     )
 
     # and
@@ -109,10 +136,18 @@ def test_clean_v2_containers(tmp_path, mocker, capsys, backend, container_type):
 def test_clean_v2_deleted_containers(tmp_path, mocker, capsys, backend, container_type):
     # given
     unsynced_container = prepare_v2_container(
-        container_type=container_type, path=tmp_path, last_ack_version=1, pid=1234, key="a1b2c3"
+        container_type=container_type,
+        path=tmp_path,
+        last_ack_version=1,
+        pid=1234,
+        key="a1b2c3",
     )
     synced_container = prepare_v2_container(
-        container_type=container_type, path=tmp_path, last_ack_version=3, pid=1235, key="d4e5f6"
+        container_type=container_type,
+        path=tmp_path,
+        last_ack_version=3,
+        pid=1235,
+        key="d4e5f6",
     )
 
     # and
@@ -123,20 +158,28 @@ def test_clean_v2_deleted_containers(tmp_path, mocker, capsys, backend, containe
     mocker.patch.object(Operation, "from_dict")
 
     assert os.path.exists(
-        tmp_path / ASYNC_DIRECTORY / f"{container_type.create_dir_name(unsynced_container.id)}__1234__a1b2c3"
+        tmp_path
+        / ASYNC_DIRECTORY
+        / f"{container_type.create_dir_name(unsynced_container.id)}__1234__a1b2c3"
     )
     assert os.path.exists(
-        tmp_path / ASYNC_DIRECTORY / f"{container_type.create_dir_name(synced_container.id)}__1235__d4e5f6"
+        tmp_path
+        / ASYNC_DIRECTORY
+        / f"{container_type.create_dir_name(synced_container.id)}__1235__d4e5f6"
     )
     # when
     ClearRunner.clear(backend=backend, path=tmp_path, force=True)
 
     # then
     assert not os.path.exists(
-        tmp_path / ASYNC_DIRECTORY / f"{container_type.create_dir_name(unsynced_container.id)}__1234__a1b2c3"
+        tmp_path
+        / ASYNC_DIRECTORY
+        / f"{container_type.create_dir_name(unsynced_container.id)}__1234__a1b2c3"
     )
     assert not os.path.exists(
-        tmp_path / ASYNC_DIRECTORY / f"{container_type.create_dir_name(synced_container.id)}__1235__d4e5f6"
+        tmp_path
+        / ASYNC_DIRECTORY
+        / f"{container_type.create_dir_name(synced_container.id)}__1235__d4e5f6"
     )
 
     # and
@@ -156,28 +199,56 @@ def test_clean_v2_deleted_containers(tmp_path, mocker, capsys, backend, containe
 @pytest.mark.parametrize("container_type", AVAILABLE_CONTAINERS)
 def test_clean_v1_containers(tmp_path, mocker, capsys, backend, container_type):
     # given
-    unsynced_container = prepare_v1_container(container_type=container_type, path=tmp_path, last_ack_version=1)
-    synced_container = prepare_v1_container(container_type=container_type, path=tmp_path, last_ack_version=3)
-    offline_containers = prepare_v1_container(container_type=container_type, path=tmp_path, last_ack_version=None)
+    unsynced_container = prepare_v1_container(
+        container_type=container_type, path=tmp_path, last_ack_version=1
+    )
+    synced_container = prepare_v1_container(
+        container_type=container_type, path=tmp_path, last_ack_version=3
+    )
+    offline_containers = prepare_v1_container(
+        container_type=container_type, path=tmp_path, last_ack_version=None
+    )
 
     # and
-    get_container_impl = generate_get_metadata_container(registered_containers=(unsynced_container, synced_container))
+    get_container_impl = generate_get_metadata_container(
+        registered_containers=(unsynced_container, synced_container)
+    )
 
     # and
     mocker.patch.object(backend, "get_metadata_container", get_container_impl)
     mocker.patch.object(Operation, "from_dict")
 
-    assert os.path.exists(tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(unsynced_container.id))
-    assert os.path.exists(tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(synced_container.id))
-    assert os.path.exists(tmp_path / OFFLINE_DIRECTORY / container_type.create_dir_name(offline_containers.id))
+    assert os.path.exists(
+        tmp_path
+        / ASYNC_DIRECTORY
+        / container_type.create_dir_name(unsynced_container.id)
+    )
+    assert os.path.exists(
+        tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(synced_container.id)
+    )
+    assert os.path.exists(
+        tmp_path
+        / OFFLINE_DIRECTORY
+        / container_type.create_dir_name(offline_containers.id)
+    )
 
     # when
     ClearRunner.clear(backend=backend, path=tmp_path, force=True)
 
     # then
-    assert not os.path.exists(tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(unsynced_container.id))
-    assert not os.path.exists(tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(synced_container.id))
-    assert not os.path.exists(tmp_path / OFFLINE_DIRECTORY / container_type.create_dir_name(offline_containers.id))
+    assert not os.path.exists(
+        tmp_path
+        / ASYNC_DIRECTORY
+        / container_type.create_dir_name(unsynced_container.id)
+    )
+    assert not os.path.exists(
+        tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(synced_container.id)
+    )
+    assert not os.path.exists(
+        tmp_path
+        / OFFLINE_DIRECTORY
+        / container_type.create_dir_name(offline_containers.id)
+    )
 
     # and
     captured = capsys.readouterr()
@@ -199,8 +270,12 @@ def test_clean_v1_containers(tmp_path, mocker, capsys, backend, container_type):
 @pytest.mark.parametrize("container_type", AVAILABLE_CONTAINERS)
 def test_clean_v1_deleted_containers(tmp_path, mocker, capsys, backend, container_type):
     # given
-    unsynced_container = prepare_v1_container(container_type=container_type, path=tmp_path, last_ack_version=1)
-    synced_container = prepare_v1_container(container_type=container_type, path=tmp_path, last_ack_version=3)
+    unsynced_container = prepare_v1_container(
+        container_type=container_type, path=tmp_path, last_ack_version=1
+    )
+    synced_container = prepare_v1_container(
+        container_type=container_type, path=tmp_path, last_ack_version=3
+    )
 
     # and
     empty_get_container_impl = generate_get_metadata_container(registered_containers=[])
@@ -209,15 +284,27 @@ def test_clean_v1_deleted_containers(tmp_path, mocker, capsys, backend, containe
     mocker.patch.object(backend, "get_metadata_container", empty_get_container_impl)
     mocker.patch.object(Operation, "from_dict")
 
-    assert os.path.exists(tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(synced_container.id))
-    assert os.path.exists(tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(unsynced_container.id))
+    assert os.path.exists(
+        tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(synced_container.id)
+    )
+    assert os.path.exists(
+        tmp_path
+        / ASYNC_DIRECTORY
+        / container_type.create_dir_name(unsynced_container.id)
+    )
 
     # when
     ClearRunner.clear(backend=backend, path=tmp_path, force=True)
 
     # then
-    assert not os.path.exists(tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(synced_container.id))
-    assert not os.path.exists(tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(unsynced_container.id))
+    assert not os.path.exists(
+        tmp_path / ASYNC_DIRECTORY / container_type.create_dir_name(synced_container.id)
+    )
+    assert not os.path.exists(
+        tmp_path
+        / ASYNC_DIRECTORY
+        / container_type.create_dir_name(unsynced_container.id)
+    )
 
     # and
     captured = capsys.readouterr()

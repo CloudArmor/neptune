@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from neptune.core.components.queue.json_file_splitter import JsonFileSplitter
 from tests.unit.neptune.new.utils.file_helpers import create_file
+
+from neptune.core.components.queue.json_file_splitter import JsonFileSplitter
 
 
 def test_simple_file():
@@ -171,6 +172,9 @@ def test_data_size():
             fp.write(content2)
             fp.flush()
 
-            assert splitter.get_with_size() == ({"a": 155, "r": "something"}, len(object2))
+            assert splitter.get_with_size() == (
+                {"a": 155, "r": "something"},
+                len(object2),
+            )
             assert splitter.get_with_size() == ({"a": {"b": [1, 2, 3]}}, len(object3))
             assert splitter.get_with_size()[0] is None

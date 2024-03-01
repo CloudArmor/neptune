@@ -17,21 +17,10 @@ __all__ = ["JsonFileSplitter"]
 
 from collections import deque
 from io import StringIO
-from json import (
-    JSONDecodeError,
-    JSONDecoder,
-)
+from json import JSONDecodeError, JSONDecoder
 from pathlib import Path
 from types import TracebackType
-from typing import (
-    IO,
-    Any,
-    Deque,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import IO, Any, Deque, Optional, Tuple, Type, Union
 
 
 class JsonFileSplitter:

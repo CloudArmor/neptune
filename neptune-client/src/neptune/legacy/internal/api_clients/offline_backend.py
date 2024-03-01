@@ -17,17 +17,16 @@ import logging
 from io import StringIO
 
 from neptune.common.utils import NoopObject
-from neptune.legacy.backend import (
-    BackendApiClient,
-    LeaderboardApiClient,
-)
+from neptune.legacy.backend import BackendApiClient, LeaderboardApiClient
 
 _logger = logging.getLogger(__name__)
 
 
 class OfflineBackendApiClient(BackendApiClient):
     def __init__(self):
-        _logger.warning("Neptune is running in offline mode. No data is being logged to Neptune.")
+        _logger.warning(
+            "Neptune is running in offline mode. No data is being logged to Neptune."
+        )
         _logger.warning("Disable offline mode to log your experiments.")
 
     @property

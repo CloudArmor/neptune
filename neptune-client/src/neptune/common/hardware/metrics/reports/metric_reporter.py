@@ -32,7 +32,14 @@ class MetricReporter(object):
         return [
             MetricReport(
                 metric=metric,
-                values=[x for x in [self.__metric_value_for_gauge(gauge, timestamp) for gauge in metric.gauges] if x],
+                values=[
+                    x
+                    for x in [
+                        self.__metric_value_for_gauge(gauge, timestamp)
+                        for gauge in metric.gauges
+                    ]
+                    if x
+                ],
             )
             for metric in self.__metrics
         ]

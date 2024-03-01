@@ -29,10 +29,7 @@ from neptune import (
     init_run,
 )
 from neptune.common.utils import IS_WINDOWS
-from neptune.envs import (
-    API_TOKEN_ENV_NAME,
-    PROJECT_ENV_NAME,
-)
+from neptune.envs import API_TOKEN_ENV_NAME, PROJECT_ENV_NAME
 from neptune.exceptions import (
     InactiveModelException,
     InactiveModelVersionException,
@@ -42,17 +39,10 @@ from neptune.exceptions import (
     NeptuneProtectedPathException,
 )
 from neptune.internal.operation_processors.factory import get_operation_processor
-from neptune.metadata_containers import (
-    Model,
-    ModelVersion,
-    Project,
-)
+from neptune.metadata_containers import Model, ModelVersion, Project
 from neptune.types.atoms.float import Float
 from neptune.types.atoms.string import String
-from neptune.types.series import (
-    FloatSeries,
-    StringSeries,
-)
+from neptune.types.series import FloatSeries, StringSeries
 
 
 class TestExperiment(unittest.TestCase):
@@ -80,13 +70,17 @@ class TestExperiment(unittest.TestCase):
         for exp in self.get_experiments(flush_period=0.5):
             with self.subTest(msg=f"For type {exp.container_type}"):
                 exp.define("some/path/value", Float(5), wait=True)
-                self.assertEqual(exp.get_structure()["some"]["path"]["value"].fetch(), 5)
+                self.assertEqual(
+                    exp.get_structure()["some"]["path"]["value"].fetch(), 5
+                )
 
     def test_define_string(self):
         for exp in self.get_experiments(flush_period=0.5):
             with self.subTest(msg=f"For type {exp.container_type}"):
                 exp.define("some/path/value", String("Some string"), wait=True)
-                self.assertEqual(exp.get_structure()["some"]["path"]["value"].fetch(), "Some string")
+                self.assertEqual(
+                    exp.get_structure()["some"]["path"]["value"].fetch(), "Some string"
+                )
 
     def test_define_few_variables(self):
         for exp in self.get_experiments(flush_period=0.5):
@@ -94,7 +88,9 @@ class TestExperiment(unittest.TestCase):
                 exp.define("some/path/num", Float(3))
                 exp.define("some/path/text", String("Some text"), wait=True)
                 self.assertEqual(exp.get_structure()["some"]["path"]["num"].fetch(), 3)
-                self.assertEqual(exp.get_structure()["some"]["path"]["text"].fetch(), "Some text")
+                self.assertEqual(
+                    exp.get_structure()["some"]["path"]["text"].fetch(), "Some text"
+                )
 
     def test_define_conflict(self):
         for exp in self.get_experiments(flush_period=0.5):
@@ -263,7 +259,10 @@ class TestExperiment(unittest.TestCase):
             del model_version["sys"]
 
     @unittest.skipIf(IS_WINDOWS, "Windows does not support fork")
-    @mock.patch("neptune.metadata_containers.metadata_container.get_operation_processor", wraps=get_operation_processor)
+    @mock.patch(
+        "neptune.metadata_containers.metadata_container.get_operation_processor",
+        wraps=get_operation_processor,
+    )
     def test_operation_processor_on_fork_lazy_init(self, mock_get_operation_processor):
         mmap_size = 5
         for exp in self.get_experiments():
@@ -281,7 +280,9 @@ class TestExperiment(unittest.TestCase):
                     # parent process exec
                     # wait for child process to send data and finish
                     os.waitpid(child_pid, 0)
-                    child_after_fork_call_cnt = int.from_bytes(mm.read(mmap_size), byteorder="big")
+                    child_after_fork_call_cnt = int.from_bytes(
+                        mm.read(mmap_size), byteorder="big"
+                    )
                     mm.close()
                     assert (
                         before_fork_call_cnt == child_after_fork_call_cnt

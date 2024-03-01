@@ -15,16 +15,8 @@
 #
 __all__ = ["SupportsNamespaces", "NeptuneObject", "NeptuneObjectCallback"]
 
-from abc import (
-    ABC,
-    abstractmethod,
-)
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    Optional,
-    Union,
-)
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Callable, Optional, Union
 
 if TYPE_CHECKING:
     from neptune.handler import Handler
