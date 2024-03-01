@@ -16,7 +16,11 @@
 __all__ = ["upload_source_code"]
 
 import os
-from typing import TYPE_CHECKING, List, Optional
+from typing import (
+    TYPE_CHECKING,
+    List,
+    Optional,
+)
 
 from neptune.attributes import constants as attr_consts
 from neptune.common.storage.storage_utils import normalize_file_name
@@ -26,7 +30,10 @@ from neptune.internal.utils import (
     get_absolute_paths,
     get_common_root,
 )
-from neptune.vendor.lib_programname import empty_path, get_path_executed_script
+from neptune.vendor.lib_programname import (
+    empty_path,
+    get_path_executed_script,
+)
 
 if TYPE_CHECKING:
     from neptune import Run
@@ -35,11 +42,7 @@ if TYPE_CHECKING:
 def upload_source_code(source_files: Optional[List[str]], run: "Run") -> None:
     entrypoint_filepath = get_path_executed_script()
 
-    if (
-        not is_ipython()
-        and entrypoint_filepath != empty_path
-        and os.path.isfile(entrypoint_filepath)
-    ):
+    if not is_ipython() and entrypoint_filepath != empty_path and os.path.isfile(entrypoint_filepath):
         if source_files is None:
             entrypoint = os.path.basename(entrypoint_filepath)
             source_files = str(entrypoint_filepath)
@@ -49,12 +52,8 @@ def upload_source_code(source_files: Optional[List[str]], run: "Run") -> None:
             common_root = get_common_root(get_absolute_paths(source_files))
             entrypoint_filepath = os.path.abspath(entrypoint_filepath)
 
-            if common_root is not None and does_paths_share_common_drive(
-                [common_root, entrypoint_filepath]
-            ):
-                entrypoint_filepath = normalize_file_name(
-                    os.path.relpath(path=entrypoint_filepath, start=common_root)
-                )
+            if common_root is not None and does_paths_share_common_drive([common_root, entrypoint_filepath]):
+                entrypoint_filepath = normalize_file_name(os.path.relpath(path=entrypoint_filepath, start=common_root))
 
             entrypoint = normalize_file_name(entrypoint_filepath)
 

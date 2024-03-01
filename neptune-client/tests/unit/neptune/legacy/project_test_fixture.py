@@ -14,9 +14,7 @@
 # limitations under the License.
 #
 
-from tests.unit.neptune.legacy.api_objects_factory import (
-    an_experiment_leaderboard_entry_dto,
-)
+from tests.unit.neptune.legacy.api_objects_factory import an_experiment_leaderboard_entry_dto
 
 some_exp_entry_dto = an_experiment_leaderboard_entry_dto()
 
@@ -31,12 +29,6 @@ some_exp_entry_row = {
     "size": some_exp_entry_dto.size,
     "tags": some_exp_entry_dto.tags,
 }
-some_exp_entry_row.update(
-    {"property_" + p.key: p.value for p in some_exp_entry_dto.properties}
-)
-some_exp_entry_row.update(
-    {"parameter_" + p.name: p.value for p in some_exp_entry_dto.parameters}
-)
-some_exp_entry_row.update(
-    {"channel_" + c.channelName: c.y for c in some_exp_entry_dto.channelsLastValues}
-)
+some_exp_entry_row.update({"property_" + p.key: p.value for p in some_exp_entry_dto.properties})
+some_exp_entry_row.update({"parameter_" + p.name: p.value for p in some_exp_entry_dto.parameters})
+some_exp_entry_row.update({"channel_" + c.channelName: c.y for c in some_exp_entry_dto.channelsLastValues})

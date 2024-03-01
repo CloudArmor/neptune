@@ -22,9 +22,7 @@ logger = get_logger()
 
 
 class LogFile(Resource):
-    def __init__(
-        self, data_path: Path, min_version: int, extension: str = "log"
-    ) -> None:
+    def __init__(self, data_path: Path, min_version: int, extension: str = "log") -> None:
         self._data_path: Path = data_path
         self._min_version: int = min_version
         self._extension: str = extension

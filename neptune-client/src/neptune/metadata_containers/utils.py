@@ -21,9 +21,18 @@ __all__ = [
 ]
 
 from datetime import datetime
-from typing import Generator, Iterable, List, Optional, Union
+from typing import (
+    Generator,
+    Iterable,
+    List,
+    Optional,
+    Union,
+)
 
-from neptune.common.warnings import NeptuneWarning, warn_once
+from neptune.common.warnings import (
+    NeptuneWarning,
+    warn_once,
+)
 from neptune.internal.backends.api_model import (
     AttributeType,
     AttributeWithProperties,
@@ -128,9 +137,7 @@ def prepare_nql_query(
     return query
 
 
-def parse_dates(
-    leaderboard_entries: Iterable[LeaderboardEntry],
-) -> Generator[LeaderboardEntry, None, None]:
+def parse_dates(leaderboard_entries: Iterable[LeaderboardEntry]) -> Generator[LeaderboardEntry, None, None]:
     yield from [_parse_entry(entry) for entry in leaderboard_entries]
 
 
@@ -144,9 +151,7 @@ def _parse_entry(entry: LeaderboardEntry) -> LeaderboardEntry:
                     attribute.type,
                     {
                         **attribute.properties,
-                        "value": datetime.strptime(
-                            attribute.properties["value"], DATE_FORMAT
-                        ),
+                        "value": datetime.strptime(attribute.properties["value"], DATE_FORMAT),
                     },
                 )
                 if attribute.type == AttributeType.DATETIME

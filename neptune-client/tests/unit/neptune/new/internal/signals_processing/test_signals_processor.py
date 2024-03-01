@@ -15,7 +15,11 @@
 #
 from queue import Queue
 
-from mock import MagicMock, call, patch
+from mock import (
+    MagicMock,
+    call,
+    patch,
+)
 
 from neptune.internal.signals_processing.signals_processor import SignalsProcessor
 from neptune.internal.signals_processing.utils import (
@@ -324,9 +328,7 @@ def test__no_progress__proper_then_too_long_different_cycles(monotonic):
 
     # and
     monotonic.assert_has_calls(calls=(call(), call(), call()))
-    async_no_progress_callback.assert_has_calls(
-        calls=(call(container),), any_order=True
-    )
+    async_no_progress_callback.assert_has_calls(calls=(call(container),), any_order=True)
 
 
 def test__lag__no_signal():

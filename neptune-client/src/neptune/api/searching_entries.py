@@ -15,11 +15,22 @@
 #
 __all__ = ["get_single_page", "iter_over_pages"]
 
-from typing import TYPE_CHECKING, Any, Dict, Generator, Iterable, List, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Generator,
+    Iterable,
+    List,
+    Optional,
+)
 
 from bravado.client import construct_request  # type: ignore
 from bravado.config import RequestConfig  # type: ignore
-from typing_extensions import Literal, TypeAlias
+from typing_extensions import (
+    Literal,
+    TypeAlias,
+)
 
 from neptune.internal.backends.api_model import (
     AttributeType,
@@ -47,9 +58,7 @@ if TYPE_CHECKING:
 
 SUPPORTED_ATTRIBUTE_TYPES = {item.value for item in AttributeType}
 
-SORT_BY_COLUMN_TYPE: TypeAlias = Literal[
-    "string", "datetime", "integer", "boolean", "float"
-]
+SORT_BY_COLUMN_TYPE: TypeAlias = Literal["string", "datetime", "integer", "boolean", "float"]
 
 
 class NoLimit(int):
@@ -87,9 +96,7 @@ def get_single_page(
     searching_after: Optional[str],
 ) -> Any:
     normalized_query = query or NQLEmptyQuery()
-    sort_by_column_type = (
-        sort_by_column_type if sort_by_column_type else AttributeType.STRING.value
-    )
+    sort_by_column_type = sort_by_column_type if sort_by_column_type else AttributeType.STRING.value
     if sort_by and searching_after:
         sort_by_as_nql = NQLQueryAttribute(
             name=sort_by,
@@ -99,9 +106,7 @@ def get_single_page(
         )
 
         if not isinstance(normalized_query, NQLEmptyQuery):
-            normalized_query = NQLQueryAggregate(
-                items=[normalized_query, sort_by_as_nql], aggregator=NQLAggregator.AND
-            )
+            normalized_query = NQLQueryAggregate(items=[normalized_query, sort_by_as_nql], aggregator=NQLAggregator.AND)
         else:
             normalized_query = sort_by_as_nql
 
@@ -112,9 +117,7 @@ def get_single_page(
                 "aggregationMode": "none",
                 "sortBy": {
                     "name": sort_by,
-                    "type": sort_by_column_type
-                    if sort_by_column_type
-                    else AttributeType.STRING.value,
+                    "type": sort_by_column_type if sort_by_column_type else AttributeType.STRING.value,
                 },
             }
         }
@@ -135,16 +138,12 @@ def get_single_page(
 
     request_options = DEFAULT_REQUEST_KWARGS.get("_request_options", {})
     request_config = RequestConfig(request_options, True)
-    request_params = construct_request(
-        client.api.searchLeaderboardEntries, request_options, **params
-    )
+    request_params = construct_request(client.api.searchLeaderboardEntries, request_options, **params)
 
     http_client = client.swagger_spec.http_client
 
     return (
-        http_client.request(
-            request_params, operation=None, request_config=request_config
-        )
+        http_client.request(request_params, operation=None, request_config=request_config)
         .response()
         .incoming_response.json()
     )
@@ -165,9 +164,7 @@ def to_leaderboard_entry(entry: Dict[str, Any]) -> LeaderboardEntry:
     )
 
 
-def find_attribute(
-    *, entry: LeaderboardEntry, path: str
-) -> Optional[AttributeWithProperties]:
+def find_attribute(*, entry: LeaderboardEntry, path: str) -> Optional[AttributeWithProperties]:
     return next((attr for attr in entry.attributes if attr.path == path), None)
 
 
@@ -199,9 +196,7 @@ def iter_over_pages(
 
     total = total if total < limit else limit
 
-    progress_bar = (
-        False if total <= step_size else progress_bar
-    )  # disable progress bar if only one page is fetched
+    progress_bar = False if total <= step_size else progress_bar  # disable progress bar if only one page is fetched
 
     extracted_records = 0
 

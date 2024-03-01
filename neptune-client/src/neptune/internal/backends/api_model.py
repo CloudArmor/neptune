@@ -45,13 +45,22 @@ __all__ = [
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, FrozenSet, List, Optional, Set
+from typing import (
+    Any,
+    FrozenSet,
+    List,
+    Optional,
+    Set,
+)
 
 from packaging import version
 
 from neptune.common.backends.api_model import MultipartConfig
 from neptune.internal.container_type import ContainerType
-from neptune.internal.id_formats import SysId, UniqueId
+from neptune.internal.id_formats import (
+    SysId,
+    UniqueId,
+)
 
 
 @dataclass
@@ -149,9 +158,7 @@ class ClientConfig:
             min_chunk_size = getattr(multipart_upload_config_obj, "minChunkSize")
             max_chunk_size = getattr(multipart_upload_config_obj, "maxChunkSize")
             max_chunk_count = getattr(multipart_upload_config_obj, "maxChunkCount")
-            max_single_part_size = getattr(
-                multipart_upload_config_obj, "maxSinglePartSize"
-            )
+            max_single_part_size = getattr(multipart_upload_config_obj, "maxSinglePartSize")
             multipart_upload_config = MultipartConfig(
                 min_chunk_size, max_chunk_size, max_chunk_count, max_single_part_size
             )
@@ -170,9 +177,7 @@ class ClientConfig:
             api_url=config.apiUrl,
             display_url=config.applicationUrl,
             _missing_features=frozenset(missing_features),
-            version_info=VersionInfo.build(
-                min_recommended, min_compatible, max_compatible
-            ),
+            version_info=VersionInfo.build(min_recommended, min_compatible, max_compatible),
             multipart_config=multipart_upload_config,
         )
 

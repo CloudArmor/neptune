@@ -17,7 +17,10 @@
 __all__ = ["status", "sync", "clear"]
 
 from pathlib import Path
-from typing import List, Optional
+from typing import (
+    List,
+    Optional,
+)
 
 import click
 
@@ -128,21 +131,12 @@ def sync(
 
     if offline_only:
         if object_names:
-            raise click.BadParameter(
-                "--object and --offline-only are mutually exclusive"
-            )
+            raise click.BadParameter("--object and --offline-only are mutually exclusive")
 
-        SyncRunner.sync_all_offline(
-            backend=backend, base_path=path, project_name=project_name
-        )
+        SyncRunner.sync_all_offline(backend=backend, base_path=path, project_name=project_name)
 
     elif object_names:
-        SyncRunner.sync_selected(
-            backend=backend,
-            base_path=path,
-            project_name=project_name,
-            object_names=object_names,
-        )
+        SyncRunner.sync_selected(backend=backend, base_path=path, project_name=project_name, object_names=object_names)
     else:
         SyncRunner.sync_all(backend=backend, base_path=path, project_name=project_name)
 

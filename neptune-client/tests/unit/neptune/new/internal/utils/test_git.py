@@ -17,7 +17,10 @@ import datetime
 
 import git
 from git import Repo
-from mock import MagicMock, patch
+from mock import (
+    MagicMock,
+    patch,
+)
 
 from neptune.internal.utils.git import (
     GitInfo,
@@ -134,9 +137,7 @@ def test_search_for_most_recent_ancestor(mock_repo):
     assert searched_ancestor.hexsha == "sha1234"
 
     assert mock_repo.merge_base.call_count == 3
-    assert (
-        mock_repo.is_ancestor.call_count == 5
-    )  # 6 ancestors - 1 case when most_recent_ancestor was None
+    assert mock_repo.is_ancestor.call_count == 5  # 6 ancestors - 1 case when most_recent_ancestor was None
 
 
 @patch("neptune.internal.utils.git.search_for_most_recent_ancestor")
@@ -146,9 +147,7 @@ def test_get_relevant_upstream_commit_no_search(mock_repo, mock_search):
     upstream_commit = get_relevant_upstream_commit(mock_repo)
 
     # then
-    assert (
-        upstream_commit == mock_repo.active_branch.tracking_branch.return_value.commit
-    )
+    assert upstream_commit == mock_repo.active_branch.tracking_branch.return_value.commit
     mock_search.assert_not_called()
 
 
@@ -238,9 +237,7 @@ def test_git_ref_disabled(mock_run, mock_get_changes):
 @patch("neptune.internal.utils.git.get_repo_from_git_ref")
 @patch("neptune.internal.utils.git.File")
 @patch("neptune.metadata_containers.Run")
-def test_track_uncommitted_changes(
-    mock_run, mock_file, mock_get_repo, mock_get_changes
-):
+def test_track_uncommitted_changes(mock_run, mock_file, mock_get_repo, mock_get_changes):
     # given
     git_ref = GitRef()
 

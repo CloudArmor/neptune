@@ -19,7 +19,10 @@ import time
 import unittest
 from abc import abstractmethod
 from io import StringIO
-from unittest.mock import Mock, patch
+from unittest.mock import (
+    Mock,
+    patch,
+)
 
 from neptune.exceptions import (
     MetadataInconsistency,
@@ -72,12 +75,8 @@ class AbstractExperimentTestMixin:
             self.assertNotIn(str(exp._id), os.listdir(".neptune"))
 
     def test_async_mode(self):
-        with patch(
-            "neptune.internal.operation_processors.utils.random_key"
-        ) as random_mock:
-            with patch(
-                "neptune.internal.operation_processors.utils.os.getpid"
-            ) as getpid_mock:
+        with patch("neptune.internal.operation_processors.utils.random_key") as random_mock:
+            with patch("neptune.internal.operation_processors.utils.os.getpid") as getpid_mock:
                 random_mock.return_value = "test"
                 getpid_mock.return_value = 1234
 
@@ -118,18 +117,12 @@ class AbstractExperimentTestMixin:
                 update_freq = 1
                 default_freq = exp._op_processor.STOP_QUEUE_STATUS_UPDATE_FREQ_SECONDS
                 try:
-                    exp._op_processor.STOP_QUEUE_STATUS_UPDATE_FREQ_SECONDS = (
-                        update_freq
-                    )
-                    exp._op_processor._backend.execute_operations = Mock(
-                        side_effect=ValueError
-                    )
+                    exp._op_processor.STOP_QUEUE_STATUS_UPDATE_FREQ_SECONDS = update_freq
+                    exp._op_processor._backend.execute_operations = Mock(side_effect=ValueError)
                     exp["some/variable"] = 13
                     exp.stop()
                 finally:
-                    exp._op_processor.STOP_QUEUE_STATUS_UPDATE_FREQ_SECONDS = (
-                        default_freq
-                    )
+                    exp._op_processor.STOP_QUEUE_STATUS_UPDATE_FREQ_SECONDS = default_freq
 
         self.assertIn("NeptuneSynchronizationAlreadyStopped", stream.getvalue())
 

@@ -18,18 +18,20 @@ import threading
 from pathlib import Path
 from typing import Optional
 
-from tests.unit.neptune.new.utils.api_experiments_factory import (
-    api_metadata_container,
-    api_run,
-)
-
 from neptune.cli.utils import get_qualified_name
-from neptune.constants import ASYNC_DIRECTORY, OFFLINE_DIRECTORY
+from neptune.constants import (
+    ASYNC_DIRECTORY,
+    OFFLINE_DIRECTORY,
+)
 from neptune.core.components.queue.disk_queue import DiskQueue
 from neptune.core.components.queue.sync_offset_file import SyncOffsetFile
 from neptune.exceptions import MetadataContainerNotFound
 from neptune.internal.backends.api_model import ApiExperiment
 from neptune.internal.container_type import ContainerType
+from tests.unit.neptune.new.utils.api_experiments_factory import (
+    api_metadata_container,
+    api_run,
+)
 
 
 def generate_get_metadata_container(registered_containers):
@@ -88,11 +90,7 @@ def prepare_v2_container(
 
 
 def prepare_v1_container(
-    *,
-    container_type: ContainerType,
-    path: Path,
-    last_ack_version: Optional[int],
-    trashed: Optional[bool] = False,
+    *, container_type: ContainerType, path: Path, last_ack_version: Optional[int], trashed: Optional[bool] = False
 ) -> ApiExperiment:
     is_offline = last_ack_version is None
 
@@ -102,12 +100,7 @@ def prepare_v1_container(
         exp_path = path / OFFLINE_DIRECTORY / f"{container.type.value}__{container.id}"
     else:
         execution_id = "exec-0"
-        exp_path = (
-            path
-            / ASYNC_DIRECTORY
-            / f"{container.type.value}__{container.id}"
-            / execution_id
-        )
+        exp_path = path / ASYNC_DIRECTORY / f"{container.type.value}__{container.id}" / execution_id
 
     _prepare_disk_queue(
         exp_path=exp_path,

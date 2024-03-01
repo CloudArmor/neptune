@@ -16,7 +16,11 @@
 import random
 
 from munch import Munch
-from tests.unit.neptune.legacy.random_utils import a_string, a_uuid_string
+
+from tests.unit.neptune.legacy.random_utils import (
+    a_string,
+    a_uuid_string,
+)
 
 
 def a_channel():

@@ -17,7 +17,11 @@ __all__ = ["Datetime"]
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import TYPE_CHECKING, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    TypeVar,
+    Union,
+)
 
 from neptune.internal.types.stringify_value import (
     StringifyValue,

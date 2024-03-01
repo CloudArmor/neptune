@@ -14,12 +14,15 @@
 # limitations under the License.
 #
 import pytest
-from mock import MagicMock, patch
-from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
+from mock import (
+    MagicMock,
+    patch,
+)
 
 from neptune import init_run
 from neptune.attributes.series.float_series import FloatSeries
 from neptune.common.warnings import NeptuneUnsupportedValue
+from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 
 @patch("time.time", new=TestAttributeBase._now)

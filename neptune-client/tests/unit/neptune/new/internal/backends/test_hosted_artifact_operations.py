@@ -16,7 +16,10 @@
 import unittest
 import uuid
 
-from mock import MagicMock, patch
+from mock import (
+    MagicMock,
+    patch,
+)
 
 from neptune.exceptions import ArtifactUploadingError
 from neptune.internal.artifacts.types import ArtifactFileData
@@ -29,12 +32,8 @@ from neptune.internal.backends.hosted_artifact_operations import (
 
 class TestHostedArtifactOperations(unittest.TestCase):
     def setUp(self) -> None:
-        self.artifact_hash = (
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        )
-        self.emptyDirectoryFile = ArtifactFileData(
-            "to", "c38444d2ccff1a7aab3d323fb6234e1b4f0a81ac", "S3", {}, 0
-        )
+        self.artifact_hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        self.emptyDirectoryFile = ArtifactFileData("to", "c38444d2ccff1a7aab3d323fb6234e1b4f0a81ac", "S3", {}, 0)
         self.files = [
             ArtifactFileData(
                 "fname.txt",
@@ -47,9 +46,7 @@ class TestHostedArtifactOperations(unittest.TestCase):
         self.project_id = str(uuid.uuid4())
         self.parent_identifier = str(uuid.uuid4())
 
-    @patch(
-        "neptune.internal.backends.hosted_artifact_operations._compute_artifact_hash"
-    )
+    @patch("neptune.internal.backends.hosted_artifact_operations._compute_artifact_hash")
     @patch("neptune.internal.backends.hosted_artifact_operations._extract_file_list")
     @patch("neptune.internal.backends.hosted_artifact_operations.create_new_artifact")
     def test_track_to_new_artifact_calls_creation(
@@ -82,14 +79,10 @@ class TestHostedArtifactOperations(unittest.TestCase):
             default_request_params={},
         )
 
-    @patch(
-        "neptune.internal.backends.hosted_artifact_operations._compute_artifact_hash_without_metadata"
-    )
+    @patch("neptune.internal.backends.hosted_artifact_operations._compute_artifact_hash_without_metadata")
     @patch("neptune.internal.backends.hosted_artifact_operations._extract_file_list")
     @patch("neptune.internal.backends.hosted_artifact_operations.create_new_artifact")
-    @patch(
-        "neptune.internal.backends.hosted_artifact_operations.upload_artifact_files_metadata"
-    )
+    @patch("neptune.internal.backends.hosted_artifact_operations.upload_artifact_files_metadata")
     def test_track_to_new_artifact_calls_upload(
         self,
         upload_artifact_files_metadata,
@@ -146,12 +139,8 @@ class TestHostedArtifactOperations(unittest.TestCase):
             )
 
     @patch("neptune.internal.backends.hosted_artifact_operations._extract_file_list")
-    @patch(
-        "neptune.internal.backends.hosted_artifact_operations.create_artifact_version"
-    )
-    def test_track_to_existing_artifact_calls_version(
-        self, create_artifact_version, _extract_file_list
-    ):
+    @patch("neptune.internal.backends.hosted_artifact_operations.create_artifact_version")
+    def test_track_to_existing_artifact_calls_version(self, create_artifact_version, _extract_file_list):
         # given
         swagger_mock = self._get_swagger_mock()
         _extract_file_list.return_value = self.files
@@ -203,7 +192,5 @@ class TestHostedArtifactOperations(unittest.TestCase):
         swagger_mock.swagger_spec.http_client = MagicMock()
         swagger_mock.swagger_spec.api_url = "ui.neptune.ai"
         swagger_mock.api.createNewArtifact.operation.path_name = "/createNewArtifact"
-        swagger_mock.api.uploadArtifactFilesMetadata.operation.path_name = (
-            "/uploadArtifactFilesMetadata"
-        )
+        swagger_mock.api.uploadArtifactFilesMetadata.operation.path_name = "/uploadArtifactFilesMetadata"
         return swagger_mock

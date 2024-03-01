@@ -17,9 +17,18 @@ __all__ = ["FloatSeries"]
 
 import time
 from itertools import cycle
-from typing import TYPE_CHECKING, Optional, Sequence, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+)
 
-from neptune.common.warnings import NeptuneUnsupportedValue, warn_once
+from neptune.common.warnings import (
+    NeptuneUnsupportedValue,
+    warn_once,
+)
 from neptune.internal.types.stringify_value import extract_if_stringify_value
 from neptune.internal.types.utils import is_unsupported_float
 from neptune.internal.utils import is_collection
@@ -113,9 +122,7 @@ class FloatSeries(Series):
 
     def filter_unsupported_values(self, values, steps, timestamps, filter_by):
         filtered = [
-            (value, step, timestamp)
-            for value, step, timestamp in zip(values, steps, timestamps)
-            if filter_by(value)
+            (value, step, timestamp) for value, step, timestamp in zip(values, steps, timestamps) if filter_by(value)
         ]
         return (
             [value for value, _, _ in filtered],

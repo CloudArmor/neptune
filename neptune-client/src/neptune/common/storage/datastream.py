@@ -18,10 +18,17 @@ import io
 import math
 import os
 import tarfile
-from typing import Any, Generator, Optional
+from typing import (
+    Any,
+    Generator,
+    Optional,
+)
 
 from neptune.common.backends.api_model import MultipartConfig
-from neptune.common.exceptions import InternalClientError, UploadedFileChanged
+from neptune.common.exceptions import (
+    InternalClientError,
+    UploadedFileChanged,
+)
 
 
 @dataclasses.dataclass
@@ -32,13 +39,7 @@ class FileChunk:
 
 
 class FileChunker:
-    def __init__(
-        self,
-        filename: Optional[str],
-        fobj,
-        total_size,
-        multipart_config: MultipartConfig,
-    ):
+    def __init__(self, filename: Optional[str], fobj, total_size, multipart_config: MultipartConfig):
         self._filename: Optional[str] = filename
         self._fobj = fobj
         self._total_size = total_size
@@ -64,9 +65,7 @@ class FileChunker:
     def generate(self) -> Generator[FileChunk, Any, None]:
         chunk_size = self._get_chunk_size()
         last_offset = 0
-        last_change: Optional = (
-            os.stat(self._filename).st_mtime if self._filename else None
-        )
+        last_change: Optional = os.stat(self._filename).st_mtime if self._filename else None
         while last_offset < self._total_size:
             chunk = self._fobj.read(chunk_size)
             if chunk:

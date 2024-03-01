@@ -21,12 +21,6 @@ from datetime import datetime
 import pytest
 from faker import Faker
 from git import Repo
-from tests.e2e.utils import (
-    Environment,
-    RawEnvironment,
-    a_project_name,
-    initialize_container,
-)
 
 from neptune import init_project
 from neptune.internal.utils.s3 import get_boto_s3_client
@@ -36,6 +30,12 @@ from neptune.management import (
     create_project,
 )
 from neptune.management.internal.utils import normalize_project_name
+from tests.e2e.utils import (
+    Environment,
+    RawEnvironment,
+    a_project_name,
+    initialize_container,
+)
 
 fake = Faker()
 
@@ -91,9 +91,7 @@ def environment():
 
 @pytest.fixture(scope="session")
 def container(request, environment):
-    exp = initialize_container(
-        container_type=request.param, project=environment.project
-    )
+    exp = initialize_container(container_type=request.param, project=environment.project)
     yield exp
     exp.stop()
 
@@ -101,12 +99,8 @@ def container(request, environment):
 @pytest.fixture(scope="session")
 def containers_pair(request, environment):
     container_a_type, container_b_type = request.param.split("-")
-    container_a = initialize_container(
-        container_type=container_a_type, project=environment.project
-    )
-    container_b = initialize_container(
-        container_type=container_b_type, project=environment.project
-    )
+    container_a = initialize_container(container_type=container_a_type, project=environment.project)
+    container_b = initialize_container(container_type=container_b_type, project=environment.project)
 
     yield container_a, container_b
 
@@ -130,9 +124,7 @@ def common_tag():
 
 @pytest.fixture(scope="session")
 def project(environment):
-    yield init_project(
-        mode="read-only", project=environment.project, api_token=environment.user_token
-    )
+    yield init_project(mode="read-only", project=environment.project, api_token=environment.user_token)
 
 
 @pytest.fixture(scope="session")

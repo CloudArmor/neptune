@@ -30,7 +30,20 @@ __all__ = [
 ]
 
 
-from .atoms import Artifact, Boolean, Datetime, File, Float, GitRef, Integer, String
+from .atoms import (
+    Artifact,
+    Boolean,
+    Datetime,
+    File,
+    Float,
+    GitRef,
+    Integer,
+    String,
+)
 from .file_set import FileSet
-from .series import FileSeries, FloatSeries, StringSeries
+from .series import (
+    FileSeries,
+    FloatSeries,
+    StringSeries,
+)
 from .sets import StringSet

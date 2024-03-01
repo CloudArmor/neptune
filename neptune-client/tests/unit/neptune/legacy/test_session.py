@@ -17,11 +17,14 @@
 import unittest
 from collections import OrderedDict
 
-from mock import MagicMock, patch
-from tests.unit.neptune.legacy.api_objects_factory import a_project
+from mock import (
+    MagicMock,
+    patch,
+)
 
 from neptune.legacy.projects import Project
 from neptune.legacy.sessions import Session
+from tests.unit.neptune.legacy.api_objects_factory import a_project
 
 
 @patch(

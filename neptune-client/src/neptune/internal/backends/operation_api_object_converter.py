@@ -43,7 +43,10 @@ from neptune.internal.operation import (
     UploadFileContent,
     UploadFileSet,
 )
-from neptune.internal.operation_visitor import OperationVisitor, Ret
+from neptune.internal.operation_visitor import (
+    OperationVisitor,
+    Ret,
+)
 
 
 class OperationApiObjectConverter(OperationVisitor[dict]):
@@ -69,19 +72,13 @@ class OperationApiObjectConverter(OperationVisitor[dict]):
         return {"hash": op.hash}
 
     def visit_upload_file(self, _: UploadFile) -> dict:
-        raise InternalClientError(
-            "Specialized endpoint should be used to upload file attribute"
-        )
+        raise InternalClientError("Specialized endpoint should be used to upload file attribute")
 
     def visit_upload_file_content(self, _: UploadFileContent) -> dict:
-        raise InternalClientError(
-            "Specialized endpoint should be used to upload file attribute"
-        )
+        raise InternalClientError("Specialized endpoint should be used to upload file attribute")
 
     def visit_upload_file_set(self, op: UploadFileSet) -> Ret:
-        raise InternalClientError(
-            "Specialized endpoints should be used to upload file set attribute"
-        )
+        raise InternalClientError("Specialized endpoints should be used to upload file set attribute")
 
     def visit_log_floats(self, op: LogFloats) -> dict:
         return {
@@ -151,9 +148,7 @@ class OperationApiObjectConverter(OperationVisitor[dict]):
         return {"filePaths": list(op.file_paths)}
 
     def visit_track_files_to_artifact(self, op: TrackFilesToArtifact) -> dict:
-        raise InternalClientError(
-            "Specialized endpoint should be used to track artifact files"
-        )
+        raise InternalClientError("Specialized endpoint should be used to track artifact files")
 
     def visit_clear_artifact(self, _: ClearArtifact) -> Ret:
         return {}

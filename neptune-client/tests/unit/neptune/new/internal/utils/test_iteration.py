@@ -20,17 +20,10 @@ from neptune.internal.utils.iteration import get_batches
 
 class TestIterationUtils(unittest.TestCase):
     def test_get_batches(self):
-        self.assertEqual(
-            [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]],
-            list(get_batches(range(10), batch_size=3)),
-        )
-        self.assertEqual(
-            [[0, 1, 2], [3, 4, 5], [6, 7, 8]], list(get_batches(range(9), batch_size=3))
-        )
+        self.assertEqual([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]], list(get_batches(range(10), batch_size=3)))
+        self.assertEqual([[0, 1, 2], [3, 4, 5], [6, 7, 8]], list(get_batches(range(9), batch_size=3)))
         self.assertEqual([[1], [2], [3]], list(get_batches([1, 2, 3], batch_size=1)))
-        self.assertEqual(
-            [[1], [2], [3]], list(get_batches(iter([1, 2, 3]), batch_size=1))
-        )
+        self.assertEqual([[1], [2], [3]], list(get_batches(iter([1, 2, 3]), batch_size=1)))
         self.assertEqual([[1, 2, 3]], list(get_batches([1, 2, 3], batch_size=100)))
 
         with self.assertRaises(AssertionError):
@@ -47,6 +40,4 @@ class TestIterationUtils(unittest.TestCase):
             [[0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7]],
             [[0, 1, 2, 3, 4, 5, 6, 7, 8]],
         ]
-        self.assertEqual(
-            expected_batched, list(get_batches(list_of_lists, batch_size=3))
-        )
+        self.assertEqual(expected_batched, list(get_batches(list_of_lists, batch_size=3)))

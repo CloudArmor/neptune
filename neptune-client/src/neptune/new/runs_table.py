@@ -27,9 +27,15 @@ __all__ = [
 
 # backwards compatibility
 from neptune.exceptions import MetadataInconsistency
-from neptune.internal.backends.api_model import AttributeType, AttributeWithProperties
+from neptune.internal.backends.api_model import (
+    AttributeType,
+    AttributeWithProperties,
+)
 from neptune.internal.backends.neptune_backend import NeptuneBackend
 from neptune.internal.container_type import ContainerType
-from neptune.table import LeaderboardEntry, LeaderboardHandler
+from neptune.table import (
+    LeaderboardEntry,
+    LeaderboardHandler,
+)
 from neptune.table import Table as RunsTable
 from neptune.table import TableEntry as RunsTableEntry

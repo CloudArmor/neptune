@@ -22,13 +22,26 @@ __all__ = [
 ]
 
 from types import TracebackType
-from typing import Any, Mapping, MutableMapping, Optional, Type, Union
+from typing import (
+    Any,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Type,
+    Union,
+)
 
 from neptune.internal.init.parameters import DEFAULT_STOP_TIMEOUT
 from neptune.internal.types.stringify_value import StringifyValue
 from neptune.internal.utils.logger import get_logger
-from neptune.internal.utils.runningmode import in_interactive, in_notebook
-from neptune.typing import NeptuneObject, ProgressBarCallback
+from neptune.internal.utils.runningmode import (
+    in_interactive,
+    in_notebook,
+)
+from neptune.typing import (
+    NeptuneObject,
+    ProgressBarCallback,
+)
 
 logger = get_logger()
 
@@ -114,9 +127,7 @@ class TqdmProgressBar(ProgressBarCallback):
 
         unit = unit if unit else ""
 
-        self._progress_bar = tqdm(
-            desc=description, unit=unit, unit_scale=unit_scale, **kwargs
-        )
+        self._progress_bar = tqdm(desc=description, unit=unit, unit_scale=unit_scale, **kwargs)
 
     def __enter__(self) -> "TqdmProgressBar":
         self._progress_bar.__enter__()

@@ -15,7 +15,10 @@
 #
 __all__ = ["SeriesValue"]
 
-from typing import Generic, TypeVar
+from typing import (
+    Generic,
+    TypeVar,
+)
 
 T = TypeVar("T")
 

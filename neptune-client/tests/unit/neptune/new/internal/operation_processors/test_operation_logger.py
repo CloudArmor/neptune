@@ -32,16 +32,12 @@ from neptune.internal.operation_processors.operation_logger import (
 
 class TestOperationLoggerNoQueue(unittest.TestCase):
     def setUp(self):
-        self.logger = ProcessorStopLogger(
-            processor_id=0, signal_queue=None, logger=Mock()
-        )
+        self.logger = ProcessorStopLogger(processor_id=0, signal_queue=None, logger=Mock())
 
     def test_log_connection_interruption(self):
         self.logger.log_connection_interruption(10)
 
-        self.logger._logger.warning.assert_called_once_with(
-            CONNECTION_INTERRUPTED_MSG, 10
-        )
+        self.logger._logger.warning.assert_called_once_with(CONNECTION_INTERRUPTED_MSG, 10)
 
     def test_log_remaining_operations(self):
         self.logger.log_remaining_operations(10)
@@ -67,9 +63,7 @@ class TestOperationLoggerNoQueue(unittest.TestCase):
     def test_log_reconnect_failure(self):
         self.logger.log_reconnect_failure(10, 20)
 
-        self.logger._logger.warning.assert_called_once_with(
-            RECONNECT_FAILURE_MSG, 10, 20
-        )
+        self.logger._logger.warning.assert_called_once_with(RECONNECT_FAILURE_MSG, 10, 20)
 
     def test_log_still_waiting(self):
         self.logger.log_still_waiting(10, 10, 20)
@@ -79,9 +73,7 @@ class TestOperationLoggerNoQueue(unittest.TestCase):
 
 class TestOperationLoggerWithQueue(unittest.TestCase):
     def setUp(self):
-        self.logger = ProcessorStopLogger(
-            processor_id=0, signal_queue=Mock(), logger=Mock()
-        )
+        self.logger = ProcessorStopLogger(processor_id=0, signal_queue=Mock(), logger=Mock())
 
     def test_log_connection_interruption(self):
         self.logger.log_connection_interruption(10)
@@ -126,9 +118,7 @@ class TestOperationLoggerWithQueue(unittest.TestCase):
         self.logger._logger.warning.assert_not_called()
         self.logger._signal_queue.put.assert_called_once_with(
             ProcessorStopSignal(
-                data=ProcessorStopSignalData(
-                    size_remaining=10, already_synced=10, already_synced_proc=20
-                ),
+                data=ProcessorStopSignalData(size_remaining=10, already_synced=10, already_synced_proc=20),
                 signal_type=ProcessorStopSignalType.STILL_WAITING,
             ),
         )

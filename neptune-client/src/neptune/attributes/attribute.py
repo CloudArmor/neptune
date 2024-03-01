@@ -15,7 +15,10 @@
 #
 __all__ = ["Attribute"]
 
-from typing import TYPE_CHECKING, List
+from typing import (
+    TYPE_CHECKING,
+    List,
+)
 
 from neptune.exceptions import TypeDoesNotSupportAttributeException
 from neptune.internal.backends.neptune_backend import NeptuneBackend

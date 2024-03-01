@@ -18,14 +18,20 @@ import unittest
 from datetime import datetime
 
 from mock import patch
-from tests.unit.neptune.new.client.abstract_experiment_test_mixin import (
-    AbstractExperimentTestMixin,
-)
 
-from neptune import ANONYMOUS_API_TOKEN, init_project
+from neptune import (
+    ANONYMOUS_API_TOKEN,
+    init_project,
+)
 from neptune.common.exceptions import NeptuneException
-from neptune.common.warnings import NeptuneWarning, warned_once
-from neptune.envs import API_TOKEN_ENV_NAME, PROJECT_ENV_NAME
+from neptune.common.warnings import (
+    NeptuneWarning,
+    warned_once,
+)
+from neptune.envs import (
+    API_TOKEN_ENV_NAME,
+    PROJECT_ENV_NAME,
+)
 from neptune.exceptions import NeptuneMissingProjectNameException
 from neptune.internal.backends.api_model import (
     Attribute,
@@ -40,6 +46,7 @@ from neptune.metadata_containers.utils import (
     parse_dates,
     prepare_nql_query,
 )
+from tests.unit.neptune.new.client.abstract_experiment_test_mixin import AbstractExperimentTestMixin
 
 
 @patch(
@@ -89,9 +96,7 @@ class TestClientProject(AbstractExperimentTestMixin, unittest.TestCase):
         "neptune.internal.backends.neptune_backend_mock.NeptuneBackendMock.get_int_attribute",
         new=lambda _, _uuid, _type, _path: IntAttribute(42),
     )
-    @patch(
-        "neptune.internal.operation_processors.read_only_operation_processor.warn_once"
-    )
+    @patch("neptune.internal.operation_processors.read_only_operation_processor.warn_once")
     def test_read_only_mode(self, warn_once):
         warned_once.clear()
         with init_project(project=self.PROJECT_NAME, mode="read-only") as project:
@@ -99,8 +104,7 @@ class TestClientProject(AbstractExperimentTestMixin, unittest.TestCase):
             project["some/other_variable"] = 11
 
             warn_once.assert_called_with(
-                "Client in read-only mode, nothing will be saved to server.",
-                exception=NeptuneWarning,
+                "Client in read-only mode, nothing will be saved to server.", exception=NeptuneWarning
             )
 
             self.assertEqual(42, project["some/variable"].fetch())
@@ -144,31 +148,19 @@ def test_parse_dates():
                 AttributeWithProperties(
                     "attr1",
                     AttributeType.DATETIME,
-                    {
-                        "value": datetime(2024, 2, 5, 20, 37, 40, 915000).strftime(
-                            DATE_FORMAT
-                        )
-                    },
+                    {"value": datetime(2024, 2, 5, 20, 37, 40, 915000).strftime(DATE_FORMAT)},
                 ),
                 AttributeWithProperties(
                     "attr2",
                     AttributeType.DATETIME,
-                    {
-                        "value": datetime(2024, 2, 5, 20, 37, 40, 915000).strftime(
-                            DATE_FORMAT
-                        )
-                    },
+                    {"value": datetime(2024, 2, 5, 20, 37, 40, 915000).strftime(DATE_FORMAT)},
                 ),
             ],
         )
 
     parsed = list(parse_dates(entries_generator()))
-    assert parsed[0].attributes[0].properties["value"] == datetime(
-        2024, 2, 5, 20, 37, 40, 915000
-    )
-    assert parsed[0].attributes[1].properties["value"] == datetime(
-        2024, 2, 5, 20, 37, 40, 915000
-    )
+    assert parsed[0].attributes[0].properties["value"] == datetime(2024, 2, 5, 20, 37, 40, 915000)
+    assert parsed[0].attributes[1].properties["value"] == datetime(2024, 2, 5, 20, 37, 40, 915000)
 
 
 @patch("neptune.metadata_containers.utils.warn_once")
@@ -187,9 +179,7 @@ def test_parse_dates_wrong_format(mock_warn_once):
     ]
 
     parsed = list(parse_dates(entries))
-    assert (
-        parsed[0].attributes[0].properties["value"] == "07-02-2024"
-    )  # should be left unchanged due to ValueError
+    assert parsed[0].attributes[0].properties["value"] == "07-02-2024"  # should be left unchanged due to ValueError
     mock_warn_once.assert_called_once_with(
         "Date parsing failed. The date format is incorrect. Returning as string instead of datetime.",
         exception=NeptuneWarning,

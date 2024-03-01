@@ -28,12 +28,13 @@ from random import randint
 
 from neptune.internal.backends.api_model import ApiExperiment
 from neptune.internal.container_type import ContainerType
-from neptune.internal.id_formats import SysId, UniqueId
+from neptune.internal.id_formats import (
+    SysId,
+    UniqueId,
+)
 
 
-def api_metadata_container(
-    container_type: ContainerType, trashed: bool = False
-) -> ApiExperiment:
+def api_metadata_container(container_type: ContainerType, trashed: bool = False) -> ApiExperiment:
     if container_type == ContainerType.PROJECT:
         return api_project()
     elif container_type == ContainerType.RUN:
@@ -47,23 +48,17 @@ def api_metadata_container(
 
 
 def api_project() -> ApiExperiment:
-    return _api_metadata_container(
-        sys_id=_random_key(), container_type=ContainerType.PROJECT
-    )
+    return _api_metadata_container(sys_id=_random_key(), container_type=ContainerType.PROJECT)
 
 
 def api_run(trashed: bool = False) -> ApiExperiment:
     return _api_metadata_container(
-        sys_id=f"{_random_key()}-{randint(42, 12342)}",
-        container_type=ContainerType.RUN,
-        trashed=trashed,
+        sys_id=f"{_random_key()}-{randint(42, 12342)}", container_type=ContainerType.RUN, trashed=trashed
     )
 
 
 def api_model() -> ApiExperiment:
-    return _api_metadata_container(
-        sys_id=f"{_random_key()}-{_random_key()}", container_type=ContainerType.MODEL
-    )
+    return _api_metadata_container(sys_id=f"{_random_key()}-{_random_key()}", container_type=ContainerType.MODEL)
 
 
 def api_model_version() -> ApiExperiment:
@@ -73,9 +68,7 @@ def api_model_version() -> ApiExperiment:
     )
 
 
-def _api_metadata_container(
-    sys_id: str, container_type: ContainerType, trashed: bool = False
-) -> ApiExperiment:
+def _api_metadata_container(sys_id: str, container_type: ContainerType, trashed: bool = False) -> ApiExperiment:
     return ApiExperiment(
         id=UniqueId(str(uuid.uuid4())),
         type=container_type,
@@ -87,6 +80,4 @@ def _api_metadata_container(
 
 
 def _random_key(key_length: int = 3) -> str:
-    return "".join(
-        random.choice(string.ascii_letters).upper() for _ in range(key_length)
-    )
+    return "".join(random.choice(string.ascii_letters).upper() for _ in range(key_length))

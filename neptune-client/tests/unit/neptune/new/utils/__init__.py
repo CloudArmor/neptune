@@ -17,6 +17,4 @@ from unittest.mock import MagicMock
 
 
 def response_mock():
-    return MagicMock(
-        text=MagicMock(spec_set=str), status_code=MagicMock(), json=MagicMock()
-    )
+    return MagicMock(text=MagicMock(spec_set=str), status_code=MagicMock(), json=MagicMock())

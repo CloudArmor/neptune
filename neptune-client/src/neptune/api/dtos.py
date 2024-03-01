@@ -30,9 +30,4 @@ class FileEntry:
 
     @classmethod
     def from_dto(cls, file_dto: Any) -> "FileEntry":
-        return cls(
-            name=file_dto.name,
-            size=file_dto.size,
-            mtime=file_dto.mtime,
-            file_type=file_dto.fileType,
-        )
+        return cls(name=file_dto.name, size=file_dto.size, mtime=file_dto.mtime, file_type=file_dto.fileType)

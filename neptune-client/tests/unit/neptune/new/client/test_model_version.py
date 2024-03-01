@@ -17,19 +17,21 @@ import os
 import unittest
 
 from mock import patch
-from tests.unit.neptune.new.client.abstract_experiment_test_mixin import (
-    AbstractExperimentTestMixin,
-)
-from tests.unit.neptune.new.utils.api_experiments_factory import (
-    api_model,
-    api_model_version,
-)
 
-from neptune import ANONYMOUS_API_TOKEN, init_model_version
+from neptune import (
+    ANONYMOUS_API_TOKEN,
+    init_model_version,
+)
 from neptune.attributes import String
 from neptune.common.exceptions import NeptuneException
-from neptune.common.warnings import NeptuneWarning, warned_once
-from neptune.envs import API_TOKEN_ENV_NAME, PROJECT_ENV_NAME
+from neptune.common.warnings import (
+    NeptuneWarning,
+    warned_once,
+)
+from neptune.envs import (
+    API_TOKEN_ENV_NAME,
+    PROJECT_ENV_NAME,
+)
 from neptune.exceptions import (
     NeptuneOfflineModeChangeStageException,
     NeptuneWrongInitParametersException,
@@ -42,6 +44,11 @@ from neptune.internal.backends.api_model import (
 )
 from neptune.internal.backends.neptune_backend_mock import NeptuneBackendMock
 from neptune.internal.container_type import ContainerType
+from tests.unit.neptune.new.client.abstract_experiment_test_mixin import AbstractExperimentTestMixin
+from tests.unit.neptune.new.utils.api_experiments_factory import (
+    api_model,
+    api_model_version,
+)
 
 AN_API_MODEL = api_model()
 AN_API_MODEL_VERSION = api_model_version()
@@ -83,9 +90,7 @@ class TestClientModelVersion(AbstractExperimentTestMixin, unittest.TestCase):
         "neptune.internal.backends.neptune_backend_mock.NeptuneBackendMock.get_string_attribute",
         new=lambda _, _uuid, _type, _path: StringAttribute("MDL"),
     )
-    @patch(
-        "neptune.internal.operation_processors.read_only_operation_processor.warn_once"
-    )
+    @patch("neptune.internal.operation_processors.read_only_operation_processor.warn_once")
     def test_read_only_mode(self, warn_once):
         warned_once.clear()
         with init_model_version(mode="read-only", with_id="whatever") as exp:
@@ -93,8 +98,7 @@ class TestClientModelVersion(AbstractExperimentTestMixin, unittest.TestCase):
             exp["some/other_variable"] = 11
 
             warn_once.assert_called_with(
-                "Client in read-only mode, nothing will be saved to server.",
-                exception=NeptuneWarning,
+                "Client in read-only mode, nothing will be saved to server.", exception=NeptuneWarning
             )
             self.assertEqual(42, exp["some/variable"].fetch())
             self.assertNotIn(str(exp._id), os.listdir(".neptune"))

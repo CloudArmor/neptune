@@ -16,7 +16,11 @@
 __all__ = ["CallbacksMonitor"]
 
 from queue import Queue
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Optional,
+)
 
 from neptune.internal.background_job import BackgroundJob
 from neptune.internal.signals_processing.signals_processor import SignalsProcessor
@@ -33,9 +37,7 @@ class CallbacksMonitor(BackgroundJob):
         async_lag_threshold: float,
         async_no_progress_threshold: float,
         async_lag_callback: Optional[Callable[["MetadataContainer"], None]] = None,
-        async_no_progress_callback: Optional[
-            Callable[["MetadataContainer"], None]
-        ] = None,
+        async_no_progress_callback: Optional[Callable[["MetadataContainer"], None]] = None,
         period: float = 10,
     ) -> None:
         self._period: float = period
@@ -44,12 +46,8 @@ class CallbacksMonitor(BackgroundJob):
         self._started: bool = False
         self._async_lag_threshold: float = async_lag_threshold
         self._async_no_progress_threshold: float = async_no_progress_threshold
-        self._async_lag_callback: Optional[
-            Callable[["MetadataContainer"], None]
-        ] = async_lag_callback
-        self._async_no_progress_callback: Optional[
-            Callable[["MetadataContainer"], None]
-        ] = async_no_progress_callback
+        self._async_lag_callback: Optional[Callable[["MetadataContainer"], None]] = async_lag_callback
+        self._async_no_progress_callback: Optional[Callable[["MetadataContainer"], None]] = async_no_progress_callback
 
     def start(self, container: "MetadataContainer") -> None:
         self._thread = SignalsProcessor(

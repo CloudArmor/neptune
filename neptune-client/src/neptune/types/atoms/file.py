@@ -18,7 +18,12 @@ __all__ = [
 ]
 
 from io import IOBase
-from typing import TYPE_CHECKING, Optional, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+    TypeVar,
+    Union,
+)
 
 from neptune.internal.types.file_types import (
     FileComposite,
@@ -49,9 +54,7 @@ Ret = TypeVar("Ret")
 
 
 class File(Atom):
-    def __init__(
-        self, path: Optional[str] = None, file_composite: Optional[FileComposite] = None
-    ):
+    def __init__(self, path: Optional[str] = None, file_composite: Optional[FileComposite] = None):
         """We have to support `path` parameter since almost all of `File` usages by our users look like `File(path)`."""
         verify_type("path", path, (str, type(None)))
         verify_type("file_composite", file_composite, (FileComposite, type(None)))
@@ -112,9 +115,7 @@ class File(Atom):
         return File(file_composite=file_composite)
 
     @staticmethod
-    def from_content(
-        content: Union[str, bytes], *, extension: Optional[str] = None
-    ) -> "File":
+    def from_content(content: Union[str, bytes], *, extension: Optional[str] = None) -> "File":
         """Factory method for creating File value objects directly from binary and text content.
 
         In the case of text content, UTF-8 encoding will be used.
@@ -141,9 +142,7 @@ class File(Atom):
         return File(file_composite=file_composite)
 
     @staticmethod
-    def from_stream(
-        stream: IOBase, *, seek: Optional[int] = 0, extension: Optional[str] = None
-    ) -> "File":
+    def from_stream(stream: IOBase, *, seek: Optional[int] = 0, extension: Optional[str] = None) -> "File":
         """Factory method for creating File value objects directly from binary and text streams.
 
         Note that you can only log content from the same stream once.
@@ -211,9 +210,7 @@ class File(Atom):
             - API referene: https://docs.neptune.ai/api/field_types#as_image
         """
         content_bytes = get_image_content(image, autoscale=autoscale)
-        return File.from_content(
-            content_bytes if content_bytes is not None else b"", extension="png"
-        )
+        return File.from_content(content_bytes if content_bytes is not None else b"", extension="png")
 
     @staticmethod
     def as_html(chart) -> "File":
@@ -254,9 +251,7 @@ class File(Atom):
            https://docs.neptune.ai/api/field_types#as_html
         """
         content = get_html_content(chart)
-        return File.from_content(
-            content if content is not None else "", extension="html"
-        )
+        return File.from_content(content if content is not None else "", extension="html")
 
     @staticmethod
     def as_pickle(obj) -> "File":
@@ -287,9 +282,7 @@ class File(Atom):
            https://docs.neptune.ai/api/field_types#as_pickle
         """
         content = get_pickle_content(obj)
-        return File.from_content(
-            content if content is not None else b"", extension="pkl"
-        )
+        return File.from_content(content if content is not None else b"", extension="pkl")
 
     @staticmethod
     def create_from(value) -> "File":
@@ -300,17 +293,9 @@ class File(Atom):
         elif File.is_convertable_to_html(value):
             return File.as_html(value)
         elif is_numpy_array(value):
-            raise TypeError(
-                "Value of type {} is not supported. Please use File.as_image().".format(
-                    type(value)
-                )
-            )
+            raise TypeError("Value of type {} is not supported. Please use File.as_image().".format(type(value)))
         elif is_pandas_dataframe(value):
-            raise TypeError(
-                "Value of type {} is not supported. Please use File.as_html().".format(
-                    type(value)
-                )
-            )
+            raise TypeError("Value of type {} is not supported. Please use File.as_html().".format(type(value)))
         elif isinstance(value, File):
             return value
         raise TypeError("Value of type {} is not supported.".format(type(value)))
@@ -331,19 +316,10 @@ class File(Atom):
 
     @staticmethod
     def is_convertable_to_image(value):
-        convertable_to_img_predicates = (
-            is_pil_image,
-            is_matplotlib_figure,
-            is_seaborn_figure,
-        )
+        convertable_to_img_predicates = (is_pil_image, is_matplotlib_figure, is_seaborn_figure)
         return any(predicate(value) for predicate in convertable_to_img_predicates)
 
     @staticmethod
     def is_convertable_to_html(value):
-        convertable_to_html_predicates = (
-            is_altair_chart,
-            is_bokeh_figure,
-            is_plotly_figure,
-            is_seaborn_figure,
-        )
+        convertable_to_html_predicates = (is_altair_chart, is_bokeh_figure, is_plotly_figure, is_seaborn_figure)
         return any(predicate(value) for predicate in convertable_to_html_predicates)

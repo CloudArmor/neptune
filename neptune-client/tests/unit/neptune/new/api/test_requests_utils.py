@@ -49,9 +49,7 @@ def test_ensure_json_body__invalid():
 
 def test_ensure_json_body__standard():
     # given
-    empty_server_response = RequestsResponseAdapter(
-        TestResponse(content='{"key": "value"}'.encode("utf-8"))
-    )
+    empty_server_response = RequestsResponseAdapter(TestResponse(content='{"key": "value"}'.encode("utf-8")))
 
     # when
     body = ensure_json_response(empty_server_response)

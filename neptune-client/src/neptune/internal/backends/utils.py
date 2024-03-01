@@ -33,7 +33,10 @@ __all__ = [
 import dataclasses
 import os
 import socket
-from functools import lru_cache, wraps
+from functools import (
+    lru_cache,
+    wraps,
+)
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -45,7 +48,10 @@ from typing import (
     Text,
     Type,
 )
-from urllib.parse import urljoin, urlparse
+from urllib.parse import (
+    urljoin,
+    urlparse,
+)
 
 import urllib3
 from bravado.client import SwaggerClient
@@ -54,10 +60,16 @@ from bravado.http_client import HttpClient
 from bravado.requests_client import RequestsResponseAdapter
 from bravado_core.formatter import SwaggerFormat
 from packaging.version import Version
-from requests import Response, Session
+from requests import (
+    Response,
+    Session,
+)
 
 from neptune.common.backends.utils import with_api_exceptions_handler
-from neptune.common.warnings import NeptuneWarning, warn_once
+from neptune.common.warnings import (
+    NeptuneWarning,
+    warn_once,
+)
 from neptune.envs import NEPTUNE_ALLOW_SELF_SIGNED_CERTIFICATE
 from neptune.exceptions import (
     CannotResolveHostname,
@@ -67,11 +79,20 @@ from neptune.exceptions import (
 )
 from neptune.internal.backends.api_model import ClientConfig
 from neptune.internal.backends.swagger_client_wrapper import SwaggerClientWrapper
-from neptune.internal.operation import CopyAttribute, Operation
+from neptune.internal.operation import (
+    CopyAttribute,
+    Operation,
+)
 from neptune.internal.utils import replace_patch_version
 from neptune.internal.utils.logger import get_logger
-from neptune.typing import ProgressBarCallback, ProgressBarType
-from neptune.utils import NullProgressBar, TqdmProgressBar
+from neptune.typing import (
+    ProgressBarCallback,
+    ProgressBarType,
+)
+from neptune.utils import (
+    NullProgressBar,
+    TqdmProgressBar,
+)
 
 logger = get_logger()
 
@@ -113,24 +134,11 @@ def create_swagger_client(url: str, http_client: HttpClient) -> SwaggerClient:
 
 def verify_client_version(client_config: ClientConfig, version: Version):
     version_with_patch_0 = Version(replace_patch_version(str(version)))
-    if (
-        client_config.version_info.min_compatible
-        and client_config.version_info.min_compatible > version
-    ):
-        raise NeptuneClientUpgradeRequiredError(
-            version, min_version=client_config.version_info.min_compatible
-        )
-    if (
-        client_config.version_info.max_compatible
-        and client_config.version_info.max_compatible < version_with_patch_0
-    ):
-        raise NeptuneClientUpgradeRequiredError(
-            version, max_version=client_config.version_info.max_compatible
-        )
-    if (
-        client_config.version_info.min_recommended
-        and client_config.version_info.min_recommended > version
-    ):
+    if client_config.version_info.min_compatible and client_config.version_info.min_compatible > version:
+        raise NeptuneClientUpgradeRequiredError(version, min_version=client_config.version_info.min_compatible)
+    if client_config.version_info.max_compatible and client_config.version_info.max_compatible < version_with_patch_0:
+        raise NeptuneClientUpgradeRequiredError(version, max_version=client_config.version_info.max_compatible)
+    if client_config.version_info.min_recommended and client_config.version_info.min_recommended > version:
         logger.warning(
             "WARNING: Your version of the Neptune client library (%s) is deprecated,"
             " and soon will no longer be supported by the Neptune server."
@@ -247,9 +255,7 @@ def ssl_verify():
 
 def parse_validation_errors(error: HTTPError) -> Dict[str, str]:
     return {
-        f"{error_description.get('errorCode').get('name')}": error_description.get(
-            "context", ""
-        )
+        f"{error_description.get('errorCode').get('name')}": error_description.get("context", "")
         for validation_error in error.swagger_result.validationErrors
         for error_description in validation_error.get("errors")
     }
@@ -295,18 +301,14 @@ def _check_if_tqdm_installed() -> bool:
         return False
 
 
-def which_progress_bar(
-    progress_bar: Optional[ProgressBarType],
-) -> Type[ProgressBarCallback]:
+def which_progress_bar(progress_bar: Optional[ProgressBarType]) -> Type[ProgressBarCallback]:
     if isinstance(progress_bar, type) and issubclass(
         progress_bar, ProgressBarCallback
     ):  # return whatever the user gave us
         return progress_bar
 
     if not isinstance(progress_bar, bool) and progress_bar is not None:
-        raise TypeError(
-            f"progress_bar should be None, bool or ProgressBarCallback, got {type(progress_bar).__name__}"
-        )
+        raise TypeError(f"progress_bar should be None, bool or ProgressBarCallback, got {type(progress_bar).__name__}")
 
     if progress_bar or progress_bar is None:
         tqdm_available = _check_if_tqdm_installed()

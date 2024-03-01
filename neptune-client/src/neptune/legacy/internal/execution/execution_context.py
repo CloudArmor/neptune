@@ -21,11 +21,16 @@ import traceback
 from logging import StreamHandler
 
 from neptune.common.hardware.gauges.gauge_mode import GaugeMode
-from neptune.common.hardware.metrics.service.metric_service_factory import (
-    MetricServiceFactory,
+from neptune.common.hardware.metrics.service.metric_service_factory import MetricServiceFactory
+from neptune.common.utils import (
+    in_docker,
+    is_ipython,
+    is_notebook,
 )
-from neptune.common.utils import in_docker, is_ipython, is_notebook
-from neptune.legacy.internal.abort import CustomAbortImpl, DefaultAbortImpl
+from neptune.legacy.internal.abort import (
+    CustomAbortImpl,
+    DefaultAbortImpl,
+)
 from neptune.legacy.internal.channels.channels import ChannelNamespace
 from neptune.legacy.internal.streams.channel_writer import ChannelWriter
 from neptune.legacy.internal.streams.stdstream_uploader import (
@@ -33,9 +38,7 @@ from neptune.legacy.internal.streams.stdstream_uploader import (
     StdOutWithUpload,
 )
 from neptune.legacy.internal.threads.aborting_thread import AbortingThread
-from neptune.legacy.internal.threads.hardware_metric_reporting_thread import (
-    HardwareMetricReportingThread,
-)
+from neptune.legacy.internal.threads.hardware_metric_reporting_thread import HardwareMetricReportingThread
 from neptune.legacy.internal.threads.ping_thread import PingThread
 
 _logger = logging.getLogger(__name__)
@@ -71,12 +74,8 @@ class ExecutionContext(object):
             self._set_uncaught_exception_handler()
 
         if logger:
-            channel = self._experiment._get_channel(
-                "logger", "text", ChannelNamespace.SYSTEM
-            )
-            channel_writer = ChannelWriter(
-                self._experiment, channel.name, ChannelNamespace.SYSTEM
-            )
+            channel = self._experiment._get_channel("logger", "text", ChannelNamespace.SYSTEM)
+            channel_writer = ChannelWriter(self._experiment, channel.name, ChannelNamespace.SYSTEM)
             self._logger_handler = StreamHandler(channel_writer)
             self._logger = logger
             logger.addHandler(self._logger_handler)
@@ -87,15 +86,11 @@ class ExecutionContext(object):
         if upload_stderr and not is_notebook():
             self._stderr_uploader = StdErrWithUpload(self._experiment)
 
-        abortable = (
-            abort_callback is not None or DefaultAbortImpl.requirements_installed()
-        )
+        abortable = abort_callback is not None or DefaultAbortImpl.requirements_installed()
         if abortable:
             self._run_aborting_thread(abort_callback)
         else:
-            _logger.warning(
-                "psutil is not installed. You will not be able to abort this experiment from the UI."
-            )
+            _logger.warning("psutil is not installed. You will not be able to abort this experiment from the UI.")
 
         if run_monitoring_thread:
             self._run_monitoring_thread()
@@ -129,9 +124,7 @@ class ExecutionContext(object):
 
     def _set_uncaught_exception_handler(self):
         def exception_handler(exc_type, exc_val, exc_tb):
-            self._experiment.stop(
-                "\n".join(traceback.format_tb(exc_tb)) + "\n" + repr(exc_val)
-            )
+            self._experiment.stop("\n".join(traceback.format_tb(exc_tb)) + "\n" + repr(exc_val))
 
             sys.__excepthook__(exc_type, exc_val, exc_tb)
 
@@ -163,9 +156,7 @@ class ExecutionContext(object):
         self._aborting_thread.start()
 
     def _run_monitoring_thread(self):
-        self._ping_thread = PingThread(
-            backend=self._backend, experiment=self._experiment
-        )
+        self._ping_thread = PingThread(backend=self._backend, experiment=self._experiment)
         self._ping_thread.start()
 
     def _run_hardware_metrics_reporting_thread(self):

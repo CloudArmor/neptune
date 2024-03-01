@@ -18,16 +18,24 @@ import os
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from io import BytesIO, StringIO
+from datetime import (
+    datetime,
+    timedelta,
+)
+from io import (
+    BytesIO,
+    StringIO,
+)
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 import PIL
 import pytest
-from tests.unit.neptune.new.utils.file_helpers import create_file
 
-from neptune import ANONYMOUS_API_TOKEN, init_run
+from neptune import (
+    ANONYMOUS_API_TOKEN,
+    init_run,
+)
 from neptune.attributes.atoms.boolean import Boolean
 from neptune.attributes.atoms.datetime import Datetime
 from neptune.attributes.atoms.file import File
@@ -36,9 +44,18 @@ from neptune.attributes.atoms.integer import Integer
 from neptune.attributes.atoms.string import String
 from neptune.attributes.series import FileSeries
 from neptune.attributes.sets.string_set import StringSet
-from neptune.common.warnings import NeptuneUnsupportedType, warned_once
-from neptune.envs import API_TOKEN_ENV_NAME, PROJECT_ENV_NAME
-from neptune.exceptions import FileNotFound, NeptuneUserApiInputException
+from neptune.common.warnings import (
+    NeptuneUnsupportedType,
+    warned_once,
+)
+from neptune.envs import (
+    API_TOKEN_ENV_NAME,
+    PROJECT_ENV_NAME,
+)
+from neptune.exceptions import (
+    FileNotFound,
+    NeptuneUserApiInputException,
+)
 from neptune.types import File as FileVal
 from neptune.types.atoms.artifact import Artifact
 from neptune.types.atoms.datetime import Datetime as DatetimeVal
@@ -49,6 +66,7 @@ from neptune.types.series.file_series import FileSeries as FileSeriesVal
 from neptune.types.series.float_series import FloatSeries as FloatSeriesVal
 from neptune.types.series.string_series import StringSeries as StringSeriesVal
 from neptune.types.sets.string_set import StringSet as StringSetVal
+from tests.unit.neptune.new.utils.file_helpers import create_file
 
 
 class Obj:
@@ -87,9 +105,7 @@ class TestBaseAssign:
 
             assert exp["some/num/val"].fetch() == 5.0
             assert exp["some/str/val"].fetch() == "some text"
-            assert exp["some/datetime/val"].fetch() == now.replace(
-                microsecond=1000 * int(now.microsecond / 1000)
-            )
+            assert exp["some/datetime/val"].fetch() == now.replace(microsecond=1000 * int(now.microsecond / 1000))
             assert isinstance(exp.get_structure()["some"]["num"]["val"], Float)
             assert isinstance(exp.get_structure()["some"]["str"]["val"], String)
             assert isinstance(exp.get_structure()["some"]["datetime"]["val"], Datetime)
@@ -106,9 +122,7 @@ class TestBaseAssign:
             assert exp["some/int/val"].fetch() == 50
             assert exp["some/str/val"].fetch() == "some text"
             assert exp["some/bool/val"].fetch()  # == True
-            assert exp["some/datetime/val"].fetch() == now.replace(
-                microsecond=1000 * int(now.microsecond / 1000)
-            )
+            assert exp["some/datetime/val"].fetch() == now.replace(microsecond=1000 * int(now.microsecond / 1000))
             assert isinstance(exp.get_structure()["some"]["num"]["val"], Float)
             assert isinstance(exp.get_structure()["some"]["int"]["val"], Integer)
             assert isinstance(exp.get_structure()["some"]["str"]["val"], String)
@@ -121,9 +135,7 @@ class TestBaseAssign:
             exp["some/datetime/val"].assign(DatetimeVal(now), wait=True)
             assert exp["some/num/val"].fetch() == 15
             assert exp["some/str/val"].fetch() == "other text"
-            assert exp["some/datetime/val"].fetch() == now.replace(
-                microsecond=1000 * int(now.microsecond / 1000)
-            )
+            assert exp["some/datetime/val"].fetch() == now.replace(microsecond=1000 * int(now.microsecond / 1000))
             assert isinstance(exp.get_structure()["some"]["num"]["val"], Float)
             assert isinstance(exp.get_structure()["some"]["str"]["val"], String)
             assert isinstance(exp.get_structure()["some"]["datetime"]["val"], Datetime)
@@ -191,12 +203,8 @@ class TestUpload:
             assert isinstance(exp.get_structure()["some"]["num"]["attr_name"], File)
 
             with TemporaryDirectory() as temp_dir:
-                with patch(
-                    "neptune.internal.backends.neptune_backend_mock.os.path.abspath"
-                ) as abspath_mock:
-                    abspath_mock.side_effect = lambda path: os.path.normpath(
-                        temp_dir + "/" + path
-                    )
+                with patch("neptune.internal.backends.neptune_backend_mock.os.path.abspath") as abspath_mock:
+                    abspath_mock.side_effect = lambda path: os.path.normpath(temp_dir + "/" + path)
                     exp["some/num/attr_name"].download()
                 with open(temp_dir + "/attr_name.bin", "rb") as file:
                     assert file.read() == data
@@ -215,12 +223,8 @@ class TestUpload:
                 exp["some/artifacts"].download(temp_dir)
                 exp["some/artifacts"].download(temp_dir)
 
-            zip_write_mock.assert_any_call(
-                os.path.abspath("path/to/file.txt"), "path/to/file.txt"
-            )
-            zip_write_mock.assert_any_call(
-                os.path.abspath("path/to/other/file.txt"), "path/to/other/file.txt"
-            )
+            zip_write_mock.assert_any_call(os.path.abspath("path/to/file.txt"), "path/to/file.txt")
+            zip_write_mock.assert_any_call(os.path.abspath("path/to/other/file.txt"), "path/to/other/file.txt")
 
 
 class TestSeries:
@@ -233,19 +237,13 @@ class TestSeries:
         with init_run(mode="debug", flush_period=0.5) as exp:
             exp["some/num/val"].assign(FloatSeriesVal([1, 2, 0, 10]))
             exp["some/str/val"].assign(StringSeriesVal(["text1", "text2"]), wait=True)
-            exp["some/img/val"].assign(
-                FileSeriesVal(
-                    [FileVal.as_image(PIL.Image.new("RGB", (10, 15), color="red"))]
-                )
-            )
+            exp["some/img/val"].assign(FileSeriesVal([FileVal.as_image(PIL.Image.new("RGB", (10, 15), color="red"))]))
             assert exp["some"]["num"]["val"].fetch_last() == 10
             assert exp["some"]["str"]["val"].fetch_last() == "text2"
             assert isinstance(exp.get_structure()["some"]["img"]["val"], FileSeries)
 
             exp["some/num/val"].assign(FloatSeriesVal([122, 543, 2, 5]))
-            exp["some/str/val"].assign(
-                StringSeriesVal(["other 1", "other 2", "other 3"]), wait=True
-            )
+            exp["some/str/val"].assign(StringSeriesVal(["other 1", "other 2", "other 3"]), wait=True)
             assert exp["some"]["num"]["val"].fetch_last() == 5
             assert exp["some"]["str"]["val"].fetch_last() == "other 3"
 
@@ -253,9 +251,7 @@ class TestSeries:
         with init_run(mode="debug", flush_period=0.5) as exp:
             exp["some/num/val"].log(5)
             exp["some/str/val"].log("some text")
-            exp["some/img/val"].log(
-                FileVal.as_image(PIL.Image.new("RGB", (60, 30), color="red"))
-            )
+            exp["some/img/val"].log(FileVal.as_image(PIL.Image.new("RGB", (60, 30), color="red")))
             exp["some/img/val"].log(PIL.Image.new("RGB", (60, 30), color="red"))
             assert exp["some"]["num"]["val"].fetch_last() == 5
             assert exp["some"]["str"]["val"].fetch_last() == "some text"
@@ -271,9 +267,7 @@ class TestSeries:
         with init_run(mode="debug", flush_period=0.5) as exp:
             exp["some/num/val"].append(5)
             exp["some/str/val"].append("some text")
-            exp["some/img/val"].append(
-                FileVal.as_image(PIL.Image.new("RGB", (60, 30), color="red"))
-            )
+            exp["some/img/val"].append(FileVal.as_image(PIL.Image.new("RGB", (60, 30), color="red")))
             exp["some/img/val"].append(PIL.Image.new("RGB", (60, 30), color="red"))
             assert exp["some"]["num"]["val"].fetch_last() == 5
             assert exp["some"]["str"]["val"].fetch_last() == "some text"
@@ -352,11 +346,7 @@ class TestSeries:
 
     def test_extend_dict(self):
         with init_run(mode="debug", flush_period=0.5) as exp:
-            dict_value = {
-                "key-a": ["value-a", "value-aa"],
-                "key-b": ["value-b", "value-bb"],
-                "key-c": ["ccc"],
-            }
+            dict_value = {"key-a": ["value-a", "value-aa"], "key-b": ["value-b", "value-bb"], "key-c": ["ccc"]}
             exp["some/num/val"].extend(dict_value)
             assert exp["some"]["num"]["val"]["key-a"].fetch_last() == "value-aa"
             assert exp["some"]["num"]["val"]["key-b"].fetch_last() == "value-bb"
@@ -372,66 +362,36 @@ class TestSeries:
                 }
             )
             assert exp["train"]["simple_dict"]["list1"].fetch_last() == 6
-            assert list(exp["train"]["simple_dict"]["list1"].fetch_values().value) == [
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-            ]
+            assert list(exp["train"]["simple_dict"]["list1"].fetch_values().value) == [1, 2, 3, 4, 5, 6]
             assert exp["train"]["simple_dict"]["list2"].fetch_last() == 30
-            assert list(exp["train"]["simple_dict"]["list2"].fetch_values().value) == [
-                10,
-                20,
-                30,
-            ]
+            assert list(exp["train"]["simple_dict"]["list2"].fetch_values().value) == [10, 20, 30]
 
             exp["train/different-depths"].extend(
-                {
-                    "lvl1": {"lvl1.1": [1, 2, 3], "lvl1.2": {"lvl1.2.1": [1]}},
-                    "lvl2": [10, 20],
-                }
+                {"lvl1": {"lvl1.1": [1, 2, 3], "lvl1.2": {"lvl1.2.1": [1]}}, "lvl2": [10, 20]}
             )
             exp["train/different-depths/lvl1"].extend({"lvl1.2": {"lvl1.2.1": [2, 3]}})
             assert exp["train"]["different-depths"]["lvl1"]["lvl1.1"].fetch_last() == 3
-            assert list(
-                exp["train"]["different-depths"]["lvl1"]["lvl1.1"].fetch_values().value
-            ) == [1, 2, 3]
-            assert (
-                exp["train"]["different-depths"]["lvl1"]["lvl1.2"][
-                    "lvl1.2.1"
-                ].fetch_last()
-                == 3
-            )
-            assert list(
-                exp["train"]["different-depths"]["lvl1"]["lvl1.2"]["lvl1.2.1"]
-                .fetch_values()
-                .value
-            ) == [
+            assert list(exp["train"]["different-depths"]["lvl1"]["lvl1.1"].fetch_values().value) == [1, 2, 3]
+            assert exp["train"]["different-depths"]["lvl1"]["lvl1.2"]["lvl1.2.1"].fetch_last() == 3
+            assert list(exp["train"]["different-depths"]["lvl1"]["lvl1.2"]["lvl1.2.1"].fetch_values().value) == [
                 1,
                 2,
                 3,
             ]
             assert exp["train"]["different-depths"]["lvl2"].fetch_last() == 20
-            assert list(
-                exp["train"]["different-depths"]["lvl2"].fetch_values().value
-            ) == [10, 20]
+            assert list(exp["train"]["different-depths"]["lvl2"].fetch_values().value) == [10, 20]
 
     def test_extend_nested_with_wrong_parameters(self):
         """We expect that we are able to log arbitrary tre structure"""
         with init_run(mode="debug", flush_period=0.5) as exp:
             with pytest.raises(NeptuneUserApiInputException):
                 # wrong number of steps
-                exp["train/simple_dict"].extend(
-                    values={"list1": [1, 2, 3], "list2": [10, 20, 30]}, steps=[0, 1]
-                )
+                exp["train/simple_dict"].extend(values={"list1": [1, 2, 3], "list2": [10, 20, 30]}, steps=[0, 1])
 
             with pytest.raises(NeptuneUserApiInputException):
                 # wrong number of timestamps
                 exp["train/simple_dict"].extend(
-                    values={"list1": [1, 2, 3], "list2": [10, 20, 30]},
-                    timestamps=[time.time()] * 2,
+                    values={"list1": [1, 2, 3], "list2": [10, 20, 30]}, timestamps=[time.time()] * 2
                 )
 
     def test_log_value_errors(self):
@@ -507,9 +467,7 @@ class TestSet:
             assert exp["some/str/val"].fetch() == {"tag1", "tag2"}
             assert isinstance(exp.get_structure()["some"]["str"]["val"], StringSet)
 
-            exp["some/str/val"].assign(
-                StringSetVal(["other_1", "other_2", "other_3"]), wait=True
-            )
+            exp["some/str/val"].assign(StringSetVal(["other_1", "other_2", "other_3"]), wait=True)
             assert exp["some/str/val"].fetch() == {"other_1", "other_2", "other_3"}
             assert isinstance(exp.get_structure()["some"]["str"]["val"], StringSet)
 
@@ -519,11 +477,7 @@ class TestSet:
             assert exp["some/str/val"].fetch() == {"some text", "something else"}
 
             exp["some/str/val"].add("one more", wait=True)
-            assert exp["some/str/val"].fetch() == {
-                "some text",
-                "something else",
-                "one more",
-            }
+            assert exp["some/str/val"].fetch() == {"some text", "something else", "one more"}
 
             assert isinstance(exp.get_structure()["some"]["str"]["val"], StringSet)
 
@@ -557,9 +511,7 @@ class TestNamespace:
     def test_argparse_namespace(self):
         with init_run(mode="debug", flush_period=0.5) as exp:
             exp["params"] = argparse.Namespace(
-                foo="bar",
-                baz=42,
-                nested=argparse.Namespace(nested_attr=str([1, 2, 3]), num=55),
+                foo="bar", baz=42, nested=argparse.Namespace(nested_attr=str([1, 2, 3]), num=55)
             )
             assert exp["params/foo"].fetch() == "bar"
             assert exp["params/baz"].fetch() == 42
@@ -578,29 +530,17 @@ class TestNamespace:
             )
             assert exp["some/namespace/sub-namespace/val1"].fetch() == 1.0
             assert exp["some/namespace/sub-namespace/val2"].fetch() == {"tag1", "tag2"}
-            assert isinstance(
-                exp.get_structure()["some"]["namespace"]["sub-namespace"]["val1"], Float
-            )
-            assert isinstance(
-                exp.get_structure()["some"]["namespace"]["sub-namespace"]["val2"],
-                StringSet,
-            )
+            assert isinstance(exp.get_structure()["some"]["namespace"]["sub-namespace"]["val1"], Float)
+            assert isinstance(exp.get_structure()["some"]["namespace"]["sub-namespace"]["val2"], StringSet)
 
             exp["some"].assign(NamespaceVal({"namespace/sub-namespace/val1": 2.0}))
             assert exp["some/namespace/sub-namespace/val1"].fetch() == 2.0
             assert exp["some/namespace/sub-namespace/val2"].fetch() == {"tag1", "tag2"}
-            assert isinstance(
-                exp.get_structure()["some"]["namespace"]["sub-namespace"]["val1"], Float
-            )
-            assert isinstance(
-                exp.get_structure()["some"]["namespace"]["sub-namespace"]["val2"],
-                StringSet,
-            )
+            assert isinstance(exp.get_structure()["some"]["namespace"]["sub-namespace"]["val1"], Float)
+            assert isinstance(exp.get_structure()["some"]["namespace"]["sub-namespace"]["val2"], StringSet)
 
             with pytest.raises(TypeError):
-                exp["some"].assign(
-                    NamespaceVal({"namespace/sub-namespace/val1": {"tagA", "tagB"}})
-                )
+                exp["some"].assign(NamespaceVal({"namespace/sub-namespace/val1": {"tagA", "tagB"}}))
 
     def test_fetch_dict(self):
         now = datetime.now()
@@ -646,27 +586,16 @@ class TestNamespace:
 
     def test_assign_drops_dict_entry_with_empty_key(self, capsys):
         with init_run(mode="debug", flush_period=0.5) as exp:
-            with assert_logged_warning(
-                capsys, '"" can\'t be used in Namespaces and dicts stored in Neptune'
-            ):
+            with assert_logged_warning(capsys, '"" can\'t be used in Namespaces and dicts stored in Neptune'):
                 exp["some/namespace"] = {"": 1.1, "x": "Some text"}
                 params_dict = exp["some/namespace"].fetch()
                 assert params_dict == {"x": "Some text"}
-            with assert_logged_warning(
-                capsys, '"///" can\'t be used in Namespaces and dicts stored in Neptune'
-            ):
+            with assert_logged_warning(capsys, '"///" can\'t be used in Namespaces and dicts stored in Neptune'):
                 exp["other/namespace"] = {"///": 1.1, "x": "Some text"}
                 params_dict = exp["other/namespace"].fetch()
                 assert params_dict == {"x": "Some text"}
-            with assert_logged_warning(
-                capsys, "can't be used in Namespaces and dicts stored in Neptune"
-            ):
-                exp["other/namespace"] = {
-                    "": 2,
-                    "//": [1, 2],
-                    "///": 1.1,
-                    "x": "Some text",
-                }
+            with assert_logged_warning(capsys, "can't be used in Namespaces and dicts stored in Neptune"):
+                exp["other/namespace"] = {"": 2, "//": [1, 2], "///": 1.1, "x": "Some text"}
                 params_dict = exp["other/namespace"].fetch()
                 assert params_dict == {"x": "Some text"}
 
@@ -709,9 +638,7 @@ class TestArtifacts:
 
     def test_artifacts(self):
         with init_run(mode="debug", flush_period=0.5) as exp:
-            exp["art1"].track_files(
-                "s3://path/to/tracking/file", destination="/some/destination"
-            )
+            exp["art1"].track_files("s3://path/to/tracking/file", destination="/some/destination")
             exp["art2"].track_files("s3://path/to/tracking/file2")
             assert exp["art1"].fetch() == Artifact(
                 value="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
@@ -734,9 +661,7 @@ class TestOtherBehaviour:
             assert isinstance(exp.get_structure()["some"]["str"]["val"], Float)
 
             with pytest.raises(TypeError):
-                exp["some/str/val"].assign(
-                    StringSetVal(["other_1", "other_2", "other_3"]), wait=True
-                )
+                exp["some/str/val"].assign(StringSetVal(["other_1", "other_2", "other_3"]), wait=True)
 
     def test_attribute_error(self):
         with init_run(mode="debug", flush_period=0.5) as exp:
@@ -809,9 +734,7 @@ class TestOtherBehaviour:
     def test_convertable_to_dict(self):
         with init_run(mode="debug", flush_period=0.5) as exp:
             exp["params"] = argparse.Namespace(
-                foo="bar",
-                baz=42,
-                nested=argparse.Namespace(nested_attr=str([1, 2, 3]), num=55),
+                foo="bar", baz=42, nested=argparse.Namespace(nested_attr=str([1, 2, 3]), num=55)
             )
             assert exp["params/foo"].fetch() == "bar"
             assert exp["params/baz"].fetch() == 42
@@ -831,27 +754,13 @@ class TestOtherBehaviour:
             assert repr(exp["params/int"]) == '<Integer field at "params/int">'
             assert repr(exp["params/float"]) == '<Float field at "params/float">'
             assert repr(exp["params/bool"]) == '<Boolean field at "params/bool">'
-            assert (
-                repr(exp["params/datetime"]) == '<Datetime field at "params/datetime">'
-            )
-            assert (
-                repr(exp["params/unassigned"])
-                == '<Unassigned field at "params/unassigned">'
-            )
+            assert repr(exp["params/datetime"]) == '<Datetime field at "params/datetime">'
+            assert repr(exp["params/unassigned"]) == '<Unassigned field at "params/unassigned">'
 
             sub_namespace = exp["params/sub-namespace"]
-            assert (
-                repr(sub_namespace["int"])
-                == '<Integer field at "params/sub-namespace/int">'
-            )
-            assert (
-                repr(sub_namespace["string"])
-                == '<String field at "params/sub-namespace/string">'
-            )
-            assert (
-                repr(sub_namespace["unassigned"])
-                == '<Unassigned field at "params/sub-namespace/unassigned">'
-            )
+            assert repr(sub_namespace["int"]) == '<Integer field at "params/sub-namespace/int">'
+            assert repr(sub_namespace["string"]) == '<String field at "params/sub-namespace/string">'
+            assert repr(sub_namespace["unassigned"]) == '<Unassigned field at "params/sub-namespace/unassigned">'
 
     @dataclass
     class FloatLike:

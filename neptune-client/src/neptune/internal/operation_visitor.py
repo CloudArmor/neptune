@@ -16,7 +16,10 @@
 __all__ = ["OperationVisitor"]
 
 import abc
-from typing import Generic, TypeVar
+from typing import (
+    Generic,
+    TypeVar,
+)
 
 from neptune.internal.operation import (
     AddStrings,

@@ -16,10 +16,18 @@
 __all__ = ["String"]
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+    TypeVar,
+    Union,
+)
 
 from neptune.internal.types.stringify_value import StringifyValue
-from neptune.internal.utils import is_stringify_value, verify_type
+from neptune.internal.utils import (
+    is_stringify_value,
+    verify_type,
+)
 from neptune.types.atoms.atom import Atom
 
 if TYPE_CHECKING:

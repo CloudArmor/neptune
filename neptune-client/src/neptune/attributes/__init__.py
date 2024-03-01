@@ -47,6 +47,10 @@ from .atoms import (
     String,
 )
 from .file_set import FileSet
-from .series import FileSeries, FloatSeries, StringSeries
+from .series import (
+    FileSeries,
+    FloatSeries,
+    StringSeries,
+)
 from .sets import StringSet
 from .utils import create_attribute_from_type

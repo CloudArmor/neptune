@@ -16,7 +16,11 @@
 __all__ = ["ModelVersion"]
 
 import os
-from typing import TYPE_CHECKING, List, Optional
+from typing import (
+    TYPE_CHECKING,
+    List,
+    Optional,
+)
 
 from typing_extensions import Literal
 
@@ -42,9 +46,7 @@ from neptune.internal.init.parameters import (
     DEFAULT_NAME,
     OFFLINE_PROJECT_QUALIFIED_NAME,
 )
-from neptune.internal.operation_processors.offline_operation_processor import (
-    OfflineOperationProcessor,
-)
+from neptune.internal.operation_processors.offline_operation_processor import OfflineOperationProcessor
 from neptune.internal.state import ContainerState
 from neptune.internal.utils import verify_type
 from neptune.internal.utils.ping_background_job import PingBackgroundJob
@@ -182,9 +184,7 @@ class ModelVersion(MetadataContainer):
 
         self._model: Optional[str] = model
         self._with_id: Optional[str] = with_id
-        self._name: Optional[str] = (
-            DEFAULT_NAME if model is None and name is None else name
-        )
+        self._name: Optional[str] = DEFAULT_NAME if model is None and name is None else name
 
         # make mode proper Enum instead of string
         mode = Mode(mode or os.getenv(CONNECTION_MODE) or Mode.ASYNC.value)
@@ -215,9 +215,7 @@ class ModelVersion(MetadataContainer):
         if self._with_id is not None:
             # with_id (resume existing model_version) has priority over model (creating a new model_version)
             return self._backend.get_metadata_container(
-                container_id=QualifiedName(
-                    project_qualified_name + "/" + self._with_id
-                ),
+                container_id=QualifiedName(project_qualified_name + "/" + self._with_id),
                 expected_container_type=self.container_type,
             )
         elif self._model is not None:
@@ -228,9 +226,7 @@ class ModelVersion(MetadataContainer):
                 container_id=QualifiedName(project_qualified_name + "/" + self._model),
                 expected_container_type=ContainerType.MODEL,
             )
-            return self._backend.create_model_version(
-                project_id=self._project_api_object.id, model_id=api_model.id
-            )
+            return self._backend.create_model_version(project_id=self._project_api_object.id, model_id=api_model.id)
         else:
             raise NeptuneMissingRequiredInitParameter(
                 parameter_name="model",
@@ -290,9 +286,7 @@ class ModelVersion(MetadataContainer):
             attr = self.get_attribute(SYSTEM_STAGE_ATTRIBUTE_PATH)
             # We are sure that such attribute exists, because
             # SYSTEM_STAGE_ATTRIBUTE_PATH is set by default on ModelVersion creation
-            assert (
-                attr is not None
-            ), f"No {SYSTEM_STAGE_ATTRIBUTE_PATH} found in model version"
+            assert attr is not None, f"No {SYSTEM_STAGE_ATTRIBUTE_PATH} found in model version"
             attr.process_assignment(
                 value=mapped_stage.value,
                 wait=True,

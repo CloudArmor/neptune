@@ -16,9 +16,17 @@
 __all__ = ["MetadataFile"]
 
 import os
-from json import JSONDecodeError, dump, load
+from json import (
+    JSONDecodeError,
+    dump,
+    load,
+)
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import (
+    Any,
+    Dict,
+    Optional,
+)
 
 from neptune.core.components.abstract import Resource
 

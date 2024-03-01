@@ -15,11 +15,17 @@
 #
 import logging
 from functools import wraps
-from http.client import NOT_FOUND, UNPROCESSABLE_ENTITY
+from http.client import (
+    NOT_FOUND,
+    UNPROCESSABLE_ENTITY,
+)
 
 from requests.exceptions import HTTPError
 
-from neptune.legacy.api_exceptions import ExperimentNotFound, StorageLimitReached
+from neptune.legacy.api_exceptions import (
+    ExperimentNotFound,
+    StorageLimitReached,
+)
 from neptune.legacy.exceptions import NeptuneException
 
 _logger = logging.getLogger(__name__)
@@ -63,12 +69,9 @@ def handle_quota_limits(f):
                     experiment_short_id=experiment.id,
                     project_qualified_name=experiment._project.full_id,
                 )
-            if (
-                e.response.status_code == UNPROCESSABLE_ENTITY
-                and extract_response_field(e.response, "title").startswith(
-                    "Storage limit reached in organization: "
-                )
-            ):
+            if e.response.status_code == UNPROCESSABLE_ENTITY and extract_response_field(
+                e.response, "title"
+            ).startswith("Storage limit reached in organization: "):
                 raise StorageLimitReached()
             raise
 

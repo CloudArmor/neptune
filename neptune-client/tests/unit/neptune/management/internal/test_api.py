@@ -15,7 +15,11 @@
 #
 import os
 import unittest
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import (
+    MagicMock,
+    call,
+    patch,
+)
 
 import pytest
 from bravado.exception import HTTPNotFound
@@ -26,7 +30,11 @@ from neptune.common.envs import API_TOKEN_ENV_NAME
 from neptune.envs import PROJECT_ENV_NAME
 from neptune.internal.backends.hosted_client import DEFAULT_REQUEST_KWARGS
 from neptune.internal.backends.neptune_backend_mock import NeptuneBackendMock
-from neptune.management import clear_trash, delete_objects_from_trash, trash_objects
+from neptune.management import (
+    clear_trash,
+    delete_objects_from_trash,
+    trash_objects,
+)
 from neptune.management.exceptions import ProjectNotFound
 
 
@@ -72,28 +80,19 @@ class TestTrashObjects(unittest.TestCase):
             ),
             trash_experiments_mock.call_args,
         )
-        _mock_logger.info.assert_called_once_with(
-            "Successfully trashed objects: %d. Number of failures: %d.", 1, 2
-        )
-        self.assertEqual(
-            _mock_logger.warning.mock_calls,
-            [call("some_test_error1"), call("some_test_error2")],
-        )
+        _mock_logger.info.assert_called_once_with("Successfully trashed objects: %d. Number of failures: %d.", 1, 2)
+        self.assertEqual(_mock_logger.warning.mock_calls, [call("some_test_error1"), call("some_test_error2")])
 
     @patch("neptune.management.internal.api._get_leaderboard_client")
     def test_trash_objects_invalid_project_name(self, _get_leaderboard_client_mock):
-        _get_leaderboard_client_mock().api.trashExperiments.side_effect = HTTPNotFound(
-            MagicMock()
-        )
+        _get_leaderboard_client_mock().api.trashExperiments.side_effect = HTTPNotFound(MagicMock())
         with pytest.raises(ProjectNotFound):
             trash_objects(self.PROJECT_NAME, ["RUN-1", "MOD", "MOD-1"])
 
     @patch("neptune.management.internal.api._get_leaderboard_client")
     def test_project_delete_objects_from_trash(self, _get_leaderboard_client_mock):
         # given
-        delete_experiments_from_trash_mock = (
-            _get_leaderboard_client_mock().api.deleteExperiments
-        )
+        delete_experiments_from_trash_mock = _get_leaderboard_client_mock().api.deleteExperiments
 
         # when
         delete_objects_from_trash(self.PROJECT_NAME, ["RUN-1", "MOD", "MOD-1"])

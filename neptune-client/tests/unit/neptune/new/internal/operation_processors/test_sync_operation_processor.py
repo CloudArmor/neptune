@@ -16,21 +16,20 @@
 from pathlib import Path
 from uuid import uuid4
 
-from mock import MagicMock, patch
+from mock import (
+    MagicMock,
+    patch,
+)
 
 from neptune.constants import NEPTUNE_DATA_DIRECTORY
 from neptune.internal.container_type import ContainerType
 from neptune.internal.id_formats import UniqueId
-from neptune.internal.operation_processors.sync_operation_processor import (
-    SyncOperationProcessor,
-)
+from neptune.internal.operation_processors.sync_operation_processor import SyncOperationProcessor
 
 
 @patch("neptune.internal.operation_processors.utils.random.choice")
 @patch("neptune.internal.operation_processors.sync_operation_processor.Path.mkdir")
-@patch(
-    "neptune.internal.operation_processors.sync_operation_processor.OperationStorage"
-)
+@patch("neptune.internal.operation_processors.sync_operation_processor.OperationStorage")
 @patch("neptune.internal.operation_processors.sync_operation_processor.MetadataFile")
 @patch("neptune.internal.operation_processors.utils.os.getpid", return_value=42)
 def test_setup(_, __, ___, mkdir_mock, random_choice_mock):
@@ -42,9 +41,7 @@ def test_setup(_, __, ___, mkdir_mock, random_choice_mock):
     random_choice_mock.side_effect = tuple("abcdefgh")
 
     # and
-    processor = SyncOperationProcessor(
-        container_id=container_id, container_type=container_type, backend=MagicMock()
-    )
+    processor = SyncOperationProcessor(container_id=container_id, container_type=container_type, backend=MagicMock())
 
     # then
     mkdir_mock.assert_called_once_with(parents=True, exist_ok=True)
@@ -52,15 +49,11 @@ def test_setup(_, __, ___, mkdir_mock, random_choice_mock):
     # and
     assert (
         processor.data_path
-        == Path(NEPTUNE_DATA_DIRECTORY)
-        / "sync"
-        / f"{container_type.value}__{container_id}__42__abcdefgh"
+        == Path(NEPTUNE_DATA_DIRECTORY) / "sync" / f"{container_type.value}__{container_id}__42__abcdefgh"
     )
 
 
-@patch(
-    "neptune.internal.operation_processors.sync_operation_processor.OperationStorage"
-)
+@patch("neptune.internal.operation_processors.sync_operation_processor.OperationStorage")
 @patch("neptune.internal.operation_processors.sync_operation_processor.MetadataFile")
 def test_flush(metadata_file_mock, operation_storage_mock):
     # given
@@ -72,9 +65,7 @@ def test_flush(metadata_file_mock, operation_storage_mock):
     operation_storage = operation_storage_mock.return_value
 
     # and
-    processor = SyncOperationProcessor(
-        container_id=container_id, container_type=container_type, backend=MagicMock()
-    )
+    processor = SyncOperationProcessor(container_id=container_id, container_type=container_type, backend=MagicMock())
 
     # and
     processor.start()
@@ -87,9 +78,7 @@ def test_flush(metadata_file_mock, operation_storage_mock):
     operation_storage.flush.assert_called_once()
 
 
-@patch(
-    "neptune.internal.operation_processors.sync_operation_processor.OperationStorage"
-)
+@patch("neptune.internal.operation_processors.sync_operation_processor.OperationStorage")
 @patch("neptune.internal.operation_processors.sync_operation_processor.MetadataFile")
 def test_close(metadata_file_mock, operation_storage_mock):
     # given
@@ -101,9 +90,7 @@ def test_close(metadata_file_mock, operation_storage_mock):
     operation_storage = operation_storage_mock.return_value
 
     # and
-    processor = SyncOperationProcessor(
-        container_id=container_id, container_type=container_type, backend=MagicMock()
-    )
+    processor = SyncOperationProcessor(container_id=container_id, container_type=container_type, backend=MagicMock())
 
     # and
     processor.start()
@@ -117,9 +104,7 @@ def test_close(metadata_file_mock, operation_storage_mock):
 
 
 @patch("neptune.internal.operation_processors.sync_operation_processor.Path.rmdir")
-@patch(
-    "neptune.internal.operation_processors.sync_operation_processor.OperationStorage"
-)
+@patch("neptune.internal.operation_processors.sync_operation_processor.OperationStorage")
 @patch("neptune.internal.operation_processors.sync_operation_processor.MetadataFile")
 def test_stop(metadata_file_mock, operation_storage_mock, rmdir_mock):
     # given
@@ -131,9 +116,7 @@ def test_stop(metadata_file_mock, operation_storage_mock, rmdir_mock):
     operation_storage = operation_storage_mock.return_value
 
     # and
-    processor = SyncOperationProcessor(
-        container_id=container_id, container_type=container_type, backend=MagicMock()
-    )
+    processor = SyncOperationProcessor(container_id=container_id, container_type=container_type, backend=MagicMock())
 
     # and
     processor.start()
@@ -157,9 +140,7 @@ def test_stop(metadata_file_mock, operation_storage_mock, rmdir_mock):
     rmdir_mock.assert_called_once()
 
 
-@patch(
-    "neptune.internal.operation_processors.sync_operation_processor.OperationStorage"
-)
+@patch("neptune.internal.operation_processors.sync_operation_processor.OperationStorage")
 @patch("neptune.internal.operation_processors.sync_operation_processor.MetadataFile")
 def test_metadata(metadata_file_mock, _):
     # given
@@ -167,9 +148,7 @@ def test_metadata(metadata_file_mock, _):
     container_type = ContainerType.RUN
 
     # when
-    SyncOperationProcessor(
-        container_id=container_id, container_type=container_type, backend=MagicMock()
-    )
+    SyncOperationProcessor(container_id=container_id, container_type=container_type, backend=MagicMock())
 
     # then
     metadata = metadata_file_mock.call_args_list[0][1]["metadata"]

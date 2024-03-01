@@ -15,10 +15,17 @@
 #
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import (
+    ABC,
+    abstractmethod,
+)
 from pathlib import Path
 from types import TracebackType
-from typing import Optional, Tuple, Type
+from typing import (
+    Optional,
+    Tuple,
+    Type,
+)
 
 
 class AutoCloseable(ABC):

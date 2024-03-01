@@ -17,7 +17,10 @@ __all__ = ["CompatibilityImporter"]
 
 import sys
 from importlib import import_module
-from importlib.abc import Loader, MetaPathFinder
+from importlib.abc import (
+    Loader,
+    MetaPathFinder,
+)
 
 
 class CompatibilityModuleLoader(Loader):

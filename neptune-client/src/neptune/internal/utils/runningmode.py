@@ -30,10 +30,7 @@ def in_notebook() -> bool:
 
         ipy = get_ipython()
         return (
-            ipy is not None
-            and hasattr(ipy, "config")
-            and isinstance(ipy.config, dict)
-            and "IPKernelApp" in ipy.config
+            ipy is not None and hasattr(ipy, "config") and isinstance(ipy.config, dict) and "IPKernelApp" in ipy.config
         )
     except ImportError:
         return False

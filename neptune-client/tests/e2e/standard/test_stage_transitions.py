@@ -14,10 +14,10 @@
 # limitations under the License.
 #
 import pytest
-from tests.e2e.base import BaseE2ETest
 
 from neptune.exceptions import NeptuneCannotChangeStageManually
 from neptune.metadata_containers import ModelVersion
+from tests.e2e.base import BaseE2ETest
 
 
 class TestStageTransitions(BaseE2ETest):

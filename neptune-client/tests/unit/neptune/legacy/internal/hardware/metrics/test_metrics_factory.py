@@ -25,7 +25,10 @@ from neptune.common.hardware.gauges.gauge_factory import (
     SystemMemoryUsageGauge,
 )
 from neptune.common.hardware.gauges.gauge_mode import GaugeMode
-from neptune.common.hardware.metrics.metric import Metric, MetricResourceType
+from neptune.common.hardware.metrics.metric import (
+    Metric,
+    MetricResourceType,
+)
 from neptune.common.hardware.metrics.metrics_factory import MetricsFactory
 from neptune.common.hardware.resources.system_resource_info import SystemResourceInfo
 

@@ -17,10 +17,20 @@ __all__ = ["StringSeries"]
 
 import time
 from itertools import cycle
-from typing import TYPE_CHECKING, Iterable, Optional, Sequence, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Iterable,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+)
 
 from neptune.internal.types.stringify_value import StringifyValue
-from neptune.internal.utils import is_collection, is_stringify_value
+from neptune.internal.utils import (
+    is_collection,
+    is_stringify_value,
+)
 from neptune.types.series.series import Series
 
 if TYPE_CHECKING:
@@ -44,9 +54,7 @@ class StringSeries(Series):
         if not is_collection(values):
             raise TypeError("`values` is not a collection")
 
-        self._truncated = any(
-            [len(value) > MAX_STRING_SERIES_VALUE_LENGTH for value in values]
-        )
+        self._truncated = any([len(value) > MAX_STRING_SERIES_VALUE_LENGTH for value in values])
         self._values = [value[:MAX_STRING_SERIES_VALUE_LENGTH] for value in values]
 
         if steps is None:

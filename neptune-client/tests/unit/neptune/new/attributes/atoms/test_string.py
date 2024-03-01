@@ -13,11 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from mock import MagicMock, patch
-from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
+from mock import (
+    MagicMock,
+    patch,
+)
 
-from neptune.attributes.atoms.string import String, StringVal
+from neptune.attributes.atoms.string import (
+    String,
+    StringVal,
+)
 from neptune.internal.operation import AssignString
+from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 
 class TestString(TestAttributeBase):
@@ -39,9 +45,7 @@ class TestString(TestAttributeBase):
             with self._exp() as exp:
                 var = String(exp, path)
                 var.assign(value, wait=wait)
-                processor.enqueue_operation.assert_called_with(
-                    AssignString(path, expected), wait=wait
-                )
+                processor.enqueue_operation.assert_called_with(AssignString(path, expected), wait=wait)
 
     def test_get(self):
         with self._exp() as exp:

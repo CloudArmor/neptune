@@ -25,7 +25,10 @@ from neptune.internal.artifacts.types import (
     ArtifactFileData,
 )
 from neptune.internal.backends.api_model import OptionalFeatures
-from neptune.internal.operation import AssignArtifact, TrackFilesToArtifact
+from neptune.internal.operation import (
+    AssignArtifact,
+    TrackFilesToArtifact,
+)
 from neptune.types.atoms.artifact import Artifact as ArtifactVal
 from neptune.typing import ProgressBarType
 
@@ -49,9 +52,7 @@ class Artifact(Atom):
 
     def fetch_hash(self) -> str:
         self._check_feature()
-        val = self._backend.get_artifact_attribute(
-            self._container_id, self._container_type, self._path
-        )
+        val = self._backend.get_artifact_attribute(self._container_id, self._container_type, self._path)
         return val.hash
 
     def fetch_files_list(self) -> typing.List[ArtifactFileData]:
@@ -62,19 +63,11 @@ class Artifact(Atom):
             artifact_hash,
         )
 
-    def download(
-        self,
-        destination: str = None,
-        progress_bar: typing.Optional[ProgressBarType] = None,
-    ):
+    def download(self, destination: str = None, progress_bar: typing.Optional[ProgressBarType] = None):
         self._check_feature()
         for file_definition in self.fetch_files_list():
-            driver: typing.Type[ArtifactDriver] = ArtifactDriversMap.match_type(
-                file_definition.type
-            )
-            file_destination = pathlib.Path(destination or ".") / pathlib.Path(
-                file_definition.file_path
-            )
+            driver: typing.Type[ArtifactDriver] = ArtifactDriversMap.match_type(file_definition.type)
+            file_destination = pathlib.Path(destination or ".") / pathlib.Path(file_definition.file_path)
             file_destination.parent.mkdir(parents=True, exist_ok=True)
             driver.download_file(file_destination, file_definition)
 

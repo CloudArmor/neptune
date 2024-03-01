@@ -30,9 +30,7 @@ import neptune
 from neptune.internal.utils.logger import NEPTUNE_LOGGER_NAME
 from neptune.internal.utils.runningmode import in_interactive
 
-DEFAULT_FORMAT = (
-    "[%(name)s] [warning] %(filename)s:%(lineno)d: %(category)s: %(message)s\n"
-)
+DEFAULT_FORMAT = "[%(name)s] [warning] %(filename)s:%(lineno)d: %(category)s: %(message)s\n"
 INTERACTIVE_FORMAT = "[%(name)s] [warning] %(category)s: %(message)s\n"
 
 

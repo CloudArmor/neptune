@@ -16,7 +16,10 @@
 __all__ = ["Atom"]
 
 import abc
-from typing import TYPE_CHECKING, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    TypeVar,
+)
 
 from neptune.types.value import Value
 

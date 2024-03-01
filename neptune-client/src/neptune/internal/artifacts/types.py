@@ -13,13 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-__all__ = [
-    "ArtifactFileType",
-    "ArtifactMetadataSerializer",
-    "ArtifactFileData",
-    "ArtifactDriversMap",
-    "ArtifactDriver",
-]
+__all__ = ["ArtifactFileType", "ArtifactMetadataSerializer", "ArtifactFileData", "ArtifactDriversMap", "ArtifactDriver"]
 
 import abc
 import enum
@@ -40,19 +34,12 @@ class ArtifactFileType(enum.Enum):
 
 class ArtifactMetadataSerializer:
     @staticmethod
-    def serialize(
-        metadata: typing.Dict[str, str]
-    ) -> typing.List[typing.Dict[str, str]]:
+    def serialize(metadata: typing.Dict[str, str]) -> typing.List[typing.Dict[str, str]]:
         return [{"key": k, "value": v} for k, v in sorted(metadata.items())]
 
     @staticmethod
-    def deserialize(
-        metadata: typing.List[typing.Dict[str, str]]
-    ) -> typing.Dict[str, str]:
-        return {
-            f'{key_value.get("key")}': f'{key_value.get("value")}'
-            for key_value in metadata
-        }
+    def deserialize(metadata: typing.List[typing.Dict[str, str]]) -> typing.Dict[str, str]:
+        return {f'{key_value.get("key")}': f'{key_value.get("value")}' for key_value in metadata}
 
 
 @dataclass
@@ -71,10 +58,7 @@ class ArtifactFileData:
             type=artifact_file_dto.type,
             size=artifact_file_dto.size,
             metadata=ArtifactMetadataSerializer.deserialize(
-                [
-                    {"key": str(m.key), "value": str(m.value)}
-                    for m in artifact_file_dto.metadata
-                ]
+                [{"key": str(m.key), "value": str(m.value)} for m in artifact_file_dto.metadata]
             ),
         )
 
@@ -121,13 +105,9 @@ class ArtifactDriver(abc.ABC):
         raise NotImplementedError
 
     @classmethod
-    def get_tracked_files(
-        cls, path: str, destination: str = None
-    ) -> typing.List[ArtifactFileData]:
+    def get_tracked_files(cls, path: str, destination: str = None) -> typing.List[ArtifactFileData]:
         raise NotImplementedError
 
     @classmethod
-    def download_file(
-        cls, destination: pathlib.Path, file_definition: ArtifactFileData
-    ):
+    def download_file(cls, destination: pathlib.Path, file_definition: ArtifactFileData):
         raise NotImplementedError
