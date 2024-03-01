@@ -93,7 +93,11 @@ __all__ = [
     "NeptuneMaxDiskUtilizationExceeded",
 ]
 
-from typing import List, Optional, Union
+from typing import (
+    List,
+    Optional,
+    Union,
+)
 from urllib.parse import urlparse
 
 from packaging.version import Version
@@ -114,8 +118,14 @@ from neptune.common.exceptions import (
     NeptuneSSLVerificationError,
     Unauthorized,
 )
-from neptune.envs import CUSTOM_RUN_ID_ENV_NAME, PROJECT_ENV_NAME
-from neptune.internal.backends.api_model import Project, Workspace
+from neptune.envs import (
+    CUSTOM_RUN_ID_ENV_NAME,
+    PROJECT_ENV_NAME,
+)
+from neptune.internal.backends.api_model import (
+    Project,
+    Workspace,
+)
 from neptune.internal.container_type import ContainerType
 from neptune.internal.id_formats import QualifiedName
 from neptune.internal.utils import replace_patch_version
@@ -196,21 +206,13 @@ class MetadataContainerNotFound(NeptuneException):
     def __init__(self, container_id: str, container_type: Optional[ContainerType]):
         self.container_id = container_id
         self.container_type = container_type
-        container_type_str = (
-            container_type.value.capitalize() if container_type else "object"
-        )
-        super().__init__(
-            f"No existing {container_type_str} was found at {container_id}."
-        )
+        container_type_str = container_type.value.capitalize() if container_type else "object"
+        super().__init__(f"No existing {container_type_str} was found at {container_id}.")
 
     @classmethod
-    def of_container_type(
-        cls, container_type: Optional[ContainerType], container_id: str
-    ):
+    def of_container_type(cls, container_type: Optional[ContainerType], container_id: str):
         if container_type is None:
-            return MetadataContainerNotFound(
-                container_id=container_id, container_type=None
-            )
+            return MetadataContainerNotFound(container_id=container_id, container_type=None)
         elif container_type == ContainerType.PROJECT:
             return ProjectNotFound(project_id=container_id)
         elif container_type == ContainerType.RUN:
@@ -240,9 +242,7 @@ class ModelNotFound(MetadataContainerNotFound):
 
 class ModelVersionNotFound(MetadataContainerNotFound):
     def __init__(self, model_version_id: str):
-        super().__init__(
-            container_id=model_version_id, container_type=ContainerType.MODEL_VERSION
-        )
+        super().__init__(container_id=model_version_id, container_type=ContainerType.MODEL_VERSION)
 
 
 class ExceptionWithProjectsWorkspacesListing(NeptuneException):
@@ -279,9 +279,7 @@ You can check all of your projects on the Projects page:
 
         super().__init__(
             message.format(
-                available_projects_message=available_projects_message.format(
-                    projects=projects_formated_list
-                )
+                available_projects_message=available_projects_message.format(projects=projects_formated_list)
                 if available_projects
                 else "",
                 available_workspaces_message=available_workspaces_message.format(
@@ -314,9 +312,7 @@ class ContainerUUIDNotFound(NeptuneException):
 RunUUIDNotFound = ContainerUUIDNotFound
 
 
-class ProjectNotFoundWithSuggestions(
-    ExceptionWithProjectsWorkspacesListing, ProjectNotFound
-):
+class ProjectNotFoundWithSuggestions(ExceptionWithProjectsWorkspacesListing, ProjectNotFound):
     def __init__(
         self,
         project_id: QualifiedName,
@@ -355,9 +351,7 @@ You may also want to check the following docs pages:
 
 {correct}Need help?{end}-> https://docs.neptune.ai/getting_help
 """
-        super().__init__(
-            message=message, available_projects=available_projects, project=project_id
-        )
+        super().__init__(message=message, available_projects=available_projects, project=project_id)
 
 
 class NeptuneMissingProjectNameException(ExceptionWithProjectsWorkspacesListing):
@@ -562,16 +556,12 @@ You may also want to check the following docs pages:
 
 class NeedExistingRunForReadOnlyMode(NeedExistingExperimentForReadOnlyMode):
     def __init__(self):
-        super().__init__(
-            container_type=ContainerType.RUN, callback_name="neptune.init_run"
-        )
+        super().__init__(container_type=ContainerType.RUN, callback_name="neptune.init_run")
 
 
 class NeedExistingModelForReadOnlyMode(NeedExistingExperimentForReadOnlyMode):
     def __init__(self):
-        super().__init__(
-            container_type=ContainerType.MODEL, callback_name="neptune.init_model"
-        )
+        super().__init__(container_type=ContainerType.MODEL, callback_name="neptune.init_model")
 
 
 class NeedExistingModelVersionForReadOnlyMode(NeedExistingExperimentForReadOnlyMode):
@@ -641,11 +631,7 @@ class NeptuneClientUpgradeRequiredError(NeptuneException):
         max_version: Optional[Union[Version, str]] = None,
     ):
         current_version = str(version)
-        required_version = (
-            "==" + replace_patch_version(str(max_version))
-            if max_version
-            else ">=" + str(min_version)
-        )
+        required_version = "==" + replace_patch_version(str(max_version)) if max_version else ">=" + str(min_version)
         message = """
 {h1}
 ----NeptuneClientUpgradeRequiredError-------------------------------------------------------------
@@ -1052,11 +1038,7 @@ Neptune had a problem processing "{path}". It expects it to be {expected_descrip
 
 {correct}Need help?{end}-> https://docs.neptune.ai/getting_help
 """
-        super().__init__(
-            message.format(
-                path=path, expected_description=expected_description, **STYLES
-            )
-        )
+        super().__init__(message.format(path=path, expected_description=expected_description, **STYLES))
 
 
 class NeptuneRemoteStorageCredentialsException(NeptuneException):
@@ -1102,9 +1084,7 @@ It seems you are using Neptune Artifacts functionality that is currently not sup
 
 {correct}Need help?{end}-> https://docs.neptune.ai/getting_help
 """
-        super().__init__(
-            message.format(functionality_info=functionality_info, **STYLES)
-        )
+        super().__init__(message.format(functionality_info=functionality_info, **STYLES))
 
 
 class NeptuneEmptyLocationException(NeptuneException):
@@ -1117,9 +1097,7 @@ Neptune could not find files in the requested location ({location}) during the c
 
 {correct}Need help?{end}-> https://docs.neptune.ai/getting_help
 """
-        super().__init__(
-            message.format(location=location, namespace=namespace, **STYLES)
-        )
+        super().__init__(message.format(location=location, namespace=namespace, **STYLES))
 
 
 class NeptuneFeatureNotAvailableException(NeptuneException):
@@ -1160,9 +1138,7 @@ available again.
 
 {correct}Need help?{end}-> https://docs.neptune.ai/getting_help
 """
-        super().__init__(
-            message.format(model_key=model_key, models_tab_url=models_tab_url, **STYLES)
-        )
+        super().__init__(message.format(model_key=model_key, models_tab_url=models_tab_url, **STYLES))
 
 
 class NeptuneSynchronizationAlreadyStoppedException(NeptuneException):
@@ -1245,9 +1221,5 @@ Current disk utilization ({disk_utilization}%) exceeds the limit ({utilization_l
 {correct}Need help?{end}-> https://docs.neptune.ai/getting_help
     """
         super().__init__(
-            message.format(
-                disk_utilization=disk_utilization,
-                utilization_limit=utilization_limit,
-                **STYLES,
-            )
+            message.format(disk_utilization=disk_utilization, utilization_limit=utilization_limit, **STYLES)
         )

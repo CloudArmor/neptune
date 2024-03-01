@@ -13,8 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from random import choices, randint
-from string import ascii_uppercase, digits
+from random import (
+    choices,
+    randint,
+)
+from string import (
+    ascii_uppercase,
+    digits,
+)
 
 from neptune.internal.utils.hashing import generate_hash
 
@@ -22,10 +28,7 @@ from neptune.internal.utils.hashing import generate_hash
 class TestHashGenerator:
     def test_should_be_deterministic(self):
         # given
-        descriptors = [
-            randint(0, 1024),
-            "".join(choices(ascii_uppercase + digits, k=8)),
-        ]
+        descriptors = [randint(0, 1024), "".join(choices(ascii_uppercase + digits, k=8))]
 
         # when
         hash1 = generate_hash(*descriptors, length=8)
@@ -36,15 +39,10 @@ class TestHashGenerator:
 
     def test_should_be_unique(self):
         # given
-        unique_descriptors = set(
-            (randint(0, 1024), "".join(choices(ascii_uppercase + digits, k=8)))
-            for _ in range(10)
-        )
+        unique_descriptors = set((randint(0, 1024), "".join(choices(ascii_uppercase + digits, k=8))) for _ in range(10))
 
         # when
-        unique_hashes = set(
-            generate_hash(*descriptors, length=8) for descriptors in unique_descriptors
-        )
+        unique_hashes = set(generate_hash(*descriptors, length=8) for descriptors in unique_descriptors)
 
         # then
         assert len(unique_descriptors) == len(unique_hashes)

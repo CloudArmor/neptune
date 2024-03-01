@@ -25,7 +25,10 @@ from typing import Optional
 from mock import patch
 from pytest import fixture
 
-from neptune.core.components.queue.disk_queue import DiskQueue, QueueElement
+from neptune.core.components.queue.disk_queue import (
+    DiskQueue,
+    QueueElement,
+)
 
 
 def test_put():
@@ -93,21 +96,10 @@ def test_get_batch():
             queue.flush()
 
             # then
-            assert [
-                get_queue_element(Obj(i, str(i)), i, 1234 + i - 1) for i in range(1, 26)
-            ] == queue.get_batch(25)
-            assert [
-                get_queue_element(Obj(i, str(i)), i, 1234 + i - 1)
-                for i in range(26, 51)
-            ] == queue.get_batch(25)
-            assert [
-                get_queue_element(Obj(i, str(i)), i, 1234 + i - 1)
-                for i in range(51, 76)
-            ] == queue.get_batch(25)
-            assert [
-                get_queue_element(Obj(i, str(i)), i, 1234 + i - 1)
-                for i in range(76, 91)
-            ] == queue.get_batch(25)
+            assert [get_queue_element(Obj(i, str(i)), i, 1234 + i - 1) for i in range(1, 26)] == queue.get_batch(25)
+            assert [get_queue_element(Obj(i, str(i)), i, 1234 + i - 1) for i in range(26, 51)] == queue.get_batch(25)
+            assert [get_queue_element(Obj(i, str(i)), i, 1234 + i - 1) for i in range(51, 76)] == queue.get_batch(25)
+            assert [get_queue_element(Obj(i, str(i)), i, 1234 + i - 1) for i in range(76, 91)] == queue.get_batch(25)
 
 
 def test_batch_limit():
@@ -129,12 +121,8 @@ def test_batch_limit():
             queue.flush()
 
             # then
-            assert [
-                get_queue_element(Obj(i, str(i)), i + 1, 1234 + i) for i in range(3)
-            ] == queue.get_batch(5)
-            assert [
-                get_queue_element(Obj(i, str(i)), i + 1, 1234 + i) for i in range(3, 5)
-            ] == queue.get_batch(2)
+            assert [get_queue_element(Obj(i, str(i)), i + 1, 1234 + i) for i in range(3)] == queue.get_batch(5)
+            assert [get_queue_element(Obj(i, str(i)), i + 1, 1234 + i) for i in range(3, 5)] == queue.get_batch(2)
 
 
 def test_resuming_queue():
@@ -165,15 +153,10 @@ def test_resuming_queue():
 
             # and
             data_files = glob(data_path + "/data-*.log")
-            data_files_versions = [
-                int(file[len(data_path + "/data-") : -len(".log")])
-                for file in data_files
-            ]
+            data_files_versions = [int(file[len(data_path + "/data-") : -len(".log")]) for file in data_files]
 
             assert len(data_files) > 10
-            assert 1 == len(
-                [ver for ver in data_files_versions if ver <= version_to_ack]
-            )
+            assert 1 == len([ver for ver in data_files_versions if ver <= version_to_ack])
 
         # Resume queue
         with DiskQueue[Obj](

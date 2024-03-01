@@ -17,9 +17,21 @@ import abc
 import os
 from dataclasses import dataclass
 from datetime import datetime
-from typing import TYPE_CHECKING, Generic, List, Optional, Set, Tuple, Type, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Generic,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+)
 
-from neptune.common.exceptions import InternalClientError, NeptuneException
+from neptune.common.exceptions import (
+    InternalClientError,
+    NeptuneException,
+)
 from neptune.core.components.operation_storage import OperationStorage
 from neptune.exceptions import MalformedOperation
 from neptune.internal.container_type import ContainerType
@@ -36,9 +48,7 @@ T = TypeVar("T")
 
 
 def all_subclasses(cls):
-    return set(cls.__subclasses__()).union(
-        [s for c in cls.__subclasses__() for s in all_subclasses(c)]
-    )
+    return set(cls.__subclasses__()).union([s for c in cls.__subclasses__() for s in all_subclasses(c)])
 
 
 @dataclass
@@ -62,9 +72,7 @@ class Operation(abc.ABC):
             raise ValueError("Malformed operation {} - type is missing".format(data))
         sub_classes = {cls.__name__: cls for cls in all_subclasses(Operation)}
         if not data["type"] in sub_classes:
-            raise ValueError(
-                "Malformed operation {} - unknown type {}".format(data, data["type"])
-            )
+            raise ValueError("Malformed operation {} - unknown type {}".format(data, data["type"]))
         return sub_classes[data["type"]].from_dict(data)
 
 
@@ -155,9 +163,7 @@ class AssignDatetime(Operation):
 
     @staticmethod
     def from_dict(data: dict) -> "AssignDatetime":
-        return AssignDatetime(
-            data["path"], datetime.fromtimestamp(data["value"] / 1000)
-        )
+        return AssignDatetime(data["path"], datetime.fromtimestamp(data["value"] / 1000))
 
 
 @dataclass
@@ -188,9 +194,7 @@ class UploadFile(Operation):
     clean_after_upload: bool = False
 
     @classmethod
-    def of_file(
-        cls, value: File, attribute_path: List[str], operation_storage: OperationStorage
-    ):
+    def of_file(cls, value: File, attribute_path: List[str], operation_storage: OperationStorage):
         if value.file_type is FileType.LOCAL_FILE:
             operation = UploadFile(
                 path=attribute_path,
@@ -200,9 +204,7 @@ class UploadFile(Operation):
         elif value.file_type in (FileType.IN_MEMORY, FileType.STREAM):
             tmp_file_name = cls.get_tmp_file_name(attribute_path, value.extension)
             value._save(operation_storage.upload_path / tmp_file_name)
-            operation = UploadFile(
-                path=attribute_path, ext=value.extension, tmp_file_name=tmp_file_name
-            )
+            operation = UploadFile(path=attribute_path, ext=value.extension, tmp_file_name=tmp_file_name)
         else:
             raise ValueError(f"Unexpected FileType: {value.file_type}")
         return operation
@@ -235,7 +237,9 @@ class UploadFile(Operation):
     @staticmethod
     def get_tmp_file_name(attribute_path: List[str], extension: str):
         now = datetime.now()
-        tmp_file_name = f"{'_'.join(attribute_path)}-{now.timestamp()}-{now.strftime('%Y-%m-%d_%H.%M.%S.%f')}.{extension}"
+        tmp_file_name = (
+            f"{'_'.join(attribute_path)}-{now.timestamp()}-{now.strftime('%Y-%m-%d_%H.%M.%S.%f')}.{extension}"
+        )
         return tmp_file_name
 
     def get_absolute_path(self, operation_storage: OperationStorage) -> str:
@@ -284,9 +288,7 @@ class UploadFileSet(Operation):
 
     @staticmethod
     def from_dict(data: dict) -> "UploadFileSet":
-        return UploadFileSet(
-            data["path"], data["file_globs"], data["reset"] != str(False)
-        )
+        return UploadFileSet(data["path"], data["file_globs"], data["reset"] != str(False))
 
 
 class LogOperation(Operation, abc.ABC):
@@ -305,9 +307,7 @@ class LogSeriesValue(Generic[T]):
 
     @staticmethod
     def from_dict(data: dict, value_deserializer=lambda x: x) -> "LogSeriesValue[T]":
-        return LogSeriesValue[T](
-            value_deserializer(data["value"]), data.get("step", None), data["ts"]
-        )
+        return LogSeriesValue[T](value_deserializer(data["value"]), data.get("step", None), data["ts"])
 
 
 @dataclass
@@ -373,13 +373,9 @@ class ImageValue:
         if isinstance(obj, str):
             return ImageValue(data=obj, name=None, description=None)
         if isinstance(obj, dict):
-            return ImageValue(
-                data=obj["data"], name=obj["name"], description=obj["description"]
-            )
+            return ImageValue(data=obj["data"], name=obj["name"], description=obj["description"])
         else:
-            raise InternalClientError(
-                "Run data on disk is malformed or was saved by newer version of Neptune Library"
-            )
+            raise InternalClientError("Run data on disk is malformed or was saved by newer version of Neptune Library")
 
 
 @dataclass
@@ -401,10 +397,7 @@ class LogImages(LogOperation):
     def from_dict(data: dict) -> "LogImages":
         return LogImages(
             data["path"],
-            [
-                LogImages.ValueType.from_dict(value, ImageValue.deserializer)
-                for value in data["values"]
-            ],
+            [LogImages.ValueType.from_dict(value, ImageValue.deserializer) for value in data["values"]],
         )
 
 
@@ -589,9 +582,9 @@ class CopyAttribute(Operation):
     def from_dict(data: dict) -> "CopyAttribute":
         from neptune.attributes.attribute import Attribute
 
-        source_attr_cls = {
-            cls.__name__: cls for cls in all_subclasses(Attribute) if cls.supports_copy
-        }.get(data["source_attr_name"])
+        source_attr_cls = {cls.__name__: cls for cls in all_subclasses(Attribute) if cls.supports_copy}.get(
+            data["source_attr_name"]
+        )
 
         if source_attr_cls is None:
             raise MalformedOperation("Copy of non-copiable type found in queue!")
@@ -608,7 +601,5 @@ class CopyAttribute(Operation):
         # repack CopyAttribute op into target attribute assignment
         getter = self.source_attr_cls.getter
         create_assignment_operation = self.source_attr_cls.create_assignment_operation
-        value = getter(
-            backend, self.container_id, self.container_type, self.source_path
-        )
+        value = getter(backend, self.container_id, self.container_type, self.source_path)
         return create_assignment_operation(self.path, value)

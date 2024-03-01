@@ -18,7 +18,11 @@ __all__ = ["OperationsPreprocessor"]
 import dataclasses
 import typing
 from enum import Enum
-from typing import Callable, List, TypeVar
+from typing import (
+    Callable,
+    List,
+    TypeVar,
+)
 
 from neptune.common.exceptions import InternalClientError
 from neptune.exceptions import MetadataInconsistency
@@ -61,9 +65,7 @@ class RequiresPreviousCompleted(Exception):
 @dataclasses.dataclass
 class AccumulatedOperations:
     upload_operations: List[Operation] = dataclasses.field(default_factory=list)
-    artifact_operations: List[TrackFilesToArtifact] = dataclasses.field(
-        default_factory=list
-    )
+    artifact_operations: List[TrackFilesToArtifact] = dataclasses.field(default_factory=list)
     other_operations: List[Operation] = dataclasses.field(default_factory=list)
 
     errors: List[MetadataInconsistency] = dataclasses.field(default_factory=list)
@@ -84,9 +86,7 @@ class OperationsPreprocessor:
 
     def _process_op(self, op: Operation) -> "_OperationsAccumulator":
         path_str = path_to_str(op.path)
-        target_acc = self._accumulators.setdefault(
-            path_str, _OperationsAccumulator(op.path)
-        )
+        target_acc = self._accumulators.setdefault(path_str, _OperationsAccumulator(op.path))
         target_acc.visit(op)
         return target_acc
 
@@ -151,10 +151,9 @@ class _OperationsAccumulator(OperationVisitor[None]):
         return self._errors
 
     def _check_prerequisites(self, op: Operation):
-        if (
-            OperationsPreprocessor.is_file_op(op)
-            or OperationsPreprocessor.is_artifact_op(op)
-        ) and len(self._delete_ops) > 0:
+        if (OperationsPreprocessor.is_file_op(op) or OperationsPreprocessor.is_artifact_op(op)) and len(
+            self._delete_ops
+        ) > 0:
             raise RequiresPreviousCompleted()
 
     def _process_modify_op(
@@ -326,11 +325,7 @@ class _OperationsAccumulator(OperationVisitor[None]):
         op_old = ops[0]
         assert op_old.path == new_op.path
         assert op_old.project_id == new_op.project_id
-        return [
-            TrackFilesToArtifact(
-                op_old.path, op_old.project_id, op_old.entries + new_op.entries
-            )
-        ]
+        return [TrackFilesToArtifact(op_old.path, op_old.project_id, op_old.entries + new_op.entries)]
 
     def visit_track_files_to_artifact(self, op: TrackFilesToArtifact) -> None:
         self._process_modify_op(_DataType.ARTIFACT, op, self._artifact_log_modifier)
@@ -350,9 +345,7 @@ class _OperationsAccumulator(OperationVisitor[None]):
         return lambda ops, new_op: [new_op]
 
     @staticmethod
-    def _log_modifier(
-        log_op_class: type, clear_op_class: type, log_combine: Callable[[T, T], T]
-    ):
+    def _log_modifier(log_op_class: type, clear_op_class: type, log_combine: Callable[[T, T], T]):
         def modifier(ops, new_op):
             if len(ops) == 0:
                 return [new_op]
@@ -363,9 +356,7 @@ class _OperationsAccumulator(OperationVisitor[None]):
             elif len(ops) == 2:
                 return [ops[0], log_combine(ops[1], new_op)]
             else:
-                raise InternalClientError(
-                    "Preprocessing operations failed: len(ops) == {}".format(len(ops))
-                )
+                raise InternalClientError("Preprocessing operations failed: len(ops) == {}".format(len(ops)))
 
         return modifier
 

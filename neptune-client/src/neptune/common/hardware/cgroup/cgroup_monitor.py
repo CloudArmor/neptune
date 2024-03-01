@@ -16,9 +16,7 @@
 
 import time
 
-from neptune.common.hardware.cgroup.cgroup_filesystem_reader import (
-    CGroupFilesystemReader,
-)
+from neptune.common.hardware.cgroup.cgroup_filesystem_reader import CGroupFilesystemReader
 from neptune.common.hardware.system.system_monitor import SystemMonitor
 
 
@@ -53,26 +51,14 @@ class CGroupMonitor(object):
 
     def get_cpu_usage_percentage(self):
         current_timestamp_nanos = time.time() * 10**9
-        cpu_cumulative_usage_nanos = (
-            self.__cgroup_filesystem_reader.get_cpuacct_usage_nanos()
-        )
+        cpu_cumulative_usage_nanos = self.__cgroup_filesystem_reader.get_cpuacct_usage_nanos()
 
         if self.__first_measurement():
             current_usage = 0.0
         else:
-            usage_diff = (
-                cpu_cumulative_usage_nanos - self.__last_cpu_cumulative_usage_nanos
-            )
-            time_diff = (
-                current_timestamp_nanos
-                - self.__last_cpu_usage_measurement_timestamp_nanos
-            )
-            current_usage = (
-                float(usage_diff)
-                / float(time_diff)
-                / self.get_cpu_usage_limit_in_cores()
-                * 100.0
-            )
+            usage_diff = cpu_cumulative_usage_nanos - self.__last_cpu_cumulative_usage_nanos
+            time_diff = current_timestamp_nanos - self.__last_cpu_usage_measurement_timestamp_nanos
+            current_usage = float(usage_diff) / float(time_diff) / self.get_cpu_usage_limit_in_cores() * 100.0
 
         self.__last_cpu_usage_measurement_timestamp_nanos = current_timestamp_nanos
         self.__last_cpu_cumulative_usage_nanos = cpu_cumulative_usage_nanos
@@ -82,8 +68,7 @@ class CGroupMonitor(object):
 
     def __first_measurement(self):
         return (
-            self.__last_cpu_usage_measurement_timestamp_nanos is None
-            or self.__last_cpu_cumulative_usage_nanos is None
+            self.__last_cpu_usage_measurement_timestamp_nanos is None or self.__last_cpu_cumulative_usage_nanos is None
         )
 
     @staticmethod

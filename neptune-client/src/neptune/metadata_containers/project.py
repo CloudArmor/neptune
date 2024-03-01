@@ -16,7 +16,11 @@
 __all__ = ["Project"]
 
 import os
-from typing import Iterable, Optional, Union
+from typing import (
+    Iterable,
+    Optional,
+    Union,
+)
 
 from typing_extensions import Literal
 
@@ -48,7 +52,10 @@ from neptune.metadata_containers.abstract import NeptuneObjectCallback
 from neptune.metadata_containers.utils import prepare_nql_query
 from neptune.table import Table
 from neptune.types.mode import Mode
-from neptune.typing import ProgressBarCallback, ProgressBarType
+from neptune.typing import (
+    ProgressBarCallback,
+    ProgressBarType,
+)
 
 
 class Project(MetadataContainer):
@@ -176,9 +183,7 @@ class Project(MetadataContainer):
 
     def _raise_if_stopped(self):
         if self._state == ContainerState.STOPPED:
-            raise InactiveProjectException(
-                label=f"{self._workspace}/{self._project_name}"
-            )
+            raise InactiveProjectException(label=f"{self._workspace}/{self._project_name}")
 
     def get_url(self) -> str:
         """Returns the URL that can be accessed within the browser"""
@@ -192,11 +197,7 @@ class Project(MetadataContainer):
         self,
         *,
         id: Optional[Union[str, Iterable[str]]] = None,
-        state: Optional[
-            Union[
-                Literal["inactive", "active"], Iterable[Literal["inactive", "active"]]
-            ]
-        ] = None,
+        state: Optional[Union[Literal["inactive", "active"], Iterable[Literal["inactive", "active"]]]] = None,
         owner: Optional[Union[str, Iterable[str]]] = None,
         tag: Optional[Union[str, Iterable[str]]] = None,
         columns: Optional[Iterable[str]] = None,
@@ -296,18 +297,14 @@ class Project(MetadataContainer):
         verify_type("limit", limit, (int, type(None)))
         verify_type("sort_by", sort_by, str)
         verify_type("ascending", ascending, bool)
-        verify_type(
-            "progress_bar", progress_bar, (type(None), bool, type(ProgressBarCallback))
-        )
+        verify_type("progress_bar", progress_bar, (type(None), bool, type(ProgressBarCallback)))
         verify_collection_type("state", states, str)
 
         for state in states:
             verify_value("state", state.lower(), ("inactive", "active"))
 
         if isinstance(limit, int) and limit <= 0:
-            raise ValueError(
-                f"Parameter 'limit' must be a positive integer or None. Got {limit}."
-            )
+            raise ValueError(f"Parameter 'limit' must be a positive integer or None. Got {limit}.")
 
         nql_query = prepare_nql_query(ids, states, owners, tags, trashed)
 
@@ -378,14 +375,10 @@ class Project(MetadataContainer):
         verify_type("limit", limit, (int, type(None)))
         verify_type("sort_by", sort_by, str)
         verify_type("ascending", ascending, bool)
-        verify_type(
-            "progress_bar", progress_bar, (type(None), bool, type(ProgressBarCallback))
-        )
+        verify_type("progress_bar", progress_bar, (type(None), bool, type(ProgressBarCallback)))
 
         if isinstance(limit, int) and limit <= 0:
-            raise ValueError(
-                f"Parameter 'limit' must be a positive integer or None. Got {limit}."
-            )
+            raise ValueError(f"Parameter 'limit' must be a positive integer or None. Got {limit}.")
 
         return MetadataContainer._fetch_entries(
             self,

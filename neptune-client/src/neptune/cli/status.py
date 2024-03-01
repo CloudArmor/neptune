@@ -19,10 +19,16 @@ __all__ = ["StatusRunner"]
 import sys
 import textwrap
 from pathlib import Path
-from typing import TYPE_CHECKING, Sequence
+from typing import (
+    TYPE_CHECKING,
+    Sequence,
+)
 
 from neptune.cli.collect import collect_containers
-from neptune.cli.containers import AsyncContainer, OfflineContainer
+from neptune.cli.containers import (
+    AsyncContainer,
+    OfflineContainer,
+)
 from neptune.cli.utils import get_qualified_name
 from neptune.constants import OFFLINE_NAME_PREFIX
 from neptune.envs import PROJECT_ENV_NAME
@@ -56,22 +62,12 @@ class StatusRunner:
                 "\nWARNING: %s objects was skipped because they do not exist anymore.",
                 len(containers.not_found_containers),
             )
-        if not any(
-            [
-                containers.synced_containers,
-                containers.unsynced_containers,
-                containers.offline_containers,
-            ]
-        ):
+        if not any([containers.synced_containers, containers.unsynced_containers, containers.offline_containers]):
             logger.info("There are no Neptune objects in %s", path)
             sys.exit(1)
 
-        StatusRunner.log_unsync_objects(
-            unsynced_containers=containers.unsynced_containers
-        )
-        StatusRunner.log_offline_objects(
-            offline_containers=containers.offline_containers
-        )
+        StatusRunner.log_unsync_objects(unsynced_containers=containers.unsynced_containers)
+        StatusRunner.log_offline_objects(offline_containers=containers.offline_containers)
 
         if not containers.unsynced_containers:
             logger.info("\nThere are no unsynchronized objects in %s", path)
@@ -79,14 +75,10 @@ class StatusRunner:
         if not containers.synced_containers:
             logger.info("\nThere are no synchronized objects in %s", path)
 
-        logger.info(
-            "\nPlease run with the `neptune sync --help` to see example commands."
-        )
+        logger.info("\nPlease run with the `neptune sync --help` to see example commands.")
 
     @staticmethod
-    def log_offline_objects(
-        *, offline_containers: Sequence["OfflineContainer"], info: bool = True
-    ) -> None:
+    def log_offline_objects(*, offline_containers: Sequence["OfflineContainer"], info: bool = True) -> None:
         if offline_containers:
             logger.info("Unsynchronized offline objects:")
             for container in offline_containers:
@@ -102,13 +94,9 @@ class StatusRunner:
             for container in unsynced_containers:
                 experiment = container.experiment
 
-                assert (
-                    experiment is not None
-                )  # mypy fix as experiment is present for async containers
+                assert experiment is not None  # mypy fix as experiment is present for async containers
 
-                logger.info(
-                    "- %s%s", get_qualified_name(experiment), trashed(experiment)
-                )
+                logger.info("- %s%s", get_qualified_name(experiment), trashed(experiment))
 
 
 def trashed(cont: ApiExperiment) -> str:

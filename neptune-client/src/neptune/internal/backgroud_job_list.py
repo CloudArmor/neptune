@@ -16,7 +16,11 @@
 __all__ = ["BackgroundJobList"]
 
 import time
-from typing import TYPE_CHECKING, List, Optional
+from typing import (
+    TYPE_CHECKING,
+    List,
+    Optional,
+)
 
 from neptune.internal.background_job import BackgroundJob
 

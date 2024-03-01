@@ -2,10 +2,10 @@ from datetime import datetime
 
 import numpy
 from PIL import Image
-from tests.e2e.base import fake
-from tests.e2e.utils import tmp_context
 
 from neptune.legacy import Session
+from tests.e2e.base import fake
+from tests.e2e.utils import tmp_context
 
 
 class TestLegacyClient:
@@ -83,9 +83,7 @@ class TestLegacyClient:
             im = Image.fromarray(tmp.astype("uint8")).convert("RGBA")
             im.save(filename)
 
-            experiment.log_image(
-                "g_img", filename, image_name="name", description="desc"
-            )
+            experiment.log_image("g_img", filename, image_name="name", description="desc")
             experiment.log_image("g_img", filename)
 
         # then

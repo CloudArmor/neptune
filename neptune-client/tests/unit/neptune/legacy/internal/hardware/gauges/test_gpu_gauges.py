@@ -15,10 +15,16 @@
 #
 import unittest
 
-from mock import MagicMock, patch
+from mock import (
+    MagicMock,
+    patch,
+)
 
 from neptune.common.hardware.constants import BYTES_IN_ONE_GB
-from neptune.common.hardware.gauges.gpu import GpuMemoryGauge, GpuUsageGauge
+from neptune.common.hardware.gauges.gpu import (
+    GpuMemoryGauge,
+    GpuUsageGauge,
+)
 
 
 @patch("neptune.common.hardware.gpu.gpu_monitor.nvmlInit", MagicMock())
@@ -27,14 +33,10 @@ class TestGPUGauges(unittest.TestCase):
         self.card_index = 2
         self.gpu_card_handle = MagicMock()
 
-        patcher = patch(
-            "neptune.common.hardware.gpu.gpu_monitor.nvmlDeviceGetHandleByIndex"
-        )
+        patcher = patch("neptune.common.hardware.gpu.gpu_monitor.nvmlDeviceGetHandleByIndex")
         nvmlDeviceGetHandleByIndex = patcher.start()
         nvmlDeviceGetHandleByIndex.side_effect = (
-            lambda card_index: self.gpu_card_handle
-            if card_index == self.card_index
-            else None
+            lambda card_index: self.gpu_card_handle if card_index == self.card_index else None
         )
         self.addCleanup(patcher.stop)
 
@@ -45,9 +47,7 @@ class TestGPUGauges(unittest.TestCase):
         # and
         util_info = MagicMock()
         util_info.gpu = 40
-        nvmlDeviceGetMemoryInfo.side_effect = (
-            lambda handle: util_info if handle == self.gpu_card_handle else None
-        )
+        nvmlDeviceGetMemoryInfo.side_effect = lambda handle: util_info if handle == self.gpu_card_handle else None
 
         # when
         usage_percent = gauge.value()
@@ -63,9 +63,7 @@ class TestGPUGauges(unittest.TestCase):
         # and
         memory_info = MagicMock()
         memory_info.used = 3 * BYTES_IN_ONE_GB
-        nvmlDeviceGetMemoryInfo.side_effect = (
-            lambda handle: memory_info if handle == self.gpu_card_handle else None
-        )
+        nvmlDeviceGetMemoryInfo.side_effect = lambda handle: memory_info if handle == self.gpu_card_handle else None
 
         # when
         memory_gb = gauge.value()

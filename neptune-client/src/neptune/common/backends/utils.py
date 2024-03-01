@@ -60,9 +60,7 @@ retries_timeout = int(os.getenv(NEPTUNE_RETRIES_TIMEOUT_ENV, "60"))
 def get_retry_from_headers_or_default(headers, retry_count):
     try:
         return (
-            int(headers["retry-after"][0])
-            if "retry-after" in headers
-            else 2 ** min(MAX_RETRY_MULTIPLIER, retry_count)
+            int(headers["retry-after"][0]) if "retry-after" in headers else 2 ** min(MAX_RETRY_MULTIPLIER, retry_count)
         )
     except Exception:
         return min(2 ** min(MAX_RETRY_MULTIPLIER, retry_count), MAX_RETRY_TIME)
@@ -101,9 +99,7 @@ def with_api_exceptions_handler(func):
                 if "CertificateError" in str(e.__context__):
                     raise NeptuneSSLVerificationError() from e
                 else:
-                    time.sleep(
-                        min(2 ** min(MAX_RETRY_MULTIPLIER, retry), MAX_RETRY_TIME)
-                    )
+                    time.sleep(min(2 ** min(MAX_RETRY_MULTIPLIER, retry), MAX_RETRY_TIME))
                     last_exception = e
                     continue
             except (
@@ -148,15 +144,11 @@ def with_api_exceptions_handler(func):
                     HTTPGatewayTimeout.status_code,
                     HTTPInternalServerError.status_code,
                 ):
-                    time.sleep(
-                        min(2 ** min(MAX_RETRY_MULTIPLIER, retry), MAX_RETRY_TIME)
-                    )
+                    time.sleep(min(2 ** min(MAX_RETRY_MULTIPLIER, retry), MAX_RETRY_TIME))
                     last_exception = e
                     continue
                 elif status_code == HTTPTooManyRequests.status_code:
-                    wait_time = get_retry_from_headers_or_default(
-                        e.response.headers, retry
-                    )
+                    wait_time = get_retry_from_headers_or_default(e.response.headers, retry)
                     time.sleep(wait_time)
                     last_exception = e
                     continue

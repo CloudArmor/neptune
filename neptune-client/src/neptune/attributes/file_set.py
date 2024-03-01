@@ -16,20 +16,29 @@
 __all__ = ["FileSet"]
 
 import os
-from typing import Iterable, List, Optional, Union
+from typing import (
+    Iterable,
+    List,
+    Optional,
+    Union,
+)
 
 from neptune.api.dtos import FileEntry
 from neptune.attributes.attribute import Attribute
-from neptune.internal.operation import DeleteFiles, UploadFileSet
-from neptune.internal.utils import verify_collection_type, verify_type
+from neptune.internal.operation import (
+    DeleteFiles,
+    UploadFileSet,
+)
+from neptune.internal.utils import (
+    verify_collection_type,
+    verify_type,
+)
 from neptune.types.file_set import FileSet as FileSetVal
 from neptune.typing import ProgressBarType
 
 
 class FileSet(Attribute):
-    def assign(
-        self, value: Union[FileSetVal, str, Iterable[str]], *, wait: bool = False
-    ) -> None:
+    def assign(self, value: Union[FileSetVal, str, Iterable[str]], *, wait: bool = False) -> None:
         verify_type("value", value, (FileSetVal, str, Iterable))
         if isinstance(value, FileSetVal):
             value = value.file_globs
@@ -39,18 +48,14 @@ class FileSet(Attribute):
             verify_collection_type("value", value, str)
         self._enqueue_upload_operation(value, reset=True, wait=wait)
 
-    def upload_files(
-        self, globs: Union[str, Iterable[str]], *, wait: bool = False
-    ) -> None:
+    def upload_files(self, globs: Union[str, Iterable[str]], *, wait: bool = False) -> None:
         if isinstance(globs, str):
             globs = [globs]
         else:
             verify_collection_type("globs", globs, str)
         self._enqueue_upload_operation(globs, reset=False, wait=wait)
 
-    def delete_files(
-        self, paths: Union[str, Iterable[str]], *, wait: bool = False
-    ) -> None:
+    def delete_files(self, paths: Union[str, Iterable[str]], *, wait: bool = False) -> None:
         if isinstance(paths, str):
             paths = [paths]
         else:
@@ -58,14 +63,10 @@ class FileSet(Attribute):
         with self._container.lock():
             self._enqueue_operation(DeleteFiles(self._path, set(paths)), wait=wait)
 
-    def _enqueue_upload_operation(
-        self, globs: Iterable[str], *, reset: bool, wait: bool
-    ):
+    def _enqueue_upload_operation(self, globs: Iterable[str], *, reset: bool, wait: bool):
         with self._container.lock():
             abs_file_globs = list(os.path.abspath(file_glob) for file_glob in globs)
-            self._enqueue_operation(
-                UploadFileSet(self._path, abs_file_globs, reset=reset), wait=wait
-            )
+            self._enqueue_operation(UploadFileSet(self._path, abs_file_globs, reset=reset), wait=wait)
 
     def download(
         self,
@@ -73,13 +74,7 @@ class FileSet(Attribute):
         progress_bar: Optional[ProgressBarType] = None,
     ) -> None:
         verify_type("destination", destination, (str, type(None)))
-        self._backend.download_file_set(
-            self._container_id,
-            self._container_type,
-            self._path,
-            destination,
-            progress_bar,
-        )
+        self._backend.download_file_set(self._container_id, self._container_type, self._path, destination, progress_bar)
 
     def list_fileset_files(self, path: Optional[str] = None) -> List[FileEntry]:
         path = path or ""

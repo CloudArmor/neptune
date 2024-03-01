@@ -22,13 +22,22 @@ __all__ = [
 
 import os
 import sys
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Union
+from abc import (
+    ABC,
+    abstractmethod,
+)
+from typing import (
+    TYPE_CHECKING,
+    Union,
+)
 
 from neptune.internal.utils.logger import get_logger
 
 if sys.version_info >= (3, 8):
-    from importlib.metadata import Distribution, distributions
+    from importlib.metadata import (
+        Distribution,
+        distributions,
+    )
 else:
     from importlib_metadata import Distribution, distributions
 
@@ -58,9 +67,7 @@ class InferDependenciesStrategy(DependencyTrackingStrategy):
 
         for dist in dists:
             if dist.metadata["Name"]:
-                dependencies.append(
-                    f'{dist.metadata["Name"]}=={dist.metadata["Version"]}'
-                )
+                dependencies.append(f'{dist.metadata["Name"]}=={dist.metadata["Version"]}')
 
         dependencies_str = "\n".join(dependencies)
 
@@ -76,7 +83,4 @@ class FileDependenciesStrategy(DependencyTrackingStrategy):
         if os.path.isfile(self._path):
             run["source_code/requirements"].upload(self._path)
         else:
-            logger.error(
-                "[ERROR] File '%s' does not exist - skipping dependency file upload.",
-                self._path,
-            )
+            logger.error("[ERROR] File '%s' does not exist - skipping dependency file upload.", self._path)

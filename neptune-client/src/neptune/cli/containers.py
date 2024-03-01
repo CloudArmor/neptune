@@ -24,9 +24,19 @@ import os
 import shutil
 import threading
 import time
-from abc import ABC, abstractmethod
+from abc import (
+    ABC,
+    abstractmethod,
+)
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+)
 
 from neptune.cli.utils import get_qualified_name
 from neptune.common.exceptions import NeptuneConnectionLostException
@@ -42,7 +52,10 @@ from neptune.internal.utils.logger import get_logger
 from neptune.metadata_containers.structure_version import StructureVersion
 
 if TYPE_CHECKING:
-    from neptune.internal.backends.api_model import ApiExperiment, Project
+    from neptune.internal.backends.api_model import (
+        ApiExperiment,
+        Project,
+    )
     from neptune.internal.backends.neptune_backend import NeptuneBackend
 
 
@@ -51,13 +64,7 @@ retries_timeout = int(os.getenv(NEPTUNE_SYNC_BATCH_TIMEOUT_ENV, "3600"))
 
 
 class ExecutionDirectory:
-    def __init__(
-        self,
-        path: Path,
-        synced: bool,
-        structure_version: StructureVersion,
-        parent: Optional[Path] = None,
-    ):
+    def __init__(self, path: Path, synced: bool, structure_version: StructureVersion, parent: Optional[Path] = None):
         self._path = path
         self._synced = synced
         self._structure_version = structure_version
@@ -83,13 +90,7 @@ class ExecutionDirectory:
         if self.path.exists():
             remove_directory_structure(self.path)
 
-    def sync(
-        self,
-        *,
-        backend: "NeptuneBackend",
-        container_id: UniqueId,
-        container_type: ContainerType,
-    ) -> None:
+    def sync(self, *, backend: "NeptuneBackend", container_id: UniqueId, container_type: ContainerType) -> None:
         operation_storage = OperationStorage(self.path)
         serializer: Callable[[Operation], Dict[str, Any]] = lambda op: op.to_dict()
 
@@ -132,16 +133,8 @@ class ExecutionDirectory:
                             ex.cause.__class__.__name__,
                         )
 
-    def move(
-        self,
-        *,
-        base_path: Path,
-        target_container_id: UniqueId,
-        container_type: ContainerType,
-    ) -> None:
-        new_online_dir = get_container_dir(
-            container_id=target_container_id, container_type=container_type
-        )
+    def move(self, *, base_path: Path, target_container_id: UniqueId, container_type: ContainerType) -> None:
+        new_online_dir = get_container_dir(container_id=target_container_id, container_type=container_type)
         try:
             (base_path / ASYNC_DIRECTORY).mkdir(parents=True, exist_ok=True)
         except OSError:
@@ -169,13 +162,7 @@ class Container(ABC):
         return all(map(lambda execution_dir: execution_dir.synced, self.execution_dirs))
 
     @abstractmethod
-    def sync(
-        self,
-        *,
-        base_path: Path,
-        backend: "NeptuneBackend",
-        project: Optional["Project"] = None,
-    ) -> None:
+    def sync(self, *, base_path: Path, backend: "NeptuneBackend", project: Optional["Project"] = None) -> None:
         ...
 
     def clear(self) -> None:
@@ -223,13 +210,7 @@ class AsyncContainer(Container):
     def experiment(self) -> Optional["ApiExperiment"]:
         return self._experiment
 
-    def sync(
-        self,
-        *,
-        base_path: Path,
-        backend: "NeptuneBackend",
-        project: Optional["Project"] = None,
-    ) -> None:
+    def sync(self, *, base_path: Path, backend: "NeptuneBackend", project: Optional["Project"] = None) -> None:
         assert self.experiment is not None  # mypy fix
 
         qualified_container_name = get_qualified_name(self.experiment)
@@ -244,11 +225,7 @@ class AsyncContainer(Container):
                 )
 
         self.clear()
-        logger.info(
-            "Synchronization of %s %s completed.",
-            self.experiment.type.value,
-            qualified_container_name,
-        )
+        logger.info("Synchronization of %s %s completed.", self.experiment.type.value, qualified_container_name)
 
 
 class OfflineContainer(Container):
@@ -280,13 +257,7 @@ class OfflineContainer(Container):
     def found(self) -> bool:
         return self._found
 
-    def sync(
-        self,
-        *,
-        base_path: Path,
-        backend: "NeptuneBackend",
-        project: Optional["Project"] = None,
-    ) -> None:
+    def sync(self, *, base_path: Path, backend: "NeptuneBackend", project: Optional["Project"] = None) -> None:
         assert project is not None  # mypy fix
 
         experiment = register_offline_container(
@@ -308,11 +279,7 @@ class OfflineContainer(Container):
             return
 
         qualified_container_name = get_qualified_name(experiment)
-        logger.info(
-            "Offline container %s registered as %s",
-            self.container_id,
-            qualified_container_name,
-        )
+        logger.info("Offline container %s registered as %s", self.container_id, qualified_container_name)
         logger.info("Synchronising %s", qualified_container_name)
 
         for execution_dir in self.execution_dirs:
@@ -323,11 +290,7 @@ class OfflineContainer(Container):
             )
 
         self.clear()
-        logger.info(
-            "Synchronization of %s %s completed.",
-            experiment.type.value,
-            qualified_container_name,
-        )
+        logger.info("Synchronization of %s %s completed.", experiment.type.value, qualified_container_name)
 
 
 def remove_directory(path: Path) -> None:
@@ -356,8 +319,7 @@ def register_offline_container(
             raise ValueError("Only runs are supported in offline mode")
     except Exception as e:
         logger.warning(
-            "Exception occurred while trying to create a run"
-            " on the Neptune server. Please try again later",
+            "Exception occurred while trying to create a run" " on the Neptune server. Please try again later",
         )
         logger.exception(e)
         return None

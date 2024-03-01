@@ -15,7 +15,10 @@
 #
 __all__ = ["StdoutCaptureBackgroundJob", "StderrCaptureBackgroundJob"]
 
-from typing import TYPE_CHECKING, Optional
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+)
 
 from neptune.internal.background_job import BackgroundJob
 from neptune.internal.streams.std_stream_capture_logger import (

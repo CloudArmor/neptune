@@ -35,7 +35,13 @@ __all__ = [
 ]
 
 import os
-from typing import Dict, Iterable, List, Optional, Union
+from typing import (
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Union,
+)
 
 from bravado.exception import (
     HTTPBadRequest,
@@ -54,10 +60,16 @@ from neptune.internal.backends.hosted_client import (
     create_leaderboard_client,
 )
 from neptune.internal.backends.swagger_client_wrapper import SwaggerClientWrapper
-from neptune.internal.backends.utils import parse_validation_errors, ssl_verify
+from neptune.internal.backends.utils import (
+    parse_validation_errors,
+    ssl_verify,
+)
 from neptune.internal.credentials import Credentials
 from neptune.internal.id_formats import QualifiedName
-from neptune.internal.utils import verify_collection_type, verify_type
+from neptune.internal.utils import (
+    verify_collection_type,
+    verify_type,
+)
 from neptune.internal.utils.iteration import get_batches
 from neptune.internal.utils.logger import get_logger
 from neptune.management.exceptions import (
@@ -112,9 +124,7 @@ def _get_backend_client(api_token: Optional[str] = None) -> SwaggerClientWrapper
 
 def _get_leaderboard_client(api_token: Optional[str] = None) -> SwaggerClientWrapper:
     http_client, client_config = _get_http_client_and_config(api_token)
-    return create_leaderboard_client(
-        client_config=client_config, http_client=http_client
-    )
+    return create_leaderboard_client(client_config=client_config, http_client=http_client)
 
 
 def get_project_list(*, api_token: Optional[str] = None) -> List[str]:
@@ -145,10 +155,7 @@ def get_project_list(*, api_token: Optional[str] = None) -> List[str]:
     }
     projects = _get_projects(backend_client, params)
 
-    return [
-        normalize_project_name(name=project.name, workspace=project.organizationName)
-        for project in projects
-    ]
+    return [normalize_project_name(name=project.name, workspace=project.organizationName) for project in projects]
 
 
 @with_api_exceptions_handler
@@ -245,9 +252,7 @@ def _get_workspace_id(backend_client, workspace) -> str:
 
 @with_api_exceptions_handler
 def _get_workspaces(backend_client):
-    return (
-        backend_client.api.listOrganizations(**DEFAULT_REQUEST_KWARGS).response().result
-    )
+    return backend_client.api.listOrganizations(**DEFAULT_REQUEST_KWARGS).response().result
 
 
 @with_api_exceptions_handler
@@ -262,9 +267,7 @@ def _create_project(backend_client, project_qualified_name: str, params: dict):
 
 
 @with_api_exceptions_handler
-def delete_project(
-    project: str, *, workspace: Optional[str] = None, api_token: Optional[str] = None
-):
+def delete_project(project: str, *, workspace: Optional[str] = None, api_token: Optional[str] = None):
     """Deletes a project from a Neptune workspace.
 
     To delete projects, the user must be a workspace admin.
@@ -371,13 +374,9 @@ def add_project_member(
     except HTTPNotFound as e:
         raise ProjectNotFound(name=project_identifier) from e
     except HTTPConflict as e:
-        members = get_project_member_list(
-            project=project, workspace=workspace, api_token=api_token
-        )
+        members = get_project_member_list(project=project, workspace=workspace, api_token=api_token)
         user_role = members.get(username)
-        raise UserAlreadyHasAccess(
-            user=username, project=project_identifier, role=user_role
-        ) from e
+        raise UserAlreadyHasAccess(user=username, project=project_identifier, role=user_role) from e
 
 
 @with_api_exceptions_handler
@@ -420,10 +419,7 @@ def get_project_member_list(
 
     try:
         result = backend_client.api.listProjectMembers(**params).response().result
-        return {
-            f"{m.registeredMemberInfo.username}": ProjectMemberRoleDTO.to_domain(m.role)
-            for m in result
-        }
+        return {f"{m.registeredMemberInfo.username}": ProjectMemberRoleDTO.to_domain(m.role) for m in result}
     except HTTPNotFound as e:
         raise ProjectNotFound(name=project_identifier) from e
 
@@ -482,19 +478,13 @@ def remove_project_member(
     except HTTPNotFound as e:
         raise ProjectNotFound(name=project_identifier) from e
     except HTTPUnprocessableEntity as e:
-        raise UserNotExistsOrWithoutAccess(
-            user=username, project=project_identifier
-        ) from e
+        raise UserNotExistsOrWithoutAccess(user=username, project=project_identifier) from e
     except HTTPForbidden as e:
-        raise AccessRevokedOnMemberRemoval(
-            user=username, project=project_identifier
-        ) from e
+        raise AccessRevokedOnMemberRemoval(user=username, project=project_identifier) from e
 
 
 @with_api_exceptions_handler
-def get_workspace_member_list(
-    workspace: str, *, api_token: Optional[str] = None
-) -> Dict[str, str]:
+def get_workspace_member_list(workspace: str, *, api_token: Optional[str] = None) -> Dict[str, str]:
     """Lists members of a Neptune workspace.
 
     Args:
@@ -523,12 +513,7 @@ def get_workspace_member_list(
 
     try:
         result = backend_client.api.listOrganizationMembers(**params).response().result
-        return {
-            f"{m.registeredMemberInfo.username}": WorkspaceMemberRoleDTO.to_domain(
-                m.role
-            )
-            for m in result
-        }
+        return {f"{m.registeredMemberInfo.username}": WorkspaceMemberRoleDTO.to_domain(m.role) for m in result}
     except HTTPNotFound as e:
         raise WorkspaceNotFound(workspace=workspace) from e
 
@@ -550,18 +535,13 @@ def _get_raw_workspace_service_account_list(
 
     try:
         result = backend_client.api.listServiceAccounts(**params).response().result
-        return {
-            f"{sa.displayName}": ServiceAccountDTO(name=sa.displayName, id=sa.id)
-            for sa in result
-        }
+        return {f"{sa.displayName}": ServiceAccountDTO(name=sa.displayName, id=sa.id) for sa in result}
     except HTTPNotFound as e:
         raise WorkspaceNotFound(workspace=workspace_name) from e
 
 
 @with_api_exceptions_handler
-def get_workspace_service_account_list(
-    workspace: str, *, api_token: Optional[str] = None
-) -> Dict[str, str]:
+def get_workspace_service_account_list(workspace: str, *, api_token: Optional[str] = None) -> Dict[str, str]:
     """Lists service accounts of a Neptune workspace.
 
     Args:
@@ -581,9 +561,7 @@ def get_workspace_service_account_list(
     You may also want to check the management API reference:
     https://docs.neptune.ai/api/management
     """
-    service_accounts = _get_raw_workspace_service_account_list(
-        workspace_name=workspace, api_token=api_token
-    )
+    service_accounts = _get_raw_workspace_service_account_list(workspace_name=workspace, api_token=api_token)
 
     return {
         service_account_name: WorkspaceMemberRoleDTO.to_domain("member")
@@ -646,9 +624,7 @@ def invite_to_workspace(
         invitee = email
         invitation_type = "emailRecipient"
     else:
-        raise ValueError(
-            "Neither `username` nor `email` arguments filled. At least one needs to be passed"
-        )
+        raise ValueError("Neither `username` nor `email` arguments filled. At least one needs to be passed")
 
     if isinstance(role, str):
         role = WorkspaceMemberRole(role)
@@ -718,15 +694,8 @@ def get_project_service_account_list(
     params = {"projectIdentifier": project_identifier, **DEFAULT_REQUEST_KWARGS}
 
     try:
-        result = (
-            backend_client.api.listProjectServiceAccounts(**params).response().result
-        )
-        return {
-            f"{sa.serviceAccountInfo.displayName}": ProjectMemberRoleDTO.to_domain(
-                sa.role
-            )
-            for sa in result
-        }
+        result = backend_client.api.listProjectServiceAccounts(**params).response().result
+        return {f"{sa.serviceAccountInfo.displayName}": ProjectMemberRoleDTO.to_domain(sa.role) for sa in result}
     except HTTPNotFound as e:
         raise ProjectNotFound(name=project_identifier) from e
 
@@ -782,19 +751,15 @@ def add_project_service_account(
     verify_type("api_token", api_token, (str, type(None)))
 
     backend_client = _get_backend_client(api_token=api_token)
-    workspace, project_name = extract_project_and_workspace(
-        name=project, workspace=workspace
-    )
+    workspace, project_name = extract_project_and_workspace(name=project, workspace=workspace)
     project_qualified_name = f"{workspace}/{project_name}"
 
     try:
-        service_account = _get_raw_workspace_service_account_list(
-            workspace_name=workspace, api_token=api_token
-        )[service_account_name]
+        service_account = _get_raw_workspace_service_account_list(workspace_name=workspace, api_token=api_token)[
+            service_account_name
+        ]
     except KeyError as e:
-        raise ServiceAccountNotFound(
-            service_account_name=service_account_name, workspace=workspace
-        ) from e
+        raise ServiceAccountNotFound(service_account_name=service_account_name, workspace=workspace) from e
 
     params = {
         "projectIdentifier": project_qualified_name,
@@ -810,9 +775,7 @@ def add_project_service_account(
     except HTTPNotFound as e:
         raise ProjectNotFound(name=project_qualified_name) from e
     except HTTPConflict as e:
-        service_accounts = get_project_service_account_list(
-            project=project, workspace=workspace, api_token=api_token
-        )
+        service_accounts = get_project_service_account_list(project=project, workspace=workspace, api_token=api_token)
         service_account_role = service_accounts.get(service_account_name)
 
         raise ServiceAccountAlreadyHasAccess(
@@ -864,19 +827,15 @@ def remove_project_service_account(
     verify_type("api_token", api_token, (str, type(None)))
 
     backend_client = _get_backend_client(api_token=api_token)
-    workspace, project_name = extract_project_and_workspace(
-        name=project, workspace=workspace
-    )
+    workspace, project_name = extract_project_and_workspace(name=project, workspace=workspace)
     project_qualified_name = f"{workspace}/{project_name}"
 
     try:
-        service_account = _get_raw_workspace_service_account_list(
-            workspace_name=workspace, api_token=api_token
-        )[service_account_name]
+        service_account = _get_raw_workspace_service_account_list(workspace_name=workspace, api_token=api_token)[
+            service_account_name
+        ]
     except KeyError as e:
-        raise ServiceAccountNotFound(
-            service_account_name=service_account_name, workspace=workspace
-        ) from e
+        raise ServiceAccountNotFound(service_account_name=service_account_name, workspace=workspace) from e
 
     params = {
         "projectIdentifier": project_qualified_name,
@@ -946,15 +905,10 @@ def trash_objects(
             verify_collection_type("ids", ids, str)
 
     leaderboard_client = _get_leaderboard_client(api_token=api_token)
-    workspace, project_name = extract_project_and_workspace(
-        name=project, workspace=workspace
-    )
+    workspace, project_name = extract_project_and_workspace(name=project, workspace=workspace)
     project_qualified_name = f"{workspace}/{project_name}"
 
-    qualified_name_ids = [
-        QualifiedName(f"{workspace}/{project_name}/{container_id}")
-        for container_id in ids
-    ]
+    qualified_name_ids = [QualifiedName(f"{workspace}/{project_name}/{container_id}") for container_id in ids]
     errors = list()
     succeeded = 0
     for batch_ids in get_batches(qualified_name_ids, batch_size=TRASH_BATCH_SIZE):
@@ -973,11 +927,7 @@ def trash_objects(
     for error in errors:
         logger.warning(error)
 
-    logger.info(
-        "Successfully trashed objects: %d. Number of failures: %d.",
-        succeeded,
-        len(ids) - succeeded,
-    )
+    logger.info("Successfully trashed objects: %d. Number of failures: %d.", succeeded, len(ids) - succeeded)
 
 
 def delete_objects_from_trash(
@@ -1019,9 +969,7 @@ def delete_objects_from_trash(
     verify_type("workspace", workspace, (str, type(None)))
     verify_type("api_token", api_token, (str, type(None)))
 
-    workspace, project_name = extract_project_and_workspace(
-        name=project, workspace=workspace
-    )
+    workspace, project_name = extract_project_and_workspace(name=project, workspace=workspace)
     project_qualified_name = f"{workspace}/{project_name}"
 
     if isinstance(ids, str):
@@ -1031,10 +979,7 @@ def delete_objects_from_trash(
 
     leaderboard_client = _get_leaderboard_client(api_token=api_token)
 
-    qualified_name_ids = [
-        QualifiedName(f"{workspace}/{project_name}/{container_id}")
-        for container_id in ids
-    ]
+    qualified_name_ids = [QualifiedName(f"{workspace}/{project_name}/{container_id}") for container_id in ids]
     for batch_ids in get_batches(qualified_name_ids, batch_size=TRASH_BATCH_SIZE):
         params = {
             "projectIdentifier": project_qualified_name,
@@ -1077,9 +1022,7 @@ def clear_trash(
 
     leaderboard_client = _get_leaderboard_client(api_token=api_token)
 
-    workspace, project_name = extract_project_and_workspace(
-        name=project, workspace=workspace
-    )
+    workspace, project_name = extract_project_and_workspace(name=project, workspace=workspace)
     project_qualified_name = f"{workspace}/{project_name}"
 
     params = {
@@ -1093,9 +1036,7 @@ def clear_trash(
         logger.warning(error)
 
 
-def get_workspace_status(
-    workspace: str, *, api_token: Optional[str] = None
-) -> Dict[str, int]:
+def get_workspace_status(workspace: str, *, api_token: Optional[str] = None) -> Dict[str, int]:
     """Retrieves status information about a Neptune workspace.
 
     Includes the following:
@@ -1145,13 +1086,8 @@ def get_workspace_status(
             result["storageBytesAvailable"] = response.result.storageBytesAvailable
         if hasattr(response.result, "storageBytesLimit"):
             result["storageBytesLimit"] = response.result.storageBytesLimit
-        if hasattr(response.result, "storageBytesAvailable") and hasattr(
-            response.result, "storageBytesLimit"
-        ):
-            result["storageBytesUsed"] = (
-                response.result.storageBytesLimit
-                - response.result.storageBytesAvailable
-            )
+        if hasattr(response.result, "storageBytesAvailable") and hasattr(response.result, "storageBytesLimit"):
+            result["storageBytesUsed"] = response.result.storageBytesLimit - response.result.storageBytesAvailable
         if hasattr(response.result, "activeProjectsUsage"):
             result["activeProjectsUsage"] = response.result.activeProjectsUsage
         if hasattr(response.result, "activeProjectsLimit"):

@@ -1,5 +1,8 @@
 import itertools
-from unittest.mock import MagicMock, patch
+from unittest.mock import (
+    MagicMock,
+    patch,
+)
 
 import pytest
 
@@ -23,9 +26,7 @@ class TestDependencyTracking:
 
     @patch("neptune.internal.utils.dependency_tracking.distributions", return_value=[])
     @patch("neptune.types.File.from_content")
-    def test_infer_does_not_upload_empty_dependency_string(
-        self, mock_from_content, mock_distributions
-    ):
+    def test_infer_does_not_upload_empty_dependency_string(self, mock_from_content, mock_distributions):
         InferDependenciesStrategy().log_dependencies(run=MagicMock())
 
         mock_distributions.assert_called_once()
@@ -34,9 +35,7 @@ class TestDependencyTracking:
     @patch("neptune.handler.Handler.upload")
     @patch("neptune.internal.utils.dependency_tracking.logger")
     def test_file_strategy_path_incorrect(self, mock_logger, mock_upload):
-        FileDependenciesStrategy(path="non-existent_file_path.txt").log_dependencies(
-            run=MagicMock()
-        )
+        FileDependenciesStrategy(path="non-existent_file_path.txt").log_dependencies(run=MagicMock())
 
         mock_upload.assert_not_called()
         mock_logger.error.assert_called_once()

@@ -14,11 +14,11 @@
 # limitations under the License.
 #
 from mock import MagicMock
-from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 from neptune.attributes.atoms.artifact import Artifact
 from neptune.internal.operation import AssignArtifact
 from neptune.types.atoms.artifact import Artifact as ArtifactVal
+from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 
 class TestArtifactHash(TestAttributeBase):
@@ -34,16 +34,12 @@ class TestArtifactHash(TestAttributeBase):
             var._enqueue_operation(
                 AssignArtifact(
                     var._path,
-                    ArtifactVal(
-                        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                    ).hash,
+                    ArtifactVal("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").hash,
                 ),
                 wait=False,
             )
             self.assertEqual(
-                ArtifactVal(
-                    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                ),
+                ArtifactVal("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
                 var.fetch(),
             )
 
@@ -53,9 +49,7 @@ class TestArtifactHash(TestAttributeBase):
             var._enqueue_operation(
                 AssignArtifact(
                     var._path,
-                    ArtifactVal(
-                        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                    ).hash,
+                    ArtifactVal("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").hash,
                 ),
                 wait=False,
             )

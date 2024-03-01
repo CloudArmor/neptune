@@ -16,11 +16,17 @@
 import unittest
 import uuid
 from typing import Optional
-from unittest.mock import Mock, patch
+from unittest.mock import (
+    Mock,
+    patch,
+)
 
 import pytest
 
-from neptune.attributes import Integer, String
+from neptune.attributes import (
+    Integer,
+    String,
+)
 from neptune.exceptions import FetchAttributeNotFoundException
 from neptune.internal import operation
 from neptune.internal.backends.neptune_backend import NeptuneBackend
@@ -32,7 +38,10 @@ from neptune.internal.backends.utils import (
 )
 from neptune.internal.container_type import ContainerType
 from neptune.typing import ProgressBarCallback
-from neptune.utils import NullProgressBar, TqdmProgressBar
+from neptune.utils import (
+    NullProgressBar,
+    TqdmProgressBar,
+)
 
 
 class CustomProgressBar(ProgressBarCallback):
@@ -49,9 +58,7 @@ class CustomProgressBar(ProgressBarCallback):
 class TestNeptuneBackendMock(unittest.TestCase):
     def test_building_operation_url(self):
         urls = {
-            build_operation_url(
-                "https://app.stage.neptune.ai", "api/leaderboard/v1/attributes/download"
-            ),
+            build_operation_url("https://app.stage.neptune.ai", "api/leaderboard/v1/attributes/download"),
             build_operation_url(
                 "https://app.stage.neptune.ai",
                 "/api/leaderboard/v1/attributes/download",
@@ -64,18 +71,10 @@ class TestNeptuneBackendMock(unittest.TestCase):
                 "https://app.stage.neptune.ai/",
                 "/api/leaderboard/v1/attributes/download",
             ),
-            build_operation_url(
-                "app.stage.neptune.ai", "api/leaderboard/v1/attributes/download"
-            ),
-            build_operation_url(
-                "app.stage.neptune.ai", "/api/leaderboard/v1/attributes/download"
-            ),
-            build_operation_url(
-                "app.stage.neptune.ai/", "api/leaderboard/v1/attributes/download"
-            ),
-            build_operation_url(
-                "app.stage.neptune.ai/", "/api/leaderboard/v1/attributes/download"
-            ),
+            build_operation_url("app.stage.neptune.ai", "api/leaderboard/v1/attributes/download"),
+            build_operation_url("app.stage.neptune.ai", "/api/leaderboard/v1/attributes/download"),
+            build_operation_url("app.stage.neptune.ai/", "api/leaderboard/v1/attributes/download"),
+            build_operation_url("app.stage.neptune.ai/", "/api/leaderboard/v1/attributes/download"),
         }
         self.assertEqual(
             {"https://app.stage.neptune.ai/api/leaderboard/v1/attributes/download"},
@@ -91,14 +90,10 @@ class TestExecuteOperationsBatchingManager(unittest.TestCase):
         operations = [
             operation.AssignInt(["a"], 12),
             operation.AssignString(["b/c"], "test"),
-            operation.CopyAttribute(
-                ["a"], str(uuid.uuid4()), ContainerType.RUN, ["b"], Integer
-            ),
+            operation.CopyAttribute(["a"], str(uuid.uuid4()), ContainerType.RUN, ["b"], Integer),
             operation.AssignFloat(["q/d"], 44.12),
             operation.AssignInt(["pp"], 12),
-            operation.CopyAttribute(
-                ["q/d"], str(uuid.uuid4()), ContainerType.RUN, ["b"], String
-            ),
+            operation.CopyAttribute(["q/d"], str(uuid.uuid4()), ContainerType.RUN, ["b"], String),
         ]
 
         batch = manager.get_batch(operations)
@@ -111,21 +106,15 @@ class TestExecuteOperationsBatchingManager(unittest.TestCase):
         manager = ExecuteOperationsBatchingManager(backend)
 
         operations = [
-            operation.CopyAttribute(
-                ["a"], str(uuid.uuid4()), ContainerType.RUN, ["b"], Integer
-            ),
+            operation.CopyAttribute(["a"], str(uuid.uuid4()), ContainerType.RUN, ["b"], Integer),
             operation.AssignFloat(["q/d"], 44.12),
             operation.AssignInt(["pp"], 12),
-            operation.CopyAttribute(
-                ["q/d"], str(uuid.uuid4()), ContainerType.RUN, ["b"], String
-            ),
+            operation.CopyAttribute(["q/d"], str(uuid.uuid4()), ContainerType.RUN, ["b"], String),
         ]
 
         batch = manager.get_batch(operations)
         expected_batch = [
-            operation.AssignInt(
-                operations[0].path, backend.get_int_attribute.return_value.value
-            )
+            operation.AssignInt(operations[0].path, backend.get_int_attribute.return_value.value)
         ] + operations[1:3]
         self.assertEqual(expected_batch, batch.operations)
         self.assertEqual([], batch.errors)
@@ -161,23 +150,13 @@ class TestExecuteOperationsBatchingManager(unittest.TestCase):
         manager = ExecuteOperationsBatchingManager(backend)
 
         operations = [
-            operation.CopyAttribute(
-                ["a"], str(uuid.uuid4()), ContainerType.RUN, ["b"], Integer
-            ),
-            operation.CopyAttribute(
-                ["q/d"], str(uuid.uuid4()), ContainerType.RUN, ["b"], String
-            ),
-            operation.CopyAttribute(
-                ["pp"], str(uuid.uuid4()), ContainerType.RUN, ["b"], Integer
-            ),
+            operation.CopyAttribute(["a"], str(uuid.uuid4()), ContainerType.RUN, ["b"], Integer),
+            operation.CopyAttribute(["q/d"], str(uuid.uuid4()), ContainerType.RUN, ["b"], String),
+            operation.CopyAttribute(["pp"], str(uuid.uuid4()), ContainerType.RUN, ["b"], Integer),
         ]
 
         batch = manager.get_batch(operations)
-        expected_batch = [
-            operation.AssignInt(
-                operations[0].path, backend.get_int_attribute.return_value.value
-            )
-        ]
+        expected_batch = [operation.AssignInt(operations[0].path, backend.get_int_attribute.return_value.value)]
         self.assertEqual(expected_batch, batch.operations)
         self.assertEqual([], batch.errors)
         self.assertEqual(0, batch.dropped_operations_count)
@@ -188,9 +167,7 @@ class TestExecuteOperationsBatchingManager(unittest.TestCase):
         manager = ExecuteOperationsBatchingManager(backend)
 
         operations = [
-            operation.CopyAttribute(
-                ["q/d"], str(uuid.uuid4()), ContainerType.RUN, ["b"], Integer
-            ),
+            operation.CopyAttribute(["q/d"], str(uuid.uuid4()), ContainerType.RUN, ["b"], Integer),
             operation.AssignInt(["a"], 12),
             operation.AssignString(["b/c"], "test"),
             operation.AssignInt(["pp"], 12),

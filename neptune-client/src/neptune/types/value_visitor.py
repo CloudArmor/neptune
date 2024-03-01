@@ -16,7 +16,12 @@
 __all__ = ["ValueVisitor"]
 
 import abc
-from typing import Generic, List, Type, TypeVar
+from typing import (
+    Generic,
+    List,
+    Type,
+    TypeVar,
+)
 
 from neptune.attributes.attribute import Attribute
 from neptune.types import (

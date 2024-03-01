@@ -31,7 +31,10 @@ from neptune.common.utils import (
     get_git_info,
     map_keys,
 )
-from neptune.legacy.envs import NOTEBOOK_ID_ENV_NAME, NOTEBOOK_PATH_ENV_NAME
+from neptune.legacy.envs import (
+    NOTEBOOK_ID_ENV_NAME,
+    NOTEBOOK_PATH_ENV_NAME,
+)
 from neptune.legacy.exceptions import NeptuneNoExperimentContextException
 from neptune.legacy.experiments import Experiment
 from neptune.legacy.internal.abort import DefaultAbortImpl
@@ -81,15 +84,9 @@ class Project(object):
 
         """
         project_members = self._backend.get_project_members(self.internal_id)
-        return [
-            member.registeredMemberInfo.username
-            for member in project_members
-            if member.registeredMemberInfo
-        ]
+        return [member.registeredMemberInfo.username for member in project_members if member.registeredMemberInfo]
 
-    def get_experiments(
-        self, id=None, state=None, owner=None, tag=None, min_running_time=None
-    ):
+    def get_experiments(self, id=None, state=None, owner=None, tag=None, min_running_time=None):
         """Retrieve list of experiments matching the specified criteria.
 
         All parameters are optional, each of them specifies a single criterion.
@@ -133,17 +130,10 @@ class Project(object):
                 #  Experiment(SAL-1960),
                 #  Experiment(SAL-2025)]
         """
-        leaderboard_entries = self._fetch_leaderboard(
-            id, state, owner, tag, min_running_time
-        )
-        return [
-            Experiment(self._backend, self, entry.id, entry.internal_id)
-            for entry in leaderboard_entries
-        ]
+        leaderboard_entries = self._fetch_leaderboard(id, state, owner, tag, min_running_time)
+        return [Experiment(self._backend, self, entry.id, entry.internal_id) for entry in leaderboard_entries]
 
-    def get_leaderboard(
-        self, id=None, state=None, owner=None, tag=None, min_running_time=None
-    ):
+    def get_leaderboard(self, id=None, state=None, owner=None, tag=None, min_running_time=None):
         """Fetch Neptune experiments view as pandas ``DataFrame``.
 
         **returned DataFrame**
@@ -192,14 +182,10 @@ class Project(object):
                 project.get_leaderboard(state=['aborted'], owner=['neyo'], min_running_time=100000)
         """
 
-        leaderboard_entries = self._fetch_leaderboard(
-            id, state, owner, tag, min_running_time
-        )
+        leaderboard_entries = self._fetch_leaderboard(id, state, owner, tag, min_running_time)
 
         def make_row(entry):
-            channels = dict(
-                ("channel_{}".format(ch.name), ch.trimmed_y) for ch in entry.channels
-            )
+            channels = dict(("channel_{}".format(ch.name), ch.trimmed_y) for ch in entry.channels)
 
             parameters = map_keys("parameter_{}".format, entry.parameters)
             properties = map_keys("property_{}".format, entry.properties)
@@ -427,19 +413,12 @@ class Project(object):
         if isinstance(upload_source_files, six.string_types):
             upload_source_files = [upload_source_files]
 
-        entrypoint, source_target_pairs = get_source_code_to_upload(
-            upload_source_files=upload_source_files
-        )
+        entrypoint, source_target_pairs = get_source_code_to_upload(upload_source_files=upload_source_files)
 
-        if (
-            notebook_path is None
-            and os.getenv(NOTEBOOK_PATH_ENV_NAME, None) is not None
-        ):
+        if notebook_path is None and os.getenv(NOTEBOOK_PATH_ENV_NAME, None) is not None:
             notebook_path = os.environ[NOTEBOOK_PATH_ENV_NAME]
 
-        abortable = (
-            abort_callback is not None or DefaultAbortImpl.requirements_installed()
-        )
+        abortable = abort_callback is not None or DefaultAbortImpl.requirements_installed()
 
         checkpoint_id = None
         if notebook_id is not None and notebook_path is not None:
@@ -607,9 +586,7 @@ class Project(object):
     def _remove_stopped_experiment(self, experiment):
         with self.__lock:
             if self._experiments_stack:
-                self._experiments_stack = [
-                    exp for exp in self._experiments_stack if exp != experiment
-                ]
+                self._experiments_stack = [exp for exp in self._experiments_stack if exp != experiment]
 
     def _shutdown_hook(self):
         if self._experiments_stack:

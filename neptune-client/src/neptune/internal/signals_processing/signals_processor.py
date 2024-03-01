@@ -15,13 +15,23 @@
 #
 __all__ = ["SignalsProcessor"]
 
-from queue import Empty, Queue
+from queue import (
+    Empty,
+    Queue,
+)
 from threading import Thread
 from time import monotonic
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Optional,
+)
 
 from neptune.internal.init.parameters import IN_BETWEEN_CALLBACKS_MINIMUM_INTERVAL
-from neptune.internal.signals_processing.signals import BatchLagSignal, SignalsVisitor
+from neptune.internal.signals_processing.signals import (
+    BatchLagSignal,
+    SignalsVisitor,
+)
 from neptune.internal.threading.daemon import Daemon
 
 if TYPE_CHECKING:
@@ -39,9 +49,7 @@ class SignalsProcessor(Daemon, SignalsVisitor):
         async_lag_threshold: float,
         async_no_progress_threshold: float,
         async_lag_callback: Optional[Callable[["MetadataContainer"], None]] = None,
-        async_no_progress_callback: Optional[
-            Callable[["MetadataContainer"], None]
-        ] = None,
+        async_no_progress_callback: Optional[Callable[["MetadataContainer"], None]] = None,
         callbacks_interval: float = IN_BETWEEN_CALLBACKS_MINIMUM_INTERVAL,
         in_async: bool = True,
     ) -> None:
@@ -51,12 +59,8 @@ class SignalsProcessor(Daemon, SignalsVisitor):
         self._queue: "Queue[Signal]" = queue
         self._async_lag_threshold: float = async_lag_threshold
         self._async_no_progress_threshold: float = async_no_progress_threshold
-        self._async_lag_callback: Optional[
-            Callable[["MetadataContainer"], None]
-        ] = async_lag_callback
-        self._async_no_progress_callback: Optional[
-            Callable[["MetadataContainer"], None]
-        ] = async_no_progress_callback
+        self._async_lag_callback: Optional[Callable[["MetadataContainer"], None]] = async_lag_callback
+        self._async_no_progress_callback: Optional[Callable[["MetadataContainer"], None]] = async_no_progress_callback
         self._callbacks_interval: float = callbacks_interval
         self._in_async: bool = in_async
 
@@ -83,11 +87,7 @@ class SignalsProcessor(Daemon, SignalsVisitor):
                 self._last_lag_callback_at is None
                 or current_time - self._last_lag_callback_at > self._callbacks_interval
             ):
-                execute_callback(
-                    callback=self._async_lag_callback,
-                    container=self._container,
-                    in_async=self._in_async,
-                )
+                execute_callback(callback=self._async_lag_callback, container=self._container, in_async=self._in_async)
                 self._last_lag_callback_at = current_time
 
     def _check_callbacks(self) -> None:
@@ -98,19 +98,13 @@ class SignalsProcessor(Daemon, SignalsVisitor):
             return
 
         if self._last_batch_started_at is not None:
-            if (
-                at_timestamp - self._last_batch_started_at
-                > self._async_no_progress_threshold
-            ):
+            if at_timestamp - self._last_batch_started_at > self._async_no_progress_threshold:
                 if (
                     self._last_no_progress_callback_at is None
-                    or at_timestamp - self._last_no_progress_callback_at
-                    > self._callbacks_interval
+                    or at_timestamp - self._last_no_progress_callback_at > self._callbacks_interval
                 ):
                     execute_callback(
-                        callback=self._async_no_progress_callback,
-                        container=self._container,
-                        in_async=self._in_async,
+                        callback=self._async_no_progress_callback, container=self._container, in_async=self._in_async
                     )
                     self._last_no_progress_callback_at = monotonic()
 
@@ -125,14 +119,9 @@ class SignalsProcessor(Daemon, SignalsVisitor):
 
 
 def execute_callback(
-    *,
-    callback: Callable[["MetadataContainer"], None],
-    container: "MetadataContainer",
-    in_async: bool,
+    *, callback: Callable[["MetadataContainer"], None], container: "MetadataContainer", in_async: bool
 ) -> None:
     if in_async:
-        Thread(
-            target=callback, name="CallbackExecution", args=(container,), daemon=True
-        ).start()
+        Thread(target=callback, name="CallbackExecution", args=(container,), daemon=True).start()
     else:
         callback(container)

@@ -331,9 +331,7 @@ class NVMLError(Exception):
     def __str__(self):
         try:
             if self.value not in NVMLError._errcode_to_string:
-                NVMLError._errcode_to_string[self.value] = str(
-                    nvml_error_string(self.value)
-                )
+                NVMLError._errcode_to_string[self.value] = str(nvml_error_string(self.value))
             return NVMLError._errcode_to_string[self.value]
         except NVMLError_Uninitialized:
             return "NVML Error with code %d" % self.value
@@ -356,9 +354,7 @@ def _extract_errors_as_classes():
     nvmlErrorsNames = filter(lambda x: x.startswith("NVML_ERROR_"), dir(this_module))
     for err_name in nvmlErrorsNames:
         # e.g. Turn NVML_ERROR_ALREADY_INITIALIZED into NVMLError_AlreadyInitialized
-        class_name = "NVMLError_" + string.capwords(
-            err_name.replace("NVML_ERROR_", ""), "_"
-        ).replace("_", "")
+        class_name = "NVMLError_" + string.capwords(err_name.replace("NVML_ERROR_", ""), "_").replace("_", "")
         err_val = getattr(this_module, err_name)
 
         def gen_new(val):
@@ -389,9 +385,7 @@ def check_return(ret):
 ##                                                                            ##
 ## ========================================================================== ##
 
-_func_pointer_cache = (
-    dict()
-)  # function pointers are cached to prevent unnecessary lib_load_lock locking
+_func_pointer_cache = dict()  # function pointers are cached to prevent unnecessary lib_load_lock locking
 
 
 def get_func_pointer(name):

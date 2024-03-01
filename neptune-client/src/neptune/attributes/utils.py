@@ -15,7 +15,10 @@
 #
 __all__ = ["create_attribute_from_type"]
 
-from typing import TYPE_CHECKING, List
+from typing import (
+    TYPE_CHECKING,
+    List,
+)
 
 from neptune.attributes import (
     Artifact,

@@ -26,9 +26,11 @@ from bravado.exception import (
     HTTPUnprocessableEntity,
 )
 from bravado.testing.response_mocks import BravadoResponseMock
-from mock import MagicMock, Mock, patch
-from tests.unit.neptune.backend_test_mixin import BackendTestMixin
-from tests.unit.neptune.new.utils import response_mock
+from mock import (
+    MagicMock,
+    Mock,
+    patch,
+)
 
 from neptune.internal.backends.api_model import AttributeType
 from neptune.internal.backends.hosted_client import (
@@ -40,9 +42,7 @@ from neptune.internal.backends.hosted_client import (
     create_leaderboard_client,
     get_client_config,
 )
-from neptune.internal.backends.hosted_neptune_backend import (
-    _get_column_type_from_entries,
-)
+from neptune.internal.backends.hosted_neptune_backend import _get_column_type_from_entries
 from neptune.internal.backends.utils import verify_host_resolution
 from neptune.management import (
     MemberRole,
@@ -67,6 +67,8 @@ from neptune.management.exceptions import (
     UserNotExistsOrWithoutAccess,
     WorkspaceNotFound,
 )
+from tests.unit.neptune.backend_test_mixin import BackendTestMixin
+from tests.unit.neptune.new.utils import response_mock
 
 API_TOKEN = (
     "eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLnN0YWdlLm5lcHR1bmUubWwiLCJ"
@@ -94,9 +96,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
 
         # given:
-        swagger_client.api.listProjects.return_value.response = BravadoResponseMock(
-            result=Mock(entries=[])
-        )
+        swagger_client.api.listProjects.return_value.response = BravadoResponseMock(result=Mock(entries=[]))
 
         # when:
         returned_projects = get_project_list(api_token=API_TOKEN)
@@ -138,12 +138,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         swagger_client.api.createOrganizationInvitations.assert_called_once_with(
             newOrganizationInvitations={
                 "invitationsEntries": [
-                    {
-                        "invitee": "tester1",
-                        "invitationType": "user",
-                        "roleGrant": "member",
-                        "addToAllProjects": False,
-                    }
+                    {"invitee": "tester1", "invitationType": "user", "roleGrant": "member", "addToAllProjects": False}
                 ],
                 "organizationIdentifier": "org2",
             },
@@ -153,9 +148,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
     def test_invite_to_workspace_username_email_raises(self, swagger_client_factory):
 
         # neither specified
-        self.assertRaises(
-            ValueError, invite_to_workspace, workspace="org2", api_token=API_TOKEN
-        )
+        self.assertRaises(ValueError, invite_to_workspace, workspace="org2", api_token=API_TOKEN)
 
         # both specified
         self.assertRaises(
@@ -177,12 +170,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
             role="non-existent-role",
         )
         self.assertRaises(
-            ValueError,
-            invite_to_workspace,
-            workspace="org2",
-            username="user",
-            api_token=API_TOKEN,
-            role="owner",
+            ValueError, invite_to_workspace, workspace="org2", username="user", api_token=API_TOKEN, role="owner"
         )
 
     def test_workspace_members(self, swagger_client_factory):
@@ -193,16 +181,12 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
             Mock(role="member", registeredMemberInfo=Mock(username="tester1")),
             Mock(role="owner", registeredMemberInfo=Mock(username="tester2")),
         ]
-        swagger_client.api.listOrganizationMembers.return_value.response = (
-            BravadoResponseMock(
-                result=members,
-            )
+        swagger_client.api.listOrganizationMembers.return_value.response = BravadoResponseMock(
+            result=members,
         )
 
         # when:
-        returned_members = get_workspace_member_list(
-            workspace="org2", api_token=API_TOKEN
-        )
+        returned_members = get_workspace_member_list(workspace="org2", api_token=API_TOKEN)
 
         # then:
         self.assertEqual({"tester1": "member", "tester2": "admin"}, returned_members)
@@ -212,16 +196,12 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
 
         # given:
         members = []
-        swagger_client.api.listOrganizationMembers.return_value.response = (
-            BravadoResponseMock(
-                result=members,
-            )
+        swagger_client.api.listOrganizationMembers.return_value.response = BravadoResponseMock(
+            result=members,
         )
 
         # when:
-        returned_members = get_workspace_member_list(
-            workspace="org2", api_token=API_TOKEN
-        )
+        returned_members = get_workspace_member_list(workspace="org2", api_token=API_TOKEN)
 
         # then:
         self.assertEqual({}, returned_members)
@@ -230,9 +210,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
 
         # when:
-        swagger_client.api.listOrganizationMembers.side_effect = HTTPNotFound(
-            response=response_mock()
-        )
+        swagger_client.api.listOrganizationMembers.side_effect = HTTPNotFound(response=response_mock())
 
         # then:
         with self.assertRaises(WorkspaceNotFound):
@@ -247,16 +225,12 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
             Mock(role="manager", registeredMemberInfo=Mock(username="tester2")),
             Mock(role="viewer", registeredMemberInfo=Mock(username="tester3")),
         ]
-        swagger_client.api.listProjectMembers.return_value.response = (
-            BravadoResponseMock(
-                result=members,
-            )
+        swagger_client.api.listProjectMembers.return_value.response = BravadoResponseMock(
+            result=members,
         )
 
         # when:
-        returned_members = get_project_member_list(
-            project="org/proj", api_token=API_TOKEN
-        )
+        returned_members = get_project_member_list(project="org/proj", api_token=API_TOKEN)
 
         # then:
         self.assertEqual(
@@ -269,16 +243,12 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
 
         # given:
         members = []
-        swagger_client.api.listProjectMembers.return_value.response = (
-            BravadoResponseMock(
-                result=members,
-            )
+        swagger_client.api.listProjectMembers.return_value.response = BravadoResponseMock(
+            result=members,
         )
 
         # when:
-        returned_members = get_project_member_list(
-            project="org/proj", api_token=API_TOKEN
-        )
+        returned_members = get_project_member_list(project="org/proj", api_token=API_TOKEN)
 
         # then:
         self.assertEqual({}, returned_members)
@@ -287,9 +257,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
 
         # when:
-        swagger_client.api.listProjectMembers.side_effect = HTTPNotFound(
-            response=response_mock()
-        )
+        swagger_client.api.listProjectMembers.side_effect = HTTPNotFound(response=response_mock())
 
         # then:
         with self.assertRaises(ProjectNotFound):
@@ -299,9 +267,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
 
         # when:
-        swagger_client.api.deleteProject.side_effect = HTTPNotFound(
-            response=response_mock()
-        )
+        swagger_client.api.deleteProject.side_effect = HTTPNotFound(response=response_mock())
 
         # then:
         with self.assertRaises(ProjectNotFound):
@@ -311,9 +277,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
 
         # when:
-        swagger_client.api.deleteProject.side_effect = HTTPForbidden(
-            response=response_mock()
-        )
+        swagger_client.api.deleteProject.side_effect = HTTPForbidden(response=response_mock())
 
         # then:
         with self.assertRaises(AccessRevokedOnDeletion):
@@ -328,10 +292,8 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         organizations = [organization]
 
         # when:
-        swagger_client.api.listOrganizations.return_value.response = (
-            BravadoResponseMock(
-                result=organizations,
-            )
+        swagger_client.api.listOrganizations.return_value.response = BravadoResponseMock(
+            result=organizations,
         )
         swagger_client.api.createProject.side_effect = HTTPBadRequest(
             response=response_mock(),
@@ -363,10 +325,8 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         organizations = [organization]
 
         # when:
-        swagger_client.api.listOrganizations.return_value.response = (
-            BravadoResponseMock(
-                result=organizations,
-            )
+        swagger_client.api.listOrganizations.return_value.response = BravadoResponseMock(
+            result=organizations,
         )
 
         with self.assertRaises(UnsupportedValue):
@@ -386,10 +346,8 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         organizations = [organization]
 
         # when:
-        swagger_client.api.listOrganizations.return_value.response = (
-            BravadoResponseMock(
-                result=organizations,
-            )
+        swagger_client.api.listOrganizations.return_value.response = BravadoResponseMock(
+            result=organizations,
         )
 
         # then:
@@ -405,10 +363,8 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         organizations = [organization]
 
         # when:
-        swagger_client.api.listOrganizations.return_value.response = (
-            BravadoResponseMock(
-                result=organizations,
-            )
+        swagger_client.api.listOrganizations.return_value.response = BravadoResponseMock(
+            result=organizations,
         )
         response = response_mock()
         response.json.return_value = {
@@ -433,10 +389,8 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         organizations = [organization]
 
         # when:
-        swagger_client.api.listOrganizations.return_value.response = (
-            BravadoResponseMock(
-                result=organizations,
-            )
+        swagger_client.api.listOrganizations.return_value.response = BravadoResponseMock(
+            result=organizations,
         )
         response = response_mock()
         response.json.return_value = {
@@ -450,16 +404,10 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         )
 
         # then:
-        with self.assertRaisesRegex(
-            ProjectPrivacyRestrictedException, '.*"priv" visibility.*'
-        ):
-            create_project(
-                name="org/proj", key="PRJ", visibility="priv", api_token=API_TOKEN
-            )
+        with self.assertRaisesRegex(ProjectPrivacyRestrictedException, '.*"priv" visibility.*'):
+            create_project(name="org/proj", key="PRJ", visibility="priv", api_token=API_TOKEN)
 
-    def test_create_project_private_not_allowed_no_details(
-        self, swagger_client_factory
-    ):
+    def test_create_project_private_not_allowed_no_details(self, swagger_client_factory):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
 
         # given:
@@ -468,10 +416,8 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         organizations = [organization]
 
         # when:
-        swagger_client.api.listOrganizations.return_value.response = (
-            BravadoResponseMock(
-                result=organizations,
-            )
+        swagger_client.api.listOrganizations.return_value.response = BravadoResponseMock(
+            result=organizations,
         )
         response = response_mock()
         response.json.return_value = {
@@ -483,12 +429,8 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         )
 
         # then:
-        with self.assertRaisesRegex(
-            ProjectPrivacyRestrictedException, ".*selected visibility.*"
-        ):
-            create_project(
-                name="org/proj", key="PRJ", visibility="priv", api_token=API_TOKEN
-            )
+        with self.assertRaisesRegex(ProjectPrivacyRestrictedException, ".*selected visibility.*"):
+            create_project(name="org/proj", key="PRJ", visibility="priv", api_token=API_TOKEN)
 
     def test_create_project(self, swagger_client_factory):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
@@ -503,19 +445,15 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         project.name = "proj"
 
         # when:
-        swagger_client.api.listOrganizations.return_value.response = (
-            BravadoResponseMock(
-                result=organizations,
-            )
+        swagger_client.api.listOrganizations.return_value.response = BravadoResponseMock(
+            result=organizations,
         )
         swagger_client.api.createProject.return_value.response = BravadoResponseMock(
             result=project,
         )
 
         # then:
-        self.assertEqual(
-            "org/proj", create_project(name="org/proj", key="PRJ", api_token=API_TOKEN)
-        )
+        self.assertEqual("org/proj", create_project(name="org/proj", key="PRJ", api_token=API_TOKEN))
 
     def test_add_project_member_project_not_found(self, swagger_client_factory):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
@@ -550,9 +488,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
 
         # when:
-        swagger_client.api.addProjectMember.side_effect = HTTPConflict(
-            response=response_mock()
-        )
+        swagger_client.api.addProjectMember.side_effect = HTTPConflict(response=response_mock())
 
         # then:
         with self.assertRaises(UserAlreadyHasAccess):
@@ -573,9 +509,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
 
         # then:
         with self.assertRaises(ProjectNotFound):
-            remove_project_member(
-                project="org/proj", username="tester", api_token=API_TOKEN
-            )
+            remove_project_member(project="org/proj", username="tester", api_token=API_TOKEN)
 
     def test_remove_project_member_no_user(self, swagger_client_factory):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
@@ -587,9 +521,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
 
         # then:
         with self.assertRaises(UserNotExistsOrWithoutAccess):
-            remove_project_member(
-                project="org/proj", username="tester", api_token=API_TOKEN
-            )
+            remove_project_member(project="org/proj", username="tester", api_token=API_TOKEN)
 
     def test_remove_project_member_permissions(self, swagger_client_factory):
         swagger_client = self._get_swagger_client_mock(swagger_client_factory)
@@ -601,9 +533,7 @@ class TestHostedClient(unittest.TestCase, BackendTestMixin):
 
         # then:
         with self.assertRaises(AccessRevokedOnMemberRemoval):
-            remove_project_member(
-                project="org/proj", username="tester", api_token=API_TOKEN
-            )
+            remove_project_member(project="org/proj", username="tester", api_token=API_TOKEN)
 
 
 def test__get_column_type_from_entries():
@@ -618,24 +548,11 @@ def test__get_column_type_from_entries():
         {"entries": [DTO(type="float")], "result": AttributeType.FLOAT.value},
         {"entries": [DTO(type="string")], "result": AttributeType.STRING.value},
         {"entries": [DTO(type="float"), DTO(type="floatSeries")], "exc": ValueError},
+        {"entries": [DTO(type="float"), DTO(type="int")], "result": AttributeType.FLOAT.value},
+        {"entries": [DTO(type="float"), DTO(type="int"), DTO(type="datetime")], "result": AttributeType.STRING.value},
+        {"entries": [DTO(type="float"), DTO(type="int"), DTO(type="string")], "result": AttributeType.STRING.value},
         {
-            "entries": [DTO(type="float"), DTO(type="int")],
-            "result": AttributeType.FLOAT.value,
-        },
-        {
-            "entries": [DTO(type="float"), DTO(type="int"), DTO(type="datetime")],
-            "result": AttributeType.STRING.value,
-        },
-        {
-            "entries": [DTO(type="float"), DTO(type="int"), DTO(type="string")],
-            "result": AttributeType.STRING.value,
-        },
-        {
-            "entries": [
-                DTO(type="float"),
-                DTO(type="int"),
-                DTO(type="string", name="test_column_different"),
-            ],
+            "entries": [DTO(type="float"), DTO(type="int"), DTO(type="string", name="test_column_different")],
             "result": AttributeType.FLOAT.value,
         },
     ]

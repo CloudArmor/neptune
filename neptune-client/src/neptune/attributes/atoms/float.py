@@ -18,7 +18,10 @@ __all__ = ["Float"]
 import typing
 
 from neptune.attributes.atoms.copiable_atom import CopiableAtom
-from neptune.common.warnings import NeptuneUnsupportedValue, warn_once
+from neptune.common.warnings import (
+    NeptuneUnsupportedValue,
+    warn_once,
+)
 from neptune.internal.container_type import ContainerType
 from neptune.internal.operation import AssignFloat
 from neptune.internal.types.utils import is_unsupported_float
@@ -59,6 +62,4 @@ class Float(CopiableAtom):
             return
 
         with self._container.lock():
-            self._enqueue_operation(
-                self.create_assignment_operation(self._path, value.value), wait=wait
-            )
+            self._enqueue_operation(self.create_assignment_operation(self._path, value.value), wait=wait)

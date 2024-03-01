@@ -16,7 +16,10 @@
 __all__ = ["BackgroundJob"]
 
 import abc
-from typing import TYPE_CHECKING, Optional
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+)
 
 if TYPE_CHECKING:
     from neptune.metadata_containers import MetadataContainer

@@ -103,9 +103,7 @@ def get_channel_name_stems(columns):
 
 
 def merge_dataframes(dataframes, on, how="outer"):
-    merged_df = functools.reduce(
-        lambda left, right: pd.merge(left, right, on=on, how=how), dataframes
-    )
+    merged_df = functools.reduce(lambda left, right: pd.merge(left, right, on=on, how=how), dataframes)
     return merged_df
 
 
@@ -195,9 +193,7 @@ def get_git_info(repo_path=None):
         try:
             active_branch = repo.active_branch.name
         except TypeError as e:
-            if str(e.args[0]).startswith(
-                "HEAD is a detached symbolic reference as it points to"
-            ):
+            if str(e.args[0]).startswith("HEAD is a detached symbolic reference as it points to"):
                 active_branch = "Detached HEAD"
 
         remote_urls = [remote.url for remote in repo.remotes]
@@ -226,9 +222,7 @@ def file_contains(filename, text):
 
 def in_docker():
     cgroup_file = "/proc/self/cgroup"
-    return os.path.exists("./dockerenv") or (
-        os.path.exists(cgroup_file) and file_contains(cgroup_file, text="docker")
-    )
+    return os.path.exists("./dockerenv") or (os.path.exists(cgroup_file) and file_contains(cgroup_file, text="docker"))
 
 
 def is_ipython():
@@ -242,9 +236,7 @@ def is_ipython():
 
 
 def glob(pathname):
-    if sys.version_info.major < 3 or (
-        sys.version_info.major == 3 and sys.version_info.minor < 5
-    ):
+    if sys.version_info.major < 3 or (sys.version_info.major == 3 and sys.version_info.minor < 5):
         return globlib.glob(pathname)
     else:
         return globlib.glob(pathname, recursive=True)

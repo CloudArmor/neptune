@@ -89,9 +89,7 @@ You may also want to check the following docs pages:
 
 {correct}Need help?{end}-> https://docs-legacy.neptune.ai/getting-started/getting-help.html
 """
-        super(NeptuneLibraryNotInstalledException, self).__init__(
-            message.format(library=library, **STYLES)
-        )
+        super(NeptuneLibraryNotInstalledException, self).__init__(message.format(library=library, **STYLES))
 
 
 class InvalidChannelValue(NeptuneException):
@@ -119,9 +117,7 @@ You may also want to check the following docs pages:
 
 {correct}Need help?{end}-> https://docs-legacy.neptune.ai/getting-started/getting-help.html
 """
-        super(NeptuneNoExperimentContextException, self).__init__(
-            message.format(**STYLES)
-        )
+        super(NeptuneNoExperimentContextException, self).__init__(message.format(**STYLES))
 
 
 class NeptuneMissingApiTokenException(NeptuneException):
@@ -181,9 +177,7 @@ class InvalidNeptuneBackend(NeptuneException):
 class DeprecatedApiToken(NeptuneException):
     def __init__(self, app_url):
         super(DeprecatedApiToken, self).__init__(
-            "Your API token is deprecated. Please visit {} to get a new one.".format(
-                app_url
-            )
+            "Your API token is deprecated. Please visit {} to get a new one.".format(app_url)
         )
 
 

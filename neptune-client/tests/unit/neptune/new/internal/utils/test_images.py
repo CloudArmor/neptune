@@ -32,15 +32,18 @@ from bokeh.plotting import figure
 from matplotlib import pyplot
 from matplotlib.figure import Figure
 from PIL import Image
-from tests.unit.neptune.new.utils.logging import format_log
 from vega_datasets import data
 
-from neptune.common.utils import IS_MACOS, IS_WINDOWS
+from neptune.common.utils import (
+    IS_MACOS,
+    IS_WINDOWS,
+)
 from neptune.internal.utils.images import (
     _scale_array,
     get_html_content,
     get_image_content,
 )
+from tests.unit.neptune.new.utils.logging import format_log
 
 matplotlib.use("agg")
 
@@ -59,9 +62,7 @@ class TestImage(unittest.TestCase):
         expected_image = Image.fromarray(image_array.astype(numpy.uint8))
 
         # expect
-        self.assertEqual(
-            get_image_content(expected_image), self._encode_pil_image(expected_image)
-        )
+        self.assertEqual(get_image_content(expected_image), self._encode_pil_image(expected_image))
 
     def test_get_image_content_from_2d_grayscale_array(self):
         # given
@@ -70,9 +71,7 @@ class TestImage(unittest.TestCase):
         expected_image = Image.fromarray(scaled_array.astype(numpy.uint8))
 
         # expect
-        self.assertEqual(
-            get_image_content(image_array), self._encode_pil_image(expected_image)
-        )
+        self.assertEqual(get_image_content(image_array), self._encode_pil_image(expected_image))
 
     def test_get_image_content_from_3d_grayscale_array(self):
         # given
@@ -83,9 +82,7 @@ class TestImage(unittest.TestCase):
         # when
 
         # expect
-        self.assertEqual(
-            get_image_content(image_array), self._encode_pil_image(expected_image)
-        )
+        self.assertEqual(get_image_content(image_array), self._encode_pil_image(expected_image))
 
     def test_get_image_content_from_rgb_array(self):
         # given
@@ -94,9 +91,7 @@ class TestImage(unittest.TestCase):
         expected_image = Image.fromarray(scaled_array.astype(numpy.uint8))
 
         # expect
-        self.assertEqual(
-            get_image_content(image_array), self._encode_pil_image(expected_image)
-        )
+        self.assertEqual(get_image_content(image_array), self._encode_pil_image(expected_image))
 
         # and make sure that original image's size was preserved
         self.assertFalse((image_array * 255 - scaled_array).any())
@@ -108,9 +103,7 @@ class TestImage(unittest.TestCase):
         expected_image = Image.fromarray(scaled_array.astype(numpy.uint8))
 
         # expect
-        self.assertEqual(
-            get_image_content(image_array), self._encode_pil_image(expected_image)
-        )
+        self.assertEqual(get_image_content(image_array), self._encode_pil_image(expected_image))
 
         # and make sure that original image's size was preserved
         self.assertFalse((image_array * 255 - scaled_array).any())
@@ -138,9 +131,7 @@ class TestImage(unittest.TestCase):
         expected_image = Image.fromarray(expected_array.astype(numpy.uint8))
 
         # expect
-        self.assertEqual(
-            get_image_content(image_tensor), self._encode_pil_image(expected_image)
-        )
+        self.assertEqual(get_image_content(image_tensor), self._encode_pil_image(expected_image))
 
         # and make sure that original image's size was preserved
         self.assertFalse((image_tensor.numpy() * 255 - expected_array).any())
@@ -154,9 +145,7 @@ class TestImage(unittest.TestCase):
         expected_image = Image.fromarray(expected_array.astype(numpy.uint8))
 
         # expect
-        self.assertEqual(
-            get_image_content(image_tensor), self._encode_pil_image(expected_image)
-        )
+        self.assertEqual(get_image_content(image_tensor), self._encode_pil_image(expected_image))
 
     def test_get_image_content_from_seaborn_figure(self):
         # given
@@ -263,9 +252,7 @@ class TestImage(unittest.TestCase):
 
         # then
         self.assertTrue(
-            result.startswith(
-                '<table border="1" class="dataframe">\n  <thead>\n    <tr style="text-align: right;">'
-            )
+            result.startswith('<table border="1" class="dataframe">\n  <thead>\n    <tr style="text-align: right;">')
         )
 
     def test_get_html_from_seaborn(self):
@@ -276,9 +263,7 @@ class TestImage(unittest.TestCase):
         result = get_html_content(grid)
 
         # then
-        self.assertTrue(
-            result.startswith('<html>\n<head><meta charset="utf-8" /></head>')
-        )
+        self.assertTrue(result.startswith('<html>\n<head><meta charset="utf-8" /></head>'))
 
     @staticmethod
     def _encode_pil_image(image: Image) -> bytes:

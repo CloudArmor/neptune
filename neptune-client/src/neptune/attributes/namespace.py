@@ -37,7 +37,10 @@ from neptune.internal.utils.generic_attribute_mapper import (
     atomic_attribute_types_map,
 )
 from neptune.internal.utils.logger import get_logger
-from neptune.internal.utils.paths import parse_path, path_to_str
+from neptune.internal.utils.paths import (
+    parse_path,
+    path_to_str,
+)
 from neptune.types.namespace import Namespace as NamespaceVal
 
 if TYPE_CHECKING:
@@ -86,9 +89,7 @@ class Namespace(Attribute, MutableMapping):
         if not isinstance(value, NamespaceVal):
             value = NamespaceVal(value)
         for k, v in value.value.items():
-            self._container[f"{self._str_path}/{k}"].extend(
-                v, steps=steps, timestamps=timestamps, wait=wait, **kwargs
-            )
+            self._container[f"{self._str_path}/{k}"].extend(v, steps=steps, timestamps=timestamps, wait=wait, **kwargs)
 
     def to_dict(self) -> Dict[str, Any]:
         result = {}
@@ -115,17 +116,12 @@ class Namespace(Attribute, MutableMapping):
                 result[k] = self._collect_atom_values(v)
             else:
                 attr_type, attr_value = v
-                if (
-                    attr_type in atomic_attribute_types_map
-                    and attr_value is not NoValue
-                ):
+                if attr_type in atomic_attribute_types_map and attr_value is not NoValue:
                     result[k] = v[1]
         return result
 
     def fetch(self) -> dict:
-        attributes = self._backend.fetch_atom_attribute_values(
-            self._container_id, self._container_type, self._path
-        )
+        attributes = self._backend.fetch_atom_attribute_values(self._container_id, self._container_type, self._path)
         run_struct = ContainerStructure()
         prefix_len = len(self._path)
         for attr_name, attr_type, attr_value in attributes:

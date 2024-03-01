@@ -18,11 +18,18 @@ from datetime import datetime
 import numpy
 from bokeh.plotting import figure
 from PIL import Image
-from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
-from neptune.types import Datetime, File, Float, FloatSeries, Integer, String
+from neptune.types import (
+    Datetime,
+    File,
+    Float,
+    FloatSeries,
+    Integer,
+    String,
+)
 from neptune.types.namespace import Namespace
 from neptune.types.type_casting import cast_value
+from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 
 class TestTypeCasting(TestAttributeBase):

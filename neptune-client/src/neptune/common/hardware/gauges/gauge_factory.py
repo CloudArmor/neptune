@@ -13,9 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from neptune.common.hardware.gauges.cpu import CGroupCpuUsageGauge, SystemCpuUsageGauge
+from neptune.common.hardware.gauges.cpu import (
+    CGroupCpuUsageGauge,
+    SystemCpuUsageGauge,
+)
 from neptune.common.hardware.gauges.gauge_mode import GaugeMode
-from neptune.common.hardware.gauges.gpu import GpuMemoryGauge, GpuUsageGauge
+from neptune.common.hardware.gauges.gpu import (
+    GpuMemoryGauge,
+    GpuUsageGauge,
+)
 from neptune.common.hardware.gauges.memory import (
     CGroupMemoryUsageGauge,
     SystemMemoryUsageGauge,

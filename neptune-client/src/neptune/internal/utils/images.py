@@ -33,7 +33,10 @@ import base64
 import io
 import pickle
 import warnings
-from io import BytesIO, StringIO
+from io import (
+    BytesIO,
+    StringIO,
+)
 from typing import Optional
 
 import numpy as np
@@ -142,9 +145,7 @@ def _to_html(chart) -> str:
         return _export_seaborn_figure(chart)
 
     else:
-        raise ValueError(
-            "Currently supported are matplotlib, plotly, altair, bokeh and seaborn figures"
-        )
+        raise ValueError("Currently supported are matplotlib, plotly, altair, bokeh and seaborn figures")
 
 
 def _matplotlib_to_plotly(chart):
@@ -162,9 +163,9 @@ def _matplotlib_to_plotly(chart):
     # due to fact that mpl_to_plotly uses deprecated matplotlib functionalities
     plotly_version = plotly.__version__
     matplotlib_version = matplotlib.__version__
-    if version.parse(matplotlib_version) >= version.parse("3.3.0") and version.parse(
-        plotly_version
-    ) < version.parse("5.0.0"):
+    if version.parse(matplotlib_version) >= version.parse("3.3.0") and version.parse(plotly_version) < version.parse(
+        "5.0.0"
+    ):
         raise PlotlyIncompatibilityException(
             matplotlib_version,
             plotly_version,
@@ -182,9 +183,7 @@ def _matplotlib_to_plotly(chart):
         try:
             chart = plotly.tools.mpl_to_plotly(chart)
         except AttributeError as e:
-            if "'PathCollection' object has no attribute 'get_offset_position'" in str(
-                e
-            ):
+            if "'PathCollection' object has no attribute 'get_offset_position'" in str(e):
                 raise PlotlyIncompatibilityException(
                     matplotlib_version,
                     plotly_version,
@@ -234,9 +233,7 @@ def _scale_array(array: np.ndarray) -> np.ndarray:
     return array
 
 
-def _warn_about_incorrect_image_data_range(
-    array_min: int | float, array_max: int | float
-) -> None:
+def _warn_about_incorrect_image_data_range(array_min: int | float, array_max: int | float) -> None:
     msg = f"Image data is in range [{array_min}, {array_max}]."
     logger.warning(
         "%s To be interpreted as colors correctly values in the array need to be in the %s or %s range.",
@@ -286,37 +283,24 @@ def is_pil_image(image) -> bool:
 
 
 def is_matplotlib_figure(image):
-    return (
-        image.__class__.__module__.startswith("matplotlib.")
-        and image.__class__.__name__ == "Figure"
-    )
+    return image.__class__.__module__.startswith("matplotlib.") and image.__class__.__name__ == "Figure"
 
 
 def is_plotly_figure(chart):
-    return (
-        chart.__class__.__module__.startswith("plotly.")
-        and chart.__class__.__name__ == "Figure"
-    )
+    return chart.__class__.__module__.startswith("plotly.") and chart.__class__.__name__ == "Figure"
 
 
 def is_altair_chart(chart):
-    return (
-        chart.__class__.__module__.startswith("altair.")
-        and "Chart" in chart.__class__.__name__
-    )
+    return chart.__class__.__module__.startswith("altair.") and "Chart" in chart.__class__.__name__
 
 
 def is_bokeh_figure(chart):
-    return (
-        chart.__class__.__module__.startswith("bokeh.")
-        and chart.__class__.__name__.lower() == "figure"
-    )
+    return chart.__class__.__module__.startswith("bokeh.") and chart.__class__.__name__.lower() == "figure"
 
 
 def is_seaborn_figure(chart):
     return (
-        chart.__class__.__module__.startswith("seaborn.axisgrid")
-        and chart.__class__.__name__ in SEABORN_GRID_CLASSES
+        chart.__class__.__module__.startswith("seaborn.axisgrid") and chart.__class__.__name__ in SEABORN_GRID_CLASSES
     )
 
 

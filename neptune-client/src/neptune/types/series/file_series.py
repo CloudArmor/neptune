@@ -17,7 +17,13 @@ __all__ = ["FileSeries"]
 
 import time
 from itertools import cycle
-from typing import TYPE_CHECKING, List, Optional, Sequence, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    List,
+    Optional,
+    Sequence,
+    TypeVar,
+)
 
 from neptune.internal.types.stringify_value import extract_if_stringify_value
 from neptune.internal.utils import is_collection
@@ -34,11 +40,7 @@ Ret = TypeVar("Ret")
 
 class FileSeries(Series):
     def __init__(
-        self,
-        values,
-        timestamps: Optional[Sequence[float]] = None,
-        steps: Optional[Sequence[float]] = None,
-        **kwargs,
+        self, values, timestamps: Optional[Sequence[float]] = None, steps: Optional[Sequence[float]] = None, **kwargs
     ):
         values = extract_if_stringify_value(values)
 

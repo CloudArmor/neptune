@@ -15,17 +15,26 @@
 #
 import pickle
 import unittest
-from io import BytesIO, StringIO
+from io import (
+    BytesIO,
+    StringIO,
+)
 
 import numpy
 from bokeh.plotting import figure
 from PIL import Image
-from tests.e2e.utils import tmp_context
 
-from neptune.exceptions import NeptuneException, StreamAlreadyUsedException
-from neptune.internal.types.file_types import FileType, InMemoryComposite
+from neptune.exceptions import (
+    NeptuneException,
+    StreamAlreadyUsedException,
+)
+from neptune.internal.types.file_types import (
+    FileType,
+    InMemoryComposite,
+)
 from neptune.internal.utils.images import _get_pil_image_data
 from neptune.types import File
+from tests.e2e.utils import tmp_context
 
 
 class TestFile(unittest.TestCase):
@@ -78,15 +87,11 @@ class TestFile(unittest.TestCase):
 
     def test_create_from_string_content(self):
         self._test_in_memory_file("some_content", expected_ext="txt")
-        self._test_in_memory_file(
-            "some_content", expected_ext="png", custom_extension="png"
-        )
+        self._test_in_memory_file("some_content", expected_ext="png", custom_extension="png")
 
     def test_create_from_bytes_content(self):
         self._test_in_memory_file(b"some_content", expected_ext="bin")
-        self._test_in_memory_file(
-            b"some_content", expected_ext="png", custom_extension="png"
-        )
+        self._test_in_memory_file(b"some_content", expected_ext="png", custom_extension="png")
 
     def _test_stream_content(self, file_producer, expected_content, expected_ext):
         """We can read content of the stream only once, so expect `stream_producer`"""
@@ -108,22 +113,16 @@ class TestFile(unittest.TestCase):
             return File.from_stream(stream)
 
         self._test_stream_content(
-            lambda: File.from_stream(StringIO("aaabbbccc")),
-            expected_content=b"aaabbbccc",
-            expected_ext="txt",
+            lambda: File.from_stream(StringIO("aaabbbccc")), expected_content=b"aaabbbccc", expected_ext="txt"
         )
-        self._test_stream_content(
-            _file_from_seeked_stream, expected_content=b"aaabbbccc", expected_ext="txt"
-        )
+        self._test_stream_content(_file_from_seeked_stream, expected_content=b"aaabbbccc", expected_ext="txt")
         self._test_stream_content(
             lambda: File.from_stream(StringIO("aaabbbccc"), extension="png"),
             expected_content=b"aaabbbccc",
             expected_ext="png",
         )
         self._test_stream_content(
-            lambda: File.from_stream(StringIO("aaabbbccc"), seek=5),
-            expected_content=b"bccc",
-            expected_ext="txt",
+            lambda: File.from_stream(StringIO("aaabbbccc"), seek=5), expected_content=b"bccc", expected_ext="txt"
         )
 
     def test_create_from_bytes_io(self):
@@ -133,22 +132,16 @@ class TestFile(unittest.TestCase):
             return File.from_stream(stream)
 
         self._test_stream_content(
-            lambda: File.from_stream(BytesIO(b"aaabbbccc")),
-            expected_content=b"aaabbbccc",
-            expected_ext="bin",
+            lambda: File.from_stream(BytesIO(b"aaabbbccc")), expected_content=b"aaabbbccc", expected_ext="bin"
         )
-        self._test_stream_content(
-            _file_from_seeked_stream, expected_content=b"aaabbbccc", expected_ext="bin"
-        )
+        self._test_stream_content(_file_from_seeked_stream, expected_content=b"aaabbbccc", expected_ext="bin")
         self._test_stream_content(
             lambda: File.from_stream(BytesIO(b"aaabbbccc"), extension="png"),
             expected_content=b"aaabbbccc",
             expected_ext="png",
         )
         self._test_stream_content(
-            lambda: File.from_stream(BytesIO(b"aaabbbccc"), seek=5),
-            expected_content=b"bccc",
-            expected_ext="bin",
+            lambda: File.from_stream(BytesIO(b"aaabbbccc"), seek=5), expected_content=b"bccc", expected_ext="bin"
         )
 
     def test_stream_read_once(self):
@@ -194,11 +187,7 @@ class TestFile(unittest.TestCase):
 
         # then
         self.assertEqual(file.extension, "html")
-        self.assertTrue(
-            file.content.lstrip().startswith(
-                '<!DOCTYPE html>\n<html lang="en">'.encode("utf-8")
-            )
-        )
+        self.assertTrue(file.content.lstrip().startswith('<!DOCTYPE html>\n<html lang="en">'.encode("utf-8")))
 
     def test_as_pickle(self):
         # given

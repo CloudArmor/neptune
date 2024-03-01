@@ -17,27 +17,23 @@ import os
 import re
 
 import pytest
-from tests.e2e.base import BaseE2ETest
 
 import neptune
+from tests.e2e.base import BaseE2ETest
 
 torch = pytest.importorskip("torch")
 torch.utils.data = pytest.importorskip("torch.utils.data")
 pytorch_lightning = pytest.importorskip("pytorch_lightning")
 pytorch_lightning.callbacks = pytest.importorskip("pytorch_lightning.callbacks")
-pytorch_lightning.loggers.neptune = pytest.importorskip(
-    "pytorch_lightning.loggers.neptune"
-)
+pytorch_lightning.loggers.neptune = pytest.importorskip("pytorch_lightning.loggers.neptune")
 
 LIGHTNING_ECOSYSTEM_ENV_PROJECT = "NEPTUNE_LIGHTNING_ECOSYSTEM_CI_PROJECT"
 
 skip_if_on_regular_env = pytest.mark.skipif(
-    LIGHTNING_ECOSYSTEM_ENV_PROJECT not in os.environ,
-    reason="Tests weren't invoked in Lightning Ecosystem CI",
+    LIGHTNING_ECOSYSTEM_ENV_PROJECT not in os.environ, reason="Tests weren't invoked in Lightning Ecosystem CI"
 )
 skip_if_on_lightning_ecosystem = pytest.mark.skipif(
-    LIGHTNING_ECOSYSTEM_ENV_PROJECT in os.environ,
-    reason="Tests invoked in Lightning Ecosystem CI",
+    LIGHTNING_ECOSYSTEM_ENV_PROJECT in os.environ, reason="Tests invoked in Lightning Ecosystem CI"
 )
 
 
@@ -94,9 +90,7 @@ def prepare(project):
         monitor="valid/loss",
         every_n_epochs=1,
     )
-    neptune_logger = pytorch_lightning.loggers.neptune.NeptuneLogger(
-        run=run, prefix="custom_prefix"
-    )
+    neptune_logger = pytorch_lightning.loggers.neptune.NeptuneLogger(run=run, prefix="custom_prefix")
     # and (Subject)
     model = BoringModel()
     trainer = pytorch_lightning.Trainer(
@@ -137,9 +131,7 @@ class TestPytorchLightning(BaseE2ETest):
         if pytorch_run.exists("source_code/integrations/lightning"):
             logged_version = pytorch_run["source_code/integrations/lightning"].fetch()
         else:
-            logged_version = pytorch_run[
-                "source_code/integrations/pytorch-lightning"
-            ].fetch()
+            logged_version = pytorch_run["source_code/integrations/pytorch-lightning"].fetch()
         assert logged_version == pytorch_lightning.__version__
 
         assert pytorch_run.exists("custom_prefix/valid/loss")

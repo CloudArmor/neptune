@@ -40,9 +40,7 @@ class TestChannelWriter(unittest.TestCase):
     def test_write_data_with_low_resolution_datetime_now(self, dt):
         # given
         experiment = mock.MagicMock()
-        experiment.get_system_properties.return_value = {
-            "created": datetime(2022, 2, 2, 2, 2, 2, 2)
-        }
+        experiment.get_system_properties.return_value = {"created": datetime(2022, 2, 2, 2, 2, 2, 2)}
         channel_name = "a channel name"
         writer = ChannelWriter(experiment, channel_name)
 
@@ -53,18 +51,14 @@ class TestChannelWriter(unittest.TestCase):
         writer.write("text1\ntext2\n")
 
         # then
-        x_to_text = self._extract_x_to_text_from_calls(
-            experiment._channels_values_sender.send.call_args_list
-        )
+        x_to_text = self._extract_x_to_text_from_calls(experiment._channels_values_sender.send.call_args_list)
         self.assertEqual(x_to_text, {0.001: "text1", 0.002: "text2"})
 
     @mock.patch("neptune.legacy.internal.streams.channel_writer.datetime")
     def test_write_data_with_high_resolution_datetime_now(self, dt):
         # given
         experiment = mock.MagicMock()
-        experiment.get_system_properties.return_value = {
-            "created": datetime(2022, 2, 2, 2, 2, 2, 2)
-        }
+        experiment.get_system_properties.return_value = {"created": datetime(2022, 2, 2, 2, 2, 2, 2)}
         channel_name = "a channel name"
         writer = ChannelWriter(experiment, channel_name)
 
@@ -75,9 +69,7 @@ class TestChannelWriter(unittest.TestCase):
         writer.write("text2\n")
 
         # then
-        x_to_text = self._extract_x_to_text_from_calls(
-            experiment._channels_values_sender.send.call_args_list
-        )
+        x_to_text = self._extract_x_to_text_from_calls(experiment._channels_values_sender.send.call_args_list)
         self.assertEqual(x_to_text, {0.002: "text1", 0.003: "text2"})
 
     @staticmethod

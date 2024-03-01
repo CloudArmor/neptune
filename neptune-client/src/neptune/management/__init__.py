@@ -124,7 +124,10 @@ from .internal.api import (
     remove_project_service_account,
     trash_objects,
 )
-from .internal.types import MemberRole, ProjectVisibility
+from .internal.types import (
+    MemberRole,
+    ProjectVisibility,
+)
 
 __all__ = [
     "clear_trash",

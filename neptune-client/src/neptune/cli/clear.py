@@ -18,7 +18,10 @@ __all__ = ["ClearRunner"]
 
 import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING, Sequence
+from typing import (
+    TYPE_CHECKING,
+    Sequence,
+)
 
 import click
 
@@ -28,7 +31,11 @@ from neptune.constants import SYNC_DIRECTORY
 from neptune.internal.utils.logger import get_logger
 
 if TYPE_CHECKING:
-    from neptune.cli.containers import AsyncContainer, Container, OfflineContainer
+    from neptune.cli.containers import (
+        AsyncContainer,
+        Container,
+        OfflineContainer,
+    )
     from neptune.internal.backends.neptune_backend import NeptuneBackend
 
 logger = get_logger(with_prefix=False)
@@ -36,29 +43,18 @@ logger = get_logger(with_prefix=False)
 
 class ClearRunner:
     @staticmethod
-    def clear(
-        *,
-        backend: "NeptuneBackend",
-        path: Path,
-        force: bool = False,
-        clear_eventual: bool = True
-    ) -> None:
+    def clear(*, backend: "NeptuneBackend", path: Path, force: bool = False, clear_eventual: bool = True) -> None:
         containers = collect_containers(path=path, backend=backend)
 
         remove_sync_containers(path=path)
         remove_containers(containers=containers.not_found_containers)
         remove_containers(
-            containers=filter_containers(
-                a=containers.synced_containers, b=containers.not_found_containers
-            )
+            containers=filter_containers(a=containers.synced_containers, b=containers.not_found_containers)
         )
 
-        if clear_eventual and (
-            containers.offline_containers or containers.unsynced_containers
-        ):
+        if clear_eventual and (containers.offline_containers or containers.unsynced_containers):
             log_junk_metadata(
-                offline_containers=containers.offline_containers,
-                unsynced_containers=containers.unsynced_containers,
+                offline_containers=containers.offline_containers, unsynced_containers=containers.unsynced_containers
             )
 
             if force or click.confirm("\nDo you want to delete the listed metadata?"):
@@ -66,9 +62,7 @@ class ClearRunner:
                 remove_containers(containers=containers.unsynced_containers)
 
 
-def filter_containers(
-    *, a: Sequence["Container"], b: Sequence["Container"]
-) -> Sequence["Container"]:
+def filter_containers(*, a: Sequence["Container"], b: Sequence["Container"]) -> Sequence["Container"]:
     b_ids = {container.container_id for container in b}
     return [container for container in a if container.container_id not in b_ids]
 
@@ -81,9 +75,7 @@ def remove_sync_containers(*, path: Path) -> None:
 
 
 def log_junk_metadata(
-    *,
-    offline_containers: Sequence["OfflineContainer"],
-    unsynced_containers: Sequence["AsyncContainer"]
+    *, offline_containers: Sequence["OfflineContainer"], unsynced_containers: Sequence["AsyncContainer"]
 ) -> None:
     if unsynced_containers:
         logger.info("")
@@ -91,9 +83,7 @@ def log_junk_metadata(
 
     if offline_containers:
         logger.info("")
-        StatusRunner.log_offline_objects(
-            offline_containers=offline_containers, info=False
-        )
+        StatusRunner.log_offline_objects(offline_containers=offline_containers, info=False)
 
 
 def remove_containers(*, containers: Sequence["Container"]) -> None:

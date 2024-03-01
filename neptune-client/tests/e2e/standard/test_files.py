@@ -23,7 +23,24 @@ from unittest.mock import Mock
 from zipfile import ZipFile
 
 import pytest
-from tests.e2e.base import AVAILABLE_CONTAINERS, BaseE2ETest, fake
+
+from neptune.internal.backends import hosted_file_operations
+from neptune.internal.backends.api_model import (
+    MultipartConfig,
+    OptionalFeatures,
+)
+from neptune.internal.backends.hosted_neptune_backend import HostedNeptuneBackend
+from neptune.internal.types.file_types import FileType
+from neptune.metadata_containers import MetadataContainer
+from neptune.types import (
+    File,
+    FileSet,
+)
+from tests.e2e.base import (
+    AVAILABLE_CONTAINERS,
+    BaseE2ETest,
+    fake,
+)
 from tests.e2e.plot_utils import (
     generate_altair_chart,
     generate_brokeh_figure,
@@ -40,28 +57,15 @@ from tests.e2e.utils import (
     tmp_context,
 )
 
-from neptune.internal.backends import hosted_file_operations
-from neptune.internal.backends.api_model import MultipartConfig, OptionalFeatures
-from neptune.internal.backends.hosted_neptune_backend import HostedNeptuneBackend
-from neptune.internal.types.file_types import FileType
-from neptune.metadata_containers import MetadataContainer
-from neptune.types import File, FileSet
-
 
 class TestUpload(BaseE2ETest):
     @pytest.mark.parametrize("container", AVAILABLE_CONTAINERS, indirect=True)
     def test_using_new_api(self, container: MetadataContainer):
         assert isinstance(container._backend, HostedNeptuneBackend)
-        assert container._backend._client_config.has_feature(
-            OptionalFeatures.MULTIPART_UPLOAD
-        )
-        assert isinstance(
-            container._backend._client_config.multipart_config, MultipartConfig
-        )
+        assert container._backend._client_config.has_feature(OptionalFeatures.MULTIPART_UPLOAD)
+        assert isinstance(container._backend._client_config.multipart_config, MultipartConfig)
 
-    def _test_upload(
-        self, container: MetadataContainer, file_type: FileType, file_size: int
-    ):
+    def _test_upload(self, container: MetadataContainer, file_type: FileType, file_size: int):
         key = self.gen_key()
         extension = fake.file_extension()
         downloaded_filename = fake.file_name()
@@ -159,9 +163,7 @@ class TestUpload(BaseE2ETest):
             assert hacked_upload_raw_data.upload_part_iteration == 5
 
     @pytest.mark.parametrize("container", ["run"], indirect=True)
-    def test_replace_float_attribute_with_uploaded_file(
-        self, container: MetadataContainer
-    ):
+    def test_replace_float_attribute_with_uploaded_file(self, container: MetadataContainer):
         key = self.gen_key()
         file_size = 100 * SIZE_1KB  # 100 kB
         filename = fake.file_name()
@@ -196,9 +198,7 @@ class TestUpload(BaseE2ETest):
         key_from_disk = self.gen_key()
 
         with preserve_cwd("some_other_folder"):
-            run = initialize_container(
-                container_type="run", project=environment.project
-            )
+            run = initialize_container(container_type="run", project=environment.project)
             # upload file from memory
             run[key_in_mem].upload(File.from_content("abcd"))
 
@@ -217,14 +217,11 @@ class TestUpload(BaseE2ETest):
 
 
 class TestFileSet(BaseE2ETest):
-    def _test_fileset(
-        self, container: MetadataContainer, large_file_size: int, small_files_no: int
-    ):
+    def _test_fileset(self, container: MetadataContainer, large_file_size: int, small_files_no: int):
         key = self.gen_key()
         large_filename = fake.file_name()
         small_files = [
-            (f"{uuid.uuid4()}.{fake.file_extension()}", fake.sentence().encode("utf-8"))
-            for _ in range(small_files_no)
+            (f"{uuid.uuid4()}.{fake.file_extension()}", fake.sentence().encode("utf-8")) for _ in range(small_files_no)
         ]
 
         with tmp_context():
@@ -309,9 +306,7 @@ class TestFileSet(BaseE2ETest):
             return set(this_level_dirs)
         else:
             subpaths = cls._gen_tree_paths(depth=depth - 1, width=width)
-            new_paths = set(
-                "".join(prod) for prod in product(subpaths, this_level_dirs)
-            )
+            new_paths = set("".join(prod) for prod in product(subpaths, this_level_dirs))
             subpaths.update(new_paths)
             return subpaths
 
@@ -393,9 +388,7 @@ class TestFileSet(BaseE2ETest):
 
     @pytest.mark.parametrize("container", ["run"], indirect=True)
     @pytest.mark.parametrize("delete_attribute", [True, False])
-    def test_single_file_override(
-        self, container: MetadataContainer, delete_attribute: bool
-    ):
+    def test_single_file_override(self, container: MetadataContainer, delete_attribute: bool):
         key = self.gen_key()
         filename1 = fake.file_name()
         filename2 = fake.file_name()
@@ -433,9 +426,7 @@ class TestFileSet(BaseE2ETest):
 
     @pytest.mark.parametrize("container", ["run"], indirect=True)
     @pytest.mark.parametrize("delete_attribute", [True, False])
-    def test_fileset_file_override(
-        self, container: MetadataContainer, delete_attribute: bool
-    ):
+    def test_fileset_file_override(self, container: MetadataContainer, delete_attribute: bool):
         key = self.gen_key()
         filename = fake.file_name()
         content1 = os.urandom(random.randint(SIZE_1KB, 100 * SIZE_1KB))

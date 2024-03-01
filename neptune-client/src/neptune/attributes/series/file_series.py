@@ -18,13 +18,28 @@ __all__ = ["FileSeries"]
 import io
 import os
 import pathlib
-from typing import Iterable, List, Optional
+from typing import (
+    Iterable,
+    List,
+    Optional,
+)
 
-from PIL import Image, UnidentifiedImageError
+from PIL import (
+    Image,
+    UnidentifiedImageError,
+)
 
 from neptune.attributes.series.series import Series
-from neptune.exceptions import FileNotFound, OperationNotSupported
-from neptune.internal.operation import ClearImageLog, ImageValue, LogImages, Operation
+from neptune.exceptions import (
+    FileNotFound,
+    OperationNotSupported,
+)
+from neptune.internal.operation import (
+    ClearImageLog,
+    ImageValue,
+    LogImages,
+    Operation,
+)
 from neptune.internal.types.file_types import FileType
 from neptune.internal.utils import base64_encode
 from neptune.internal.utils.limits import image_size_exceeds_limit_for_logging
@@ -37,9 +52,7 @@ Data = File
 LogOperation = LogImages
 
 
-class FileSeries(
-    Series[Val, Data, LogOperation], max_batch_size=1, operation_cls=LogOperation
-):
+class FileSeries(Series[Val, Data, LogOperation], max_batch_size=1, operation_cls=LogOperation):
     @classmethod
     def _map_series_val(cls, value: Val) -> List[ImageValue]:
         return [
@@ -83,21 +96,14 @@ class FileSeries(
 
         return base64_encode(file_content)
 
-    def download(
-        self, destination: Optional[str], progress_bar: Optional[ProgressBarType] = None
-    ):
+    def download(self, destination: Optional[str], progress_bar: Optional[ProgressBarType] = None):
         target_dir = self._get_destination(destination)
         item_count = self._backend.get_image_series_values(
             self._container_id, self._container_type, self._path, 0, 1
         ).totalItemCount
         for i in range(0, item_count):
             self._backend.download_file_series_by_index(
-                self._container_id,
-                self._container_type,
-                self._path,
-                i,
-                target_dir,
-                progress_bar,
+                self._container_id, self._container_type, self._path, i, target_dir, progress_bar
             )
 
     def download_last(self, destination: Optional[str]):

@@ -17,6 +17,7 @@
 import time
 
 import jwt
+
 from tests.unit.neptune.legacy.random_utils import a_string
 
 SECRET = "secret"
@@ -34,6 +35,4 @@ def an_access_token():
 
 
 def a_refresh_token():
-    return jwt.encode(
-        {"exp": 0, "azp": a_string(), "iss": "http://{}.com".format(a_string())}, SECRET
-    )
+    return jwt.encode({"exp": 0, "azp": a_string(), "iss": "http://{}.com".format(a_string())}, SECRET)
