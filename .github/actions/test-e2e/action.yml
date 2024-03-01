@@ -37,6 +37,7 @@ runs:
 
     - name: E2E - ${{ inputs.module }}
       run: |
+        cd neptune \
         pytest --cov=neptune --cov-report xml \
         -v ./tests/e2e/ -m "${{ inputs.module }}" \
         --timeout=600 --timeout_method=thread \
@@ -48,7 +49,7 @@ runs:
       uses: mikepenz/action-junit-report@v3.6.2
       if: always()
       with:
-        report_paths: './test-results/test-e2e-*.xml'
+        report_paths: './neptune/test-results/test-e2e-*.xml'
         update_check: true
         include_passed: true
         annotate_notice: true
@@ -66,4 +67,4 @@ runs:
       if: always()
       with:
         name: test-artifacts
-        path: ./test-results
+        path: ./neptune/test-results
