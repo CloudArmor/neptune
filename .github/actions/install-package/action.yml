@@ -23,6 +23,7 @@ runs:
       - uses: actions/cache@v3
         id: cache
         with:
+          cd neptune
           path: ~/.cache/pip
           key: ${{ inputs.os }}-python-${{ inputs.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ steps.date.outputs.date }}
 
@@ -33,16 +34,18 @@ runs:
 
       - name: Install integration packages (if applicable)
         run: |
+            cd neptune
             pip install ${{ inputs.pip_url }}
         shell: bash
         if: inputs.pip_url
 
       - name: Install dependencies
         run: |
-          pip install -r dev_requirements.txt
+          pip install -r neptune/dev_requirements.txt
         shell: bash
 
       - name: List dependencies
         run: |
+          cd neptune
           pip list
         shell: bash
