@@ -1,0 +1,4 @@
+catalyst
+neptune-client<1.0.0
+tensorboard
+torchvision

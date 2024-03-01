@@ -1,0 +1,6 @@
+include requirements.txt
+include setupbase.py
+include packages/neptune-extension/dist/labextension/*.tgz
+include packages/neptune-extension/dist/nbextension/*.js
+include versioneer.py
+include neptune_notebooks/_version.py

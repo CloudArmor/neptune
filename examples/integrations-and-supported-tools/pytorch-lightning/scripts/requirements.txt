@@ -1,0 +1,7 @@
+lightning
+neptune
+pydantic
+scikit-plot
+scipy<1.12
+torch
+torchvision

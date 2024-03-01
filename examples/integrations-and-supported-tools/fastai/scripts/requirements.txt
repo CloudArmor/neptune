@@ -1,0 +1,6 @@
+fastai
+neptune
+neptune-fastai
+numpy
+torch
+torchvision

@@ -1,0 +1,5 @@
+matplotlib
+neptune
+scikit-learn
+skorch
+torch

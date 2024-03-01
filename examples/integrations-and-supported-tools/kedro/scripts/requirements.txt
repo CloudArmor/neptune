@@ -1,0 +1,7 @@
+kedro
+matplotlib
+neptune[kedro]
+numpy
+openpyxl
+pyarrow
+scikit-learn

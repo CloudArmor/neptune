@@ -1,0 +1,4 @@
+neptune
+torch
+torchvision
+tqdm
