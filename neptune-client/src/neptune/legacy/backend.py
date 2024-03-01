@@ -14,10 +14,7 @@
 # limitations under the License.
 #
 
-from abc import (
-    ABC,
-    abstractmethod,
-)
+from abc import ABC, abstractmethod
 from typing import Dict
 
 from neptune.legacy.model import ChannelWithLastValue
@@ -151,7 +148,9 @@ class LeaderboardApiClient(ApiClient, ABC):
         pass
 
     @abstractmethod
-    def create_system_channel(self, experiment, name, channel_type) -> ChannelWithLastValue:
+    def create_system_channel(
+        self, experiment, name, channel_type
+    ) -> ChannelWithLastValue:
         pass
 
     @abstractmethod

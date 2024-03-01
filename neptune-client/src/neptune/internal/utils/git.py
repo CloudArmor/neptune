@@ -22,23 +22,12 @@ __all__ = [
 import warnings
 from dataclasses import dataclass
 from datetime import datetime
-from typing import (
-    TYPE_CHECKING,
-    List,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, List, Optional, Union
 
-from neptune.attributes.constants import (
-    DIFF_HEAD_INDEX_PATH,
-    UPSTREAM_INDEX_DIFF,
-)
+from neptune.attributes.constants import DIFF_HEAD_INDEX_PATH, UPSTREAM_INDEX_DIFF
 from neptune.internal.utils.logger import get_logger
 from neptune.types import File
-from neptune.types.atoms.git_ref import (
-    GitRef,
-    GitRefDisabled,
-)
+from neptune.types.atoms.git_ref import GitRef, GitRefDisabled
 
 if TYPE_CHECKING:
     import git
@@ -71,7 +60,9 @@ def get_git_repo(repo_path):
         warnings.warn("GitPython could not be initialized")
 
 
-def get_repo_from_git_ref(git_ref: Union[GitRef, GitRefDisabled]) -> Optional["git.Repo"]:
+def get_repo_from_git_ref(
+    git_ref: Union[GitRef, GitRefDisabled]
+) -> Optional["git.Repo"]:
     if git_ref == GitRef.DISABLED:
         return None
 
@@ -80,10 +71,7 @@ def get_repo_from_git_ref(git_ref: Union[GitRef, GitRefDisabled]) -> Optional["g
         return None
 
     try:
-        from git.exc import (
-            InvalidGitRepositoryError,
-            NoSuchPathError,
-        )
+        from git.exc import InvalidGitRepositoryError, NoSuchPathError
 
         try:
             return get_git_repo(repo_path=initial_repo_path)
@@ -103,7 +91,9 @@ def to_git_info(git_ref: Union[GitRef, GitRefDisabled]) -> Optional[GitInfo]:
         try:
             active_branch = repo.active_branch.name
         except TypeError as e:
-            if str(e.args[0]).startswith("HEAD is a detached symbolic reference as it points to"):
+            if str(e.args[0]).startswith(
+                "HEAD is a detached symbolic reference as it points to"
+            ):
                 active_branch = "Detached HEAD"
 
         remote_urls = [remote.url for remote in repo.remotes]
@@ -169,7 +159,9 @@ def search_for_most_recent_ancestor(repo: "git.Repo") -> Optional["git.Commit"]:
                 tracking_branch = branch.tracking_branch()
                 if tracking_branch:
                     for ancestor in repo.merge_base(repo.head, tracking_branch.commit):
-                        if not most_recent_ancestor or repo.is_ancestor(most_recent_ancestor, ancestor):
+                        if not most_recent_ancestor or repo.is_ancestor(
+                            most_recent_ancestor, ancestor
+                        ):
                             most_recent_ancestor = ancestor
         except GitCommandError:
             pass
@@ -197,7 +189,9 @@ def get_uncommitted_changes(repo: Optional["git.Repo"]) -> Optional[UncommittedC
         return UncommittedChanges(head_index_diff, upstream_index_diff, upstream_sha)
 
 
-def track_uncommitted_changes(git_ref: Union[GitRef, GitRefDisabled], run: "Run") -> None:
+def track_uncommitted_changes(
+    git_ref: Union[GitRef, GitRefDisabled], run: "Run"
+) -> None:
     repo = get_repo_from_git_ref(git_ref)
 
     if not repo:
@@ -209,7 +203,9 @@ def track_uncommitted_changes(git_ref: Union[GitRef, GitRefDisabled], run: "Run"
         return
 
     if uncommitted_changes.diff_head:
-        run[DIFF_HEAD_INDEX_PATH].upload(File.from_content(uncommitted_changes.diff_head, extension="patch"))
+        run[DIFF_HEAD_INDEX_PATH].upload(
+            File.from_content(uncommitted_changes.diff_head, extension="patch")
+        )
 
     if uncommitted_changes.diff_upstream:
         run[f"{UPSTREAM_INDEX_DIFF}{uncommitted_changes.upstream_sha}"].upload(

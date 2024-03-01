@@ -21,16 +21,8 @@ import unittest
 from random import randint
 
 import pandas as pd
-from mock import (
-    MagicMock,
-    patch,
-)
+from mock import MagicMock, patch
 from munch import Munch
-
-from neptune.legacy.exceptions import NeptuneNoExperimentContextException
-from neptune.legacy.experiments import Experiment
-from neptune.legacy.model import LeaderboardEntry
-from neptune.legacy.projects import Project
 from tests.unit.neptune.legacy.api_objects_factory import (
     a_registered_project_member,
     an_invited_project_member,
@@ -44,6 +36,11 @@ from tests.unit.neptune.legacy.random_utils import (
     a_string_list,
     a_uuid_string,
 )
+
+from neptune.legacy.exceptions import NeptuneNoExperimentContextException
+from neptune.legacy.experiments import Experiment
+from neptune.legacy.model import LeaderboardEntry
+from neptune.legacy.projects import Project
 
 
 class TestProject(unittest.TestCase):
@@ -65,16 +62,22 @@ class TestProject(unittest.TestCase):
     def test_get_members(self):
         # given
         member_usernames = [a_string() for _ in range(0, 2)]
-        members = [a_registered_project_member(username) for username in member_usernames]
+        members = [
+            a_registered_project_member(username) for username in member_usernames
+        ]
 
         # and
-        self.backend.get_project_members.return_value = members + [an_invited_project_member()]
+        self.backend.get_project_members.return_value = members + [
+            an_invited_project_member()
+        ]
 
         # when
         fetched_member_usernames = self.project.get_members()
 
         # then
-        self.backend.get_project_members.assert_called_once_with(self.project.internal_id)
+        self.backend.get_project_members.assert_called_once_with(
+            self.project.internal_id
+        )
 
         # and
         self.assertEqual(member_usernames, fetched_member_usernames)
@@ -99,7 +102,8 @@ class TestProject(unittest.TestCase):
 
         # and
         expected_experiments = [
-            Experiment(self.backend, self.project, entry.id, entry.internal_id) for entry in leaderboard_entries
+            Experiment(self.backend, self.project, entry.id, entry.internal_id)
+            for entry in leaderboard_entries
         ]
         self.assertEqual(expected_experiments, experiments)
 
@@ -133,7 +137,8 @@ class TestProject(unittest.TestCase):
 
         # and
         expected_experiments = [
-            Experiment(self.backend, self.project, entry.id, entry.internal_id) for entry in leaderboard_entries
+            Experiment(self.backend, self.project, entry.id, entry.internal_id)
+            for entry in leaderboard_entries
         ]
         self.assertEqual(expected_experiments, experiments)
 
@@ -167,13 +172,16 @@ class TestProject(unittest.TestCase):
 
         # and
         expected_experiments = [
-            Experiment(self.backend, self.project, entry.id, entry.internal_id) for entry in leaderboard_entries
+            Experiment(self.backend, self.project, entry.id, entry.internal_id)
+            for entry in leaderboard_entries
         ]
         self.assertEqual(expected_experiments, experiments)
 
     def test_get_leaderboard(self):
         # given
-        self.backend.get_leaderboard_entries.return_value = [LeaderboardEntry(some_exp_entry_dto)]
+        self.backend.get_leaderboard_entries.return_value = [
+            LeaderboardEntry(some_exp_entry_dto)
+        ]
 
         # when
         leaderboard = self.project.get_leaderboard()
@@ -190,7 +198,9 @@ class TestProject(unittest.TestCase):
 
         # and
         expected_data = {0: some_exp_entry_row}
-        expected_leaderboard = pd.DataFrame.from_dict(data=expected_data, orient="index")
+        expected_leaderboard = pd.DataFrame.from_dict(
+            data=expected_data, orient="index"
+        )
         expected_leaderboard = expected_leaderboard.reindex(
             self.project._sort_leaderboard_columns(expected_leaderboard.columns),
             axis="columns",
@@ -218,14 +228,18 @@ class TestProject(unittest.TestCase):
         ]
 
         # when
-        sorted_columns = self.project._sort_leaderboard_columns(reversed(columns_in_expected_order))
+        sorted_columns = self.project._sort_leaderboard_columns(
+            reversed(columns_in_expected_order)
+        )
 
         # then
         self.assertEqual(columns_in_expected_order, sorted_columns)
 
     def test_full_id(self):
         # expect
-        self.assertEqual(self.project.namespace + "/" + self.project.name, self.project.full_id)
+        self.assertEqual(
+            self.project.namespace + "/" + self.project.name, self.project.full_id
+        )
 
     def test_to_string(self):
         # expect
@@ -269,7 +283,9 @@ class TestProject(unittest.TestCase):
 
     def test_create_experiment_with_relative_upload_sources(self):
         # skip if
-        if sys.version_info.major < 3 or (sys.version_info.major == 3 and sys.version_info.minor < 5):
+        if sys.version_info.major < 3 or (
+            sys.version_info.major == 3 and sys.version_info.minor < 5
+        ):
             self.skipTest("not supported in this Python version")
 
         # given
@@ -279,12 +295,15 @@ class TestProject(unittest.TestCase):
         self.backend.create_experiment.return_value = anExperiment
 
         # when
-        self.project.create_experiment(upload_source_files=["test_project.*", "../../../../*.md"])
+        self.project.create_experiment(
+            upload_source_files=["test_project.*", "../../../../*.md"]
+        )
 
         # then
         self.backend.upload_source_code.assert_called_once()
         source_target_pairs_targets = [
-            target_p for source_p, target_p in self.backend.upload_source_code.call_args[0][1]
+            target_p
+            for source_p, target_p in self.backend.upload_source_code.call_args[0][1]
         ]
         self.assertTrue(
             set(source_target_pairs_targets)
@@ -298,7 +317,9 @@ class TestProject(unittest.TestCase):
 
     def test_create_experiment_with_absolute_upload_sources(self):
         # skip if
-        if sys.version_info.major < 3 or (sys.version_info.major == 3 and sys.version_info.minor < 5):
+        if sys.version_info.major < 3 or (
+            sys.version_info.major == 3 and sys.version_info.minor < 5
+        ):
             self.skipTest("not supported in this Python version")
 
         # given
@@ -308,12 +329,15 @@ class TestProject(unittest.TestCase):
         self.backend.create_experiment.return_value = anExperiment
 
         # when
-        self.project.create_experiment(upload_source_files=[os.path.abspath("test_project.py"), "../../../../*.md"])
+        self.project.create_experiment(
+            upload_source_files=[os.path.abspath("test_project.py"), "../../../../*.md"]
+        )
 
         # then
         self.backend.upload_source_code.assert_called_once()
         source_target_pairs_targets = [
-            target_p for source_p, target_p in self.backend.upload_source_code.call_args[0][1]
+            target_p
+            for source_p, target_p in self.backend.upload_source_code.call_args[0][1]
         ]
         self.assertSetEqual(
             set(source_target_pairs_targets),
@@ -338,7 +362,8 @@ class TestProject(unittest.TestCase):
         # then
         self.backend.upload_source_code.assert_called_once()
         source_target_pairs_targets = [
-            target_p for source_p, target_p in self.backend.upload_source_code.call_args[0][1]
+            target_p
+            for source_p, target_p in self.backend.upload_source_code.call_args[0][1]
         ]
         self.assertTrue(set(source_target_pairs_targets) == {"test_project.py"})
 
@@ -348,15 +373,21 @@ class TestProject(unittest.TestCase):
         self.backend.create_experiment.return_value = anExperiment
 
         # when
-        self.project.create_experiment(upload_source_files=["tests/unit/neptune/legacy/*.*"])
+        self.project.create_experiment(
+            upload_source_files=["tests/unit/neptune/legacy/*.*"]
+        )
 
         # then
         self.backend.upload_source_code.assert_called_once()
         source_target_pairs_targets = [
-            target_p for source_p, target_p in self.backend.upload_source_code.call_args[0][1]
+            target_p
+            for source_p, target_p in self.backend.upload_source_code.call_args[0][1]
         ]
         self.assertTrue(
-            all(target_p.startswith("tests/unit/neptune/legacy") for target_p in source_target_pairs_targets)
+            all(
+                target_p.startswith("tests/unit/neptune/legacy")
+                for target_p in source_target_pairs_targets
+            )
         )
 
     @patch(
@@ -374,14 +405,20 @@ class TestProject(unittest.TestCase):
         self.backend.create_experiment.return_value = anExperiment
 
         # when
-        self.project.create_experiment(upload_source_files=["c:\\test1\\*", "d:\\test2\\*"])
+        self.project.create_experiment(
+            upload_source_files=["c:\\test1\\*", "d:\\test2\\*"]
+        )
 
         # then
         self.backend.upload_source_code.assert_called_once()
         source_target_pairs_targets = [
-            target_p for source_p, target_p in self.backend.upload_source_code.call_args[0][1]
+            target_p
+            for source_p, target_p in self.backend.upload_source_code.call_args[0][1]
         ]
-        self.assertTrue(set(source_target_pairs_targets) == {"c:/test1/file.txt", "d:/test2/file.txt"})
+        self.assertTrue(
+            set(source_target_pairs_targets)
+            == {"c:/test1/file.txt", "d:/test2/file.txt"}
+        )
 
 
 if __name__ == "__main__":

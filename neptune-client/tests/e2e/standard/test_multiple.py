@@ -17,16 +17,15 @@ import concurrent.futures
 import random
 
 import pytest
-
-import neptune
-from tests.e2e.base import (
-    BaseE2ETest,
-    fake,
-)
+from tests.e2e.base import BaseE2ETest, fake
 from tests.e2e.utils import reinitialize_container
 
+import neptune
 
-def store_in_container(sys_id: str, project: str, container_type: str, destination: str):
+
+def store_in_container(
+    sys_id: str, project: str, container_type: str, destination: str
+):
     container = reinitialize_container(
         sys_id=sys_id,
         container_type=container_type,
@@ -42,7 +41,9 @@ def store_in_container(sys_id: str, project: str, container_type: str, destinati
 
 class TestMultiple(BaseE2ETest):
     @pytest.mark.parametrize("container", ["run"], indirect=True)
-    def test_single_thread(self, container: neptune.metadata_containers.MetadataContainer, environment):
+    def test_single_thread(
+        self, container: neptune.metadata_containers.MetadataContainer, environment
+    ):
         sys_id = container["sys/id"].fetch()
         number_of_reinitialized = 5
         namespace = self.gen_key()

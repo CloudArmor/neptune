@@ -22,11 +22,7 @@ import string
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-)
+from typing import TYPE_CHECKING, Any, Dict
 
 from neptune.constants import NEPTUNE_DATA_DIRECTORY
 from neptune.metadata_containers.structure_version import StructureVersion
@@ -45,7 +41,9 @@ def get_neptune_version() -> str:
     return neptune_version
 
 
-def common_metadata(mode: str, container_id: "UniqueId", container_type: "ContainerType") -> Dict[str, Any]:
+def common_metadata(
+    mode: str, container_id: "UniqueId", container_type: "ContainerType"
+) -> Dict[str, Any]:
     return {
         "mode": mode,
         "containerId": container_id,
@@ -62,9 +60,15 @@ def get_container_dir(container_id: "UniqueId", container_type: "ContainerType")
     return f"{container_type.value}__{container_id}__{os.getpid()}__{random_key(RANDOM_KEY_LENGTH)}"
 
 
-def get_container_full_path(type_dir: str, container_id: "UniqueId", container_type: "ContainerType") -> Path:
+def get_container_full_path(
+    type_dir: str, container_id: "UniqueId", container_type: "ContainerType"
+) -> Path:
     neptune_data_dir = Path(os.getenv("NEPTUNE_DATA_DIRECTORY", NEPTUNE_DATA_DIRECTORY))
-    return neptune_data_dir / type_dir / get_container_dir(container_id=container_id, container_type=container_type)
+    return (
+        neptune_data_dir
+        / type_dir
+        / get_container_dir(container_id=container_id, container_type=container_type)
+    )
 
 
 def random_key(length: int) -> str:

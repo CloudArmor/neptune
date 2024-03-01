@@ -17,13 +17,7 @@ __all__ = ["GitRef", "GitRefDisabled"]
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    NewType,
-    Optional,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, NewType, Optional, TypeVar, Union
 
 from neptune.types.atoms.atom import Atom
 from neptune.vendor.lib_programname import get_path_executed_script

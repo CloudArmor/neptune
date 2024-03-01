@@ -27,32 +27,16 @@ import os
 import textwrap
 import threading
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from neptune.common.exceptions import NeptuneException
 from neptune.core.components.queue.disk_queue import DiskQueue
 from neptune.envs import PROJECT_ENV_NAME
-from neptune.exceptions import (
-    MetadataContainerNotFound,
-    ProjectNotFound,
-)
-from neptune.internal.backends.api_model import (
-    ApiExperiment,
-    Project,
-)
+from neptune.exceptions import MetadataContainerNotFound, ProjectNotFound
+from neptune.internal.backends.api_model import ApiExperiment, Project
 from neptune.internal.backends.neptune_backend import NeptuneBackend
 from neptune.internal.container_type import ContainerType
-from neptune.internal.id_formats import (
-    QualifiedName,
-    UniqueId,
-)
+from neptune.internal.id_formats import QualifiedName, UniqueId
 from neptune.internal.operation import Operation
 from neptune.internal.utils.logger import get_logger
 from neptune.metadata_containers.structure_version import StructureVersion
@@ -67,11 +51,19 @@ def get_metadata_container(
 ) -> Optional[ApiExperiment]:
     public_container_type = container_type or "object"
     try:
-        return backend.get_metadata_container(container_id=container_id, expected_container_type=container_type)
+        return backend.get_metadata_container(
+            container_id=container_id, expected_container_type=container_type
+        )
     except MetadataContainerNotFound:
-        logger.warning("Can't fetch %s %s. Skipping.", public_container_type, container_id)
+        logger.warning(
+            "Can't fetch %s %s. Skipping.", public_container_type, container_id
+        )
     except NeptuneException as e:
-        logger.warning("Exception while fetching %s %s. Skipping.", public_container_type, container_id)
+        logger.warning(
+            "Exception while fetching %s %s. Skipping.",
+            public_container_type,
+            container_id,
+        )
         logger.exception(e)
 
     return None
@@ -92,7 +84,9 @@ def _project_not_found_message(project_name: QualifiedName) -> str:
     )
 
 
-def get_project(backend: NeptuneBackend, project_name_flag: Optional[QualifiedName] = None) -> Optional[Project]:
+def get_project(
+    backend: NeptuneBackend, project_name_flag: Optional[QualifiedName] = None
+) -> Optional[Project]:
     project_name: Optional[QualifiedName] = project_name_flag
     if project_name_flag is None:
         project_name_from_env = os.getenv(PROJECT_ENV_NAME)
@@ -110,13 +104,17 @@ def get_project(backend: NeptuneBackend, project_name_flag: Optional[QualifiedNa
 
 
 def get_qualified_name(experiment: ApiExperiment) -> QualifiedName:
-    return QualifiedName(f"{experiment.workspace}/{experiment.project_name}/{experiment.sys_id}")
+    return QualifiedName(
+        f"{experiment.workspace}/{experiment.project_name}/{experiment.sys_id}"
+    )
 
 
 def is_single_execution_dir_synced(execution_path: Path) -> bool:
     serializer: Callable[[Operation], Dict[str, Any]] = lambda op: op.to_dict()
 
-    with DiskQueue(execution_path, serializer, Operation.from_dict, threading.RLock()) as disk_queue:
+    with DiskQueue(
+        execution_path, serializer, Operation.from_dict, threading.RLock()
+    ) as disk_queue:
         is_queue_empty: bool = disk_queue.is_empty()
 
     return is_queue_empty
@@ -127,18 +125,32 @@ def detect_async_dir(dir_name: str) -> Tuple[ContainerType, UniqueId, StructureV
     if len(parts) == 1:
         return ContainerType.RUN, UniqueId(dir_name), StructureVersion.LEGACY
     elif len(parts) == 2:
-        return ContainerType(parts[0]), UniqueId(parts[1]), StructureVersion.CHILD_EXECUTION_DIRECTORIES
+        return (
+            ContainerType(parts[0]),
+            UniqueId(parts[1]),
+            StructureVersion.CHILD_EXECUTION_DIRECTORIES,
+        )
     elif len(parts) == 4 or len(parts) == 5:
-        return ContainerType(parts[0]), UniqueId(parts[1]), StructureVersion.DIRECT_DIRECTORY
+        return (
+            ContainerType(parts[0]),
+            UniqueId(parts[1]),
+            StructureVersion.DIRECT_DIRECTORY,
+        )
     else:
         raise ValueError(f"Wrong dir format: {dir_name}")
 
 
-def detect_offline_dir(dir_name: str) -> Tuple[ContainerType, UniqueId, StructureVersion]:
+def detect_offline_dir(
+    dir_name: str,
+) -> Tuple[ContainerType, UniqueId, StructureVersion]:
     parts = dir_name.split("__")
     if len(parts) == 1:
         return ContainerType.RUN, UniqueId(dir_name), StructureVersion.DIRECT_DIRECTORY
     elif len(parts) == 2 or len(parts) == 4:
-        return ContainerType(parts[0]), UniqueId(parts[1]), StructureVersion.DIRECT_DIRECTORY
+        return (
+            ContainerType(parts[0]),
+            UniqueId(parts[1]),
+            StructureVersion.DIRECT_DIRECTORY,
+        )
     else:
         raise ValueError(f"Wrong dir format: {dir_name}")

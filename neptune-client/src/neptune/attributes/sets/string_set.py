@@ -16,22 +16,11 @@
 __all__ = ["StringSet"]
 
 import typing
-from typing import (
-    Iterable,
-    Union,
-)
+from typing import Iterable, Union
 
 from neptune.attributes.sets.set import Set
-from neptune.internal.operation import (
-    AddStrings,
-    ClearStringSet,
-    RemoveStrings,
-)
-from neptune.internal.utils import (
-    is_collection,
-    verify_collection_type,
-    verify_type,
-)
+from neptune.internal.operation import AddStrings, ClearStringSet, RemoveStrings
+from neptune.internal.utils import is_collection, verify_collection_type, verify_type
 from neptune.types.sets.string_set import StringSet as StringSetVal
 
 
@@ -60,7 +49,9 @@ class StringSet(Set):
             self._enqueue_operation(ClearStringSet(self._path), wait=wait)
 
     def fetch(self) -> typing.Set[str]:
-        val = self._backend.get_string_set_attribute(self._container_id, self._container_type, self._path)
+        val = self._backend.get_string_set_attribute(
+            self._container_id, self._container_type, self._path
+        )
         return val.values
 
     @staticmethod

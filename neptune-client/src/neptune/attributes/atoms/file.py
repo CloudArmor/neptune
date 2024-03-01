@@ -46,8 +46,16 @@ class File(Atom):
         progress_bar: Optional[ProgressBarType] = None,
     ) -> None:
         verify_type("destination", destination, (str, type(None)))
-        self._backend.download_file(self._container_id, self._container_type, self._path, destination, progress_bar)
+        self._backend.download_file(
+            self._container_id,
+            self._container_type,
+            self._path,
+            destination,
+            progress_bar,
+        )
 
     def fetch_extension(self) -> str:
-        val = self._backend.get_file_attribute(self._container_id, self._container_type, self._path)
+        val = self._backend.get_file_attribute(
+            self._container_id, self._container_type, self._path
+        )
         return val.ext

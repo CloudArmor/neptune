@@ -19,6 +19,7 @@ import unittest
 import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
+from tests.unit.neptune.legacy.random_utils import sort_df_by_columns
 
 from neptune.common.utils import (
     align_channels_on_x,
@@ -28,7 +29,6 @@ from neptune.common.utils import (
     map_values,
     merge_dataframes,
 )
-from tests.unit.neptune.legacy.random_utils import sort_df_by_columns
 
 
 class TestMapValues(unittest.TestCase):

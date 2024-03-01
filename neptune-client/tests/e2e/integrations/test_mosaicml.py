@@ -66,14 +66,24 @@ def model() -> composer.models.ComposerClassifier:
 def test_e2e(environment, model):
     transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
 
-    train_dataset = torchvision.datasets.MNIST("data", download=True, train=True, transform=transform)
-    eval_dataset = torchvision.datasets.MNIST("data", download=True, train=False, transform=transform)
+    train_dataset = torchvision.datasets.MNIST(
+        "data", download=True, train=True, transform=transform
+    )
+    eval_dataset = torchvision.datasets.MNIST(
+        "data", download=True, train=False, transform=transform
+    )
 
-    train_dataset = torch.utils.data.Subset(train_dataset, indices=range(len(train_dataset) // 50))
-    eval_dataset = torch.utils.data.Subset(eval_dataset, indices=range(len(eval_dataset) // 50))
+    train_dataset = torch.utils.data.Subset(
+        train_dataset, indices=range(len(train_dataset) // 50)
+    )
+    eval_dataset = torch.utils.data.Subset(
+        eval_dataset, indices=range(len(eval_dataset) // 50)
+    )
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=128)
     eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=128)
-    logger = composer.loggers.NeptuneLogger(project=environment.project, base_namespace="composer-training")
+    logger = composer.loggers.NeptuneLogger(
+        project=environment.project, base_namespace="composer-training"
+    )
 
     trainer = composer.Trainer(
         model=model,
@@ -99,6 +109,10 @@ def test_e2e(environment, model):
 
     assert logger.neptune_run.exists("composer-training/metrics/loss/train/total")
 
-    assert logger.neptune_run["composer-training/hyperparameters/num_nodes"].fetch() == 1
+    assert (
+        logger.neptune_run["composer-training/hyperparameters/num_nodes"].fetch() == 1
+    )
 
-    assert logger.neptune_run.exists("composer-training/traces/algorithm_traces/ChannelsLast")
+    assert logger.neptune_run.exists(
+        "composer-training/traces/algorithm_traces/ChannelsLast"
+    )

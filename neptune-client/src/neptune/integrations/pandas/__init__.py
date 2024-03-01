@@ -18,13 +18,7 @@ from __future__ import annotations
 __all__ = ["to_pandas"]
 
 from datetime import datetime
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Tuple,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Dict, Tuple, Union
 
 import pandas as pd
 

@@ -15,11 +15,7 @@
 #
 __all__ = ["FloatSeries"]
 
-from typing import (
-    Iterable,
-    Optional,
-    Union,
-)
+from typing import Iterable, Optional, Union
 
 from neptune.attributes.series.fetchable_series import FetchableSeries
 from neptune.attributes.series.series import Series
@@ -39,7 +35,10 @@ LogOperation = LogFloats
 
 
 class FloatSeries(
-    Series[Val, Data, LogOperation], FetchableSeries[FloatSeriesValues], max_batch_size=100, operation_cls=LogOperation
+    Series[Val, Data, LogOperation],
+    FetchableSeries[FloatSeriesValues],
+    max_batch_size=100,
+    operation_cls=LogOperation,
 ):
     def configure(
         self,
@@ -52,7 +51,9 @@ class FloatSeries(
         verify_type("max", max, (float, int))
         verify_type("unit", unit, str)
         with self._container.lock():
-            self._enqueue_operation(ConfigFloatSeries(self._path, min, max, unit), wait=wait)
+            self._enqueue_operation(
+                ConfigFloatSeries(self._path, min, max, unit), wait=wait
+            )
 
     def _get_clear_operation(self) -> Operation:
         return ClearFloatLog(self._path)
@@ -67,7 +68,9 @@ class FloatSeries(
         return isinstance(value, FloatSeriesVal)
 
     def fetch_last(self) -> float:
-        val = self._backend.get_float_series_attribute(self._container_id, self._container_type, self._path)
+        val = self._backend.get_float_series_attribute(
+            self._container_id, self._container_type, self._path
+        )
         return val.last
 
     def _fetch_values_from_backend(self, offset, limit) -> FloatSeriesValues:

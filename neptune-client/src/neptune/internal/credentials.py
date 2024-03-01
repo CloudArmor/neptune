@@ -19,10 +19,7 @@ import base64
 import json
 import os
 from dataclasses import dataclass
-from typing import (
-    Dict,
-    Optional,
-)
+from typing import Dict, Optional
 
 from neptune.common.envs import API_TOKEN_ENV_NAME
 from neptune.common.exceptions import NeptuneInvalidApiTokenException

@@ -19,6 +19,7 @@ from datetime import datetime
 from typing import List
 
 from mock import patch
+from tests.unit.neptune.new.client.abstract_tables_test import AbstractTablesTestMixin
 
 from neptune import init_project
 from neptune.internal.backends.api_model import (
@@ -29,18 +30,16 @@ from neptune.internal.backends.api_model import (
 from neptune.internal.backends.neptune_backend_mock import NeptuneBackendMock
 from neptune.internal.container_type import ContainerType
 from neptune.metadata_containers.utils import DATE_FORMAT
-from neptune.table import (
-    Table,
-    TableEntry,
-)
-from tests.unit.neptune.new.client.abstract_tables_test import AbstractTablesTestMixin
+from neptune.table import Table, TableEntry
 
 
 class TestRunTables(AbstractTablesTestMixin, unittest.TestCase):
     expected_container_type = ContainerType.RUN
 
     def get_table(self, **kwargs) -> Table:
-        return init_project(project="organization/project", mode="read-only").fetch_runs_table(**kwargs)
+        return init_project(
+            project="organization/project", mode="read-only"
+        ).fetch_runs_table(**kwargs)
 
     def get_table_entries(self, table) -> List[TableEntry]:
         return table.to_rows()
@@ -72,7 +71,11 @@ class TestRunTables(AbstractTablesTestMixin, unittest.TestCase):
                     AttributeWithProperties(
                         "sys/creation_time",
                         AttributeType.DATETIME,
-                        {"value": datetime(2024, 2, 5, 20, 37, 40, 915000).strftime(DATE_FORMAT)},
+                        {
+                            "value": datetime(2024, 2, 5, 20, 37, 40, 915000).strftime(
+                                DATE_FORMAT
+                            )
+                        },
                     )
                 ],
             )

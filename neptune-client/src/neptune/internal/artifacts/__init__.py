@@ -18,7 +18,4 @@ __all__ = [
     "S3ArtifactDriver",
 ]
 
-from neptune.internal.artifacts.drivers import (
-    LocalArtifactDriver,
-    S3ArtifactDriver,
-)
+from neptune.internal.artifacts.drivers import LocalArtifactDriver, S3ArtifactDriver

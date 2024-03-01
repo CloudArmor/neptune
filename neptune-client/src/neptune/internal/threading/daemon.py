@@ -53,7 +53,9 @@ class Daemon(threading.Thread):
                 if not self._is_interrupted():
                     self._state = Daemon.DaemonState.PAUSING
                 self._wait_condition.notify_all()
-                self._wait_condition.wait_for(lambda: self._state != Daemon.DaemonState.PAUSING)
+                self._wait_condition.wait_for(
+                    lambda: self._state != Daemon.DaemonState.PAUSING
+                )
 
     def resume(self):
         with self._wait_condition:
@@ -78,7 +80,10 @@ class Daemon(threading.Thread):
 
     def _is_interrupted(self) -> bool:
         with self._wait_condition:
-            return self._state in (Daemon.DaemonState.INTERRUPTED, Daemon.DaemonState.STOPPED)
+            return self._state in (
+                Daemon.DaemonState.INTERRUPTED,
+                Daemon.DaemonState.STOPPED,
+            )
 
     def run(self):
         with self._wait_condition:
@@ -90,12 +95,17 @@ class Daemon(threading.Thread):
                     if self._state == Daemon.DaemonState.PAUSING:
                         self._state = Daemon.DaemonState.PAUSED
                         self._wait_condition.notify_all()
-                        self._wait_condition.wait_for(lambda: self._state != Daemon.DaemonState.PAUSED)
+                        self._wait_condition.wait_for(
+                            lambda: self._state != Daemon.DaemonState.PAUSED
+                        )
 
                 if self._state == Daemon.DaemonState.WORKING:
                     self.work()
                     with self._wait_condition:
-                        if self._sleep_time > 0 and self._state == Daemon.DaemonState.WORKING:
+                        if (
+                            self._sleep_time > 0
+                            and self._state == Daemon.DaemonState.WORKING
+                        ):
                             self._wait_condition.wait(timeout=self._sleep_time)
         finally:
             with self._wait_condition:
@@ -133,7 +143,9 @@ class Daemon(threading.Thread):
                             )
                             self_.last_backoff_time = self.INITIAL_RETRY_BACKOFF
                         else:
-                            self_.last_backoff_time = min(self_.last_backoff_time * 2, self.MAX_RETRY_BACKOFF)
+                            self_.last_backoff_time = min(
+                                self_.last_backoff_time * 2, self.MAX_RETRY_BACKOFF
+                            )
 
                         with self_._wait_condition:
                             self_._wait_condition.wait(self_.last_backoff_time)

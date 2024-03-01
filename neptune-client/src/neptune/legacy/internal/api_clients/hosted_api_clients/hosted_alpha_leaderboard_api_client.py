@@ -26,11 +26,7 @@ from http.client import NOT_FOUND
 from io import StringIO
 from itertools import groupby
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Dict,
-    List,
-)
+from typing import TYPE_CHECKING, Dict, List
 
 import requests
 import six
@@ -45,14 +41,15 @@ from neptune.attributes.constants import (
 from neptune.common import exceptions as common_exceptions
 from neptune.common.exceptions import ClientHttpError
 from neptune.common.storage.storage_utils import normalize_file_name
-from neptune.common.utils import (
-    NoopObject,
-    assure_directory_exists,
-)
+from neptune.common.utils import NoopObject, assure_directory_exists
 from neptune.internal import operation as alpha_operation
-from neptune.internal.backends import hosted_file_operations as alpha_hosted_file_operations
+from neptune.internal.backends import (
+    hosted_file_operations as alpha_hosted_file_operations,
+)
 from neptune.internal.backends.api_model import AttributeType
-from neptune.internal.backends.operation_api_name_visitor import OperationApiNameVisitor as AlphaOperationApiNameVisitor
+from neptune.internal.backends.operation_api_name_visitor import (
+    OperationApiNameVisitor as AlphaOperationApiNameVisitor,
+)
 from neptune.internal.backends.operation_api_object_converter import (
     OperationApiObjectConverter as AlphaOperationApiObjectConverter,
 )
@@ -64,10 +61,7 @@ from neptune.internal.operation import (
     LogFloats,
     LogStrings,
 )
-from neptune.internal.utils import (
-    base64_decode,
-    base64_encode,
-)
+from neptune.internal.utils import base64_decode, base64_encode
 from neptune.internal.utils import paths as alpha_path_utils
 from neptune.internal.utils.paths import parse_path
 from neptune.legacy.api_exceptions import (
@@ -88,8 +82,12 @@ from neptune.legacy.exceptions import (
     NeptuneException,
 )
 from neptune.legacy.experiments import Experiment
-from neptune.legacy.internal.api_clients.hosted_api_clients.mixins import HostedNeptuneMixin
-from neptune.legacy.internal.api_clients.hosted_api_clients.utils import legacy_with_api_exceptions_handler
+from neptune.legacy.internal.api_clients.hosted_api_clients.mixins import (
+    HostedNeptuneMixin,
+)
+from neptune.legacy.internal.api_clients.hosted_api_clients.utils import (
+    legacy_with_api_exceptions_handler,
+)
 from neptune.legacy.internal.channels.channels import (
     ChannelNamespace,
     ChannelType,
@@ -105,11 +103,10 @@ from neptune.legacy.internal.utils.alpha_integration import (
     channel_value_type_to_operation,
     deprecated_img_to_alpha_image,
 )
-from neptune.legacy.internal.websockets.reconnecting_websocket_factory import ReconnectingWebsocketFactory
-from neptune.legacy.model import (
-    ChannelWithLastValue,
-    LeaderboardEntry,
+from neptune.legacy.internal.websockets.reconnecting_websocket_factory import (
+    ReconnectingWebsocketFactory,
 )
+from neptune.legacy.model import ChannelWithLastValue, LeaderboardEntry
 from neptune.legacy.notebook import Notebook
 
 _logger = logging.getLogger(__name__)
@@ -218,7 +215,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
     @legacy_with_api_exceptions_handler
     def get_project_members(self, project_identifier):
         try:
-            r = self.backend_swagger_client.api.listProjectMembers(projectIdentifier=project_identifier).response()
+            r = self.backend_swagger_client.api.listProjectMembers(
+                projectIdentifier=project_identifier
+            ).response()
             return r.result
         except HTTPNotFound:
             raise ProjectNotFound(project_identifier)
@@ -243,15 +242,23 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         if not isinstance(name, six.string_types):
             raise ValueError("Invalid name {}, should be a string.".format(name))
         if not isinstance(description, six.string_types):
-            raise ValueError("Invalid description {}, should be a string.".format(description))
+            raise ValueError(
+                "Invalid description {}, should be a string.".format(description)
+            )
         if not isinstance(params, dict):
             raise ValueError("Invalid params {}, should be a dict.".format(params))
         if not isinstance(properties, dict):
-            raise ValueError("Invalid properties {}, should be a dict.".format(properties))
+            raise ValueError(
+                "Invalid properties {}, should be a dict.".format(properties)
+            )
         if hostname is not None and not isinstance(hostname, six.string_types):
-            raise ValueError("Invalid hostname {}, should be a string.".format(hostname))
+            raise ValueError(
+                "Invalid hostname {}, should be a string.".format(hostname)
+            )
         if entrypoint is not None and not isinstance(entrypoint, six.string_types):
-            raise ValueError("Invalid entrypoint {}, should be a string.".format(entrypoint))
+            raise ValueError(
+                "Invalid entrypoint {}, should be a string.".format(entrypoint)
+            )
 
         git_info = (
             {
@@ -286,7 +293,11 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         }
 
         try:
-            api_experiment = self.leaderboard_swagger_client.api.createExperiment(**kwargs).response().result
+            api_experiment = (
+                self.leaderboard_swagger_client.api.createExperiment(**kwargs)
+                .response()
+                .result
+            )
         except HTTPNotFound:
             raise ProjectNotFound(project_identifier=project.full_id)
 
@@ -302,14 +313,18 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         return experiment
 
     def upload_source_code(self, experiment, source_target_pairs):
-        dest_path = alpha_path_utils.parse_path(alpha_consts.SOURCE_CODE_FILES_ATTRIBUTE_PATH)
+        dest_path = alpha_path_utils.parse_path(
+            alpha_consts.SOURCE_CODE_FILES_ATTRIBUTE_PATH
+        )
         file_globs = [source_path for source_path, target_path in source_target_pairs]
         upload_files_operation = alpha_operation.UploadFileSet(
             path=dest_path,
             file_globs=file_globs,
             reset=True,
         )
-        self._execute_upload_operations_with_400_retry(experiment, upload_files_operation)
+        self._execute_upload_operations_with_400_retry(
+            experiment, upload_files_operation
+        )
 
     @legacy_with_api_exceptions_handler
     def get_notebook(self, project, notebook_id):
@@ -340,7 +355,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
     def get_last_checkpoint(self, project, notebook_id):
         try:
             api_checkpoint_list = (
-                self.leaderboard_swagger_client.api.listCheckpoints(notebookId=notebook_id, offset=0, limit=1)
+                self.leaderboard_swagger_client.api.listCheckpoints(
+                    notebookId=notebook_id, offset=0, limit=1
+                )
                 .response()
                 .result
             )
@@ -357,7 +374,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
     def create_notebook(self, project):
         try:
             api_notebook = (
-                self.leaderboard_swagger_client.api.createNotebook(projectIdentifier=project.internal_id)
+                self.leaderboard_swagger_client.api.createNotebook(
+                    projectIdentifier=project.internal_id
+                )
                 .response()
                 .result
             )
@@ -385,11 +404,15 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
                     raise NotebookNotFound(notebook_id=notebook_id)
                 else:
                     response.raise_for_status()
-                    CheckpointDTO = self.leaderboard_swagger_client.get_model("CheckpointDTO")
+                    CheckpointDTO = self.leaderboard_swagger_client.get_model(
+                        "CheckpointDTO"
+                    )
                     return CheckpointDTO.unmarshal(response.json())
         else:
             try:
-                NewCheckpointDTO = self.leaderboard_swagger_client.get_model("NewCheckpointDTO")
+                NewCheckpointDTO = self.leaderboard_swagger_client.get_model(
+                    "NewCheckpointDTO"
+                )
                 return (
                     self.leaderboard_swagger_client.api.createEmptyCheckpoint(
                         notebookId=notebook_id,
@@ -418,10 +441,22 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             channelsSize=0,
             tags=system_attributes.tags.values,
             description=system_attributes.description.value,
-            hostname=system_attributes.hostname.value if system_attributes.hostname else None,
-            state="running" if system_attributes.state.value == "running" else "succeeded",
-            properties=[AlphaPropertyDTO(attr) for attr in attributes if AlphaPropertyDTO.is_valid_attribute(attr)],
-            parameters=[AlphaParameterDTO(attr) for attr in attributes if AlphaParameterDTO.is_valid_attribute(attr)],
+            hostname=system_attributes.hostname.value
+            if system_attributes.hostname
+            else None,
+            state="running"
+            if system_attributes.state.value == "running"
+            else "succeeded",
+            properties=[
+                AlphaPropertyDTO(attr)
+                for attr in attributes
+                if AlphaPropertyDTO.is_valid_attribute(attr)
+            ],
+            parameters=[
+                AlphaParameterDTO(attr)
+                for attr in attributes
+                if AlphaParameterDTO.is_valid_attribute(attr)
+            ],
         )
 
     @legacy_with_api_exceptions_handler
@@ -431,7 +466,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             experiment=experiment,
             operations=[
                 alpha_operation.AssignString(
-                    path=alpha_path_utils.parse_path(f"{alpha_consts.PROPERTIES_ATTRIBUTE_SPACE}{key}"),
+                    path=alpha_path_utils.parse_path(
+                        f"{alpha_consts.PROPERTIES_ATTRIBUTE_SPACE}{key}"
+                    ),
                     value=str(value),
                 )
             ],
@@ -439,17 +476,23 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
 
     @legacy_with_api_exceptions_handler
     def remove_property(self, experiment, key):
-        self._remove_attribute(experiment, str_path=f"{alpha_consts.PROPERTIES_ATTRIBUTE_SPACE}{key}")
+        self._remove_attribute(
+            experiment, str_path=f"{alpha_consts.PROPERTIES_ATTRIBUTE_SPACE}{key}"
+        )
 
     @legacy_with_api_exceptions_handler
     def update_tags(self, experiment, tags_to_add, tags_to_delete):
         operations = [
             alpha_operation.AddStrings(
-                path=alpha_path_utils.parse_path(alpha_consts.SYSTEM_TAGS_ATTRIBUTE_PATH),
+                path=alpha_path_utils.parse_path(
+                    alpha_consts.SYSTEM_TAGS_ATTRIBUTE_PATH
+                ),
                 values=tags_to_add,
             ),
             alpha_operation.RemoveStrings(
-                path=alpha_path_utils.parse_path(alpha_consts.SYSTEM_TAGS_ATTRIBUTE_PATH),
+                path=alpha_path_utils.parse_path(
+                    alpha_consts.SYSTEM_TAGS_ATTRIBUTE_PATH
+                ),
                 values=tags_to_delete,
             ),
         ]
@@ -459,7 +502,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         )
 
     @staticmethod
-    def _get_channel_attribute_path(channel_name: str, channel_namespace: ChannelNamespace) -> str:
+    def _get_channel_attribute_path(
+        channel_name: str, channel_namespace: ChannelNamespace
+    ) -> str:
         if channel_namespace == ChannelNamespace.USER:
             prefix = alpha_consts.LOG_ATTRIBUTE_SPACE
         else:
@@ -481,7 +526,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         operation = channel_type_to_operation(channel_type)
 
         log_empty_operation = operation(
-            path=alpha_path_utils.parse_path(self._get_channel_attribute_path(channel_name, channel_namespace)),
+            path=alpha_path_utils.parse_path(
+                self._get_channel_attribute_path(channel_name, channel_namespace)
+            ),
             values=[],
         )  # this operation is used to create empty attribute
         self._execute_operations(
@@ -533,7 +580,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         return {ch.name: ch for ch in api_channels}
 
     @legacy_with_api_exceptions_handler
-    def create_system_channel(self, experiment, name, channel_type) -> ChannelWithLastValue:
+    def create_system_channel(
+        self, experiment, name, channel_type
+    ) -> ChannelWithLastValue:
         channel_id = f"{alpha_consts.MONITORING_ATTRIBUTE_SPACE}{name}"
         return self._create_channel(
             experiment,
@@ -593,7 +642,10 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
     def mark_failed(self, experiment, traceback):
         operations = []
         path = parse_path(SYSTEM_FAILED_ATTRIBUTE_PATH)
-        traceback_values = [LogStrings.ValueType(val, step=None, ts=time.time()) for val in traceback.split("\n")]
+        traceback_values = [
+            LogStrings.ValueType(val, step=None, ts=time.time())
+            for val in traceback.split("\n")
+        ]
         operations.append(AssignBool(path=path, value=True))
         operations.append(
             LogStrings(
@@ -605,7 +657,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
 
     def ping_experiment(self, experiment):
         try:
-            self.leaderboard_swagger_client.api.ping(experimentId=str(experiment.internal_id)).response().result
+            self.leaderboard_swagger_client.api.ping(
+                experimentId=str(experiment.internal_id)
+            ).response().result
         except HTTPNotFound:
             raise ExperimentNotFound(
                 experiment_short_id=experiment.id,
@@ -623,8 +677,16 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         operations = []
         gauges_count = len(metric.gauges)
         for gauge in metric.gauges:
-            path = parse_path(self._get_attribute_name_for_metric(metric.resource_type, gauge.name(), gauges_count))
-            operations.append(ConfigFloatSeries(path, min=metric.min_value, max=metric.max_value, unit=metric.unit))
+            path = parse_path(
+                self._get_attribute_name_for_metric(
+                    metric.resource_type, gauge.name(), gauges_count
+                )
+            )
+            operations.append(
+                ConfigFloatSeries(
+                    path, min=metric.min_value, max=metric.max_value, unit=metric.unit
+                )
+            )
         self._execute_operations(experiment, operations)
 
     @legacy_with_api_exceptions_handler
@@ -634,13 +696,24 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         for report in metric_reports:
             metric = metrics_by_name.get(report.metric.name)
             gauges_count = len(metric.gauges)
-            for gauge_name, metric_values in groupby(report.values, lambda value: value.gauge_name):
+            for gauge_name, metric_values in groupby(
+                report.values, lambda value: value.gauge_name
+            ):
                 metric_values = list(metric_values)
-                path = parse_path(self._get_attribute_name_for_metric(metric.resource_type, gauge_name, gauges_count))
+                path = parse_path(
+                    self._get_attribute_name_for_metric(
+                        metric.resource_type, gauge_name, gauges_count
+                    )
+                )
                 operations.append(
                     LogFloats(
                         path,
-                        [LogFloats.ValueType(value.value, step=None, ts=value.timestamp) for value in metric_values],
+                        [
+                            LogFloats.ValueType(
+                                value.value, step=None, ts=value.timestamp
+                            )
+                            for value in metric_values
+                        ],
                     )
                 )
         self._execute_operations(experiment, operations)
@@ -648,7 +721,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
     def log_artifact(self, experiment, artifact, destination=None):
         if isinstance(artifact, str):
             if os.path.isfile(artifact):
-                target_name = os.path.basename(artifact) if destination is None else destination
+                target_name = (
+                    os.path.basename(artifact) if destination is None else destination
+                )
                 dest_path = self._get_dest_and_ext(target_name)
                 operation = alpha_operation.UploadFile(
                     path=dest_path,
@@ -656,7 +731,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
                     file_path=os.path.abspath(artifact),
                 )
             elif os.path.isdir(artifact):
-                for path, file_destination in self._log_dir_artifacts(artifact, destination):
+                for path, file_destination in self._log_dir_artifacts(
+                    artifact, destination
+                ):
                     self.log_artifact(experiment, path, file_destination)
                 return
             else:
@@ -667,7 +744,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             dest_path = self._get_dest_and_ext(destination)
             data = artifact.read()
             content = data.encode("utf-8") if isinstance(data, str) else data
-            operation = alpha_operation.UploadFileContent(path=dest_path, ext="", file_content=base64_encode(content))
+            operation = alpha_operation.UploadFileContent(
+                path=dest_path, ext="", file_content=base64_encode(content)
+            )
         else:
             raise ValueError("Artifact must be a local path or an IO object")
 
@@ -689,10 +768,17 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
 
     def delete_artifacts(self, experiment, path):
         try:
-            self._remove_attribute(experiment, str_path=f"{alpha_consts.ARTIFACT_ATTRIBUTE_SPACE}{path}")
+            self._remove_attribute(
+                experiment, str_path=f"{alpha_consts.ARTIFACT_ATTRIBUTE_SPACE}{path}"
+            )
         except ExperimentOperationErrors as e:
-            if all(isinstance(err, alpha_exceptions.MetadataInconsistency) for err in e.errors):
-                raise DeleteArtifactUnsupportedInAlphaException(path, experiment) from None
+            if all(
+                isinstance(err, alpha_exceptions.MetadataInconsistency)
+                for err in e.errors
+            ):
+                raise DeleteArtifactUnsupportedInAlphaException(
+                    path, experiment
+                ) from None
             raise
 
     @legacy_with_api_exceptions_handler
@@ -708,7 +794,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             },
         ) as response:
             if response.status_code == NOT_FOUND:
-                raise PathInExperimentNotFound(path=path, exp_identifier=experiment.internal_id)
+                raise PathInExperimentNotFound(
+                    path=path, exp_identifier=experiment.internal_id
+                )
             else:
                 response.raise_for_status()
 
@@ -725,7 +813,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
 
         destination_dir = assure_directory_exists(destination_dir)
 
-        download_request = self._get_file_set_download_request(experiment.internal_id, path)
+        download_request = self._get_file_set_download_request(
+            experiment.internal_id, path
+        )
         alpha_hosted_file_operations.download_file_set_attribute(
             swagger_client=self.leaderboard_swagger_client,
             download_id=download_request.id,
@@ -738,12 +828,22 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             "experimentId": run_id,
             "attribute": path,
         }
-        return self.leaderboard_swagger_client.api.prepareForDownloadFileSetAttributeZip(**params).response().result
+        return (
+            self.leaderboard_swagger_client.api.prepareForDownloadFileSetAttributeZip(
+                **params
+            )
+            .response()
+            .result
+        )
 
-    def download_artifacts(self, experiment: Experiment, path=None, destination_dir=None):
+    def download_artifacts(
+        self, experiment: Experiment, path=None, destination_dir=None
+    ):
         raise DownloadArtifactsUnsupportedException(experiment)
 
-    def download_artifact(self, experiment: Experiment, path=None, destination_dir=None):
+    def download_artifact(
+        self, experiment: Experiment, path=None, destination_dir=None
+    ):
         destination_dir = assure_directory_exists(destination_dir)
         destination_path = os.path.join(destination_dir, os.path.basename(path))
 
@@ -759,7 +859,11 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         params = {
             "experimentId": experiment_id,
         }
-        return self.leaderboard_swagger_client.api.getExperimentAttributes(**params).response().result
+        return (
+            self.leaderboard_swagger_client.api.getExperimentAttributes(**params)
+            .response()
+            .result
+        )
 
     def _remove_attribute(self, experiment, str_path: str):
         """Removes given attribute"""
@@ -779,7 +883,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             alpha="true",
         )
 
-    def _execute_upload_operation(self, experiment: Experiment, upload_operation: alpha_operation.Operation):
+    def _execute_upload_operation(
+        self, experiment: Experiment, upload_operation: alpha_operation.Operation
+    ):
         experiment_id = experiment.internal_id
         try:
             if isinstance(upload_operation, alpha_operation.UploadFile):
@@ -827,7 +933,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
                     raise ex
 
     @legacy_with_api_exceptions_handler
-    def _execute_operations(self, experiment: Experiment, operations: List[alpha_operation.Operation]):
+    def _execute_operations(
+        self, experiment: Experiment, operations: List[alpha_operation.Operation]
+    ):
         experiment_id = experiment.internal_id
         file_operations = (
             alpha_operation.UploadFile,
@@ -845,14 +953,23 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             "operations": [
                 {
                     "path": alpha_path_utils.path_to_str(op.path),
-                    AlphaOperationApiNameVisitor().visit(op): AlphaOperationApiObjectConverter().convert(op),
+                    AlphaOperationApiNameVisitor()
+                    .visit(op): AlphaOperationApiObjectConverter()
+                    .convert(op),
                 }
                 for op in operations
             ],
         }
         try:
-            result = self.leaderboard_swagger_client.api.executeOperations(**kwargs).response().result
-            errors = [alpha_exceptions.MetadataInconsistency(err.errorDescription) for err in result]
+            result = (
+                self.leaderboard_swagger_client.api.executeOperations(**kwargs)
+                .response()
+                .result
+            )
+            errors = [
+                alpha_exceptions.MetadataInconsistency(err.errorDescription)
+                for err in result
+            ]
             if errors:
                 raise ExperimentOperationErrors(errors=errors)
             return None
@@ -871,24 +988,34 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         # Assign experiment name
         init_operations.append(
             alpha_operation.AssignString(
-                path=alpha_path_utils.parse_path(alpha_consts.SYSTEM_NAME_ATTRIBUTE_PATH),
+                path=alpha_path_utils.parse_path(
+                    alpha_consts.SYSTEM_NAME_ATTRIBUTE_PATH
+                ),
                 value=name,
             )
         )
         # Assign experiment description
         init_operations.append(
             alpha_operation.AssignString(
-                path=alpha_path_utils.parse_path(alpha_consts.SYSTEM_DESCRIPTION_ATTRIBUTE_PATH),
+                path=alpha_path_utils.parse_path(
+                    alpha_consts.SYSTEM_DESCRIPTION_ATTRIBUTE_PATH
+                ),
                 value=description,
             )
         )
         # Assign experiment parameters
         for p_name, p_val in params.items():
             parameter_type, string_value = self._get_parameter_with_type(p_val)
-            operation_cls = alpha_operation.AssignFloat if parameter_type == "double" else alpha_operation.AssignString
+            operation_cls = (
+                alpha_operation.AssignFloat
+                if parameter_type == "double"
+                else alpha_operation.AssignString
+            )
             init_operations.append(
                 operation_cls(
-                    path=alpha_path_utils.parse_path(f"{alpha_consts.PARAMETERS_ATTRIBUTE_SPACE}{p_name}"),
+                    path=alpha_path_utils.parse_path(
+                        f"{alpha_consts.PARAMETERS_ATTRIBUTE_SPACE}{p_name}"
+                    ),
                     value=string_value,
                 )
             )
@@ -896,7 +1023,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         for p_key, p_val in properties.items():
             init_operations.append(
                 AssignString(
-                    path=alpha_path_utils.parse_path(f"{alpha_consts.PROPERTIES_ATTRIBUTE_SPACE}{p_key}"),
+                    path=alpha_path_utils.parse_path(
+                        f"{alpha_consts.PROPERTIES_ATTRIBUTE_SPACE}{p_key}"
+                    ),
                     value=str(p_val),
                 )
             )
@@ -904,7 +1033,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         if tags:
             init_operations.append(
                 alpha_operation.AddStrings(
-                    path=alpha_path_utils.parse_path(alpha_consts.SYSTEM_TAGS_ATTRIBUTE_PATH),
+                    path=alpha_path_utils.parse_path(
+                        alpha_consts.SYSTEM_TAGS_ATTRIBUTE_PATH
+                    ),
                     values=set(tags),
                 )
             )
@@ -912,7 +1043,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         if hostname:
             init_operations.append(
                 alpha_operation.AssignString(
-                    path=alpha_path_utils.parse_path(alpha_consts.SYSTEM_HOSTNAME_ATTRIBUTE_PATH),
+                    path=alpha_path_utils.parse_path(
+                        alpha_consts.SYSTEM_HOSTNAME_ATTRIBUTE_PATH
+                    ),
                     value=hostname,
                 )
             )
@@ -920,7 +1053,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         if entrypoint:
             init_operations.append(
                 alpha_operation.AssignString(
-                    path=alpha_path_utils.parse_path(alpha_consts.SOURCE_CODE_ENTRYPOINT_ATTRIBUTE_PATH),
+                    path=alpha_path_utils.parse_path(
+                        alpha_consts.SOURCE_CODE_ENTRYPOINT_ATTRIBUTE_PATH
+                    ),
                     value=entrypoint,
                 )
             )
@@ -930,7 +1065,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
     @legacy_with_api_exceptions_handler
     def reset_channel(self, experiment, channel_id, channel_name, channel_type):
         op = channel_type_to_clear_operation(ChannelType(channel_type))
-        attr_path = self._get_channel_attribute_path(channel_name, ChannelNamespace.USER)
+        attr_path = self._get_channel_attribute_path(
+            channel_name, ChannelNamespace.USER
+        )
         self._execute_operations(
             experiment=experiment,
             operations=[op(path=alpha_path_utils.parse_path(attr_path))],
@@ -958,7 +1095,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
     @legacy_with_api_exceptions_handler
     def get_channel_points_csv(self, experiment, channel_internal_id, channel_name):
         try:
-            channel_attr_path = self._get_channel_attribute_path(channel_name, ChannelNamespace.USER)
+            channel_attr_path = self._get_channel_attribute_path(
+                channel_name, ChannelNamespace.USER
+            )
             values = self._get_channel_tuples_from_csv(experiment, channel_attr_path)
             step_and_value = [val[0] + "," + val[2] for val in values]
             csv = StringIO()
@@ -984,15 +1123,29 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
         ]
         data = {
             # val[1] + ',' + val[2] is timestamp,value
-            ch.name: [val[1] + "," + val[2] for val in self._get_channel_tuples_from_csv(experiment, ch.id)]
+            ch.name: [
+                val[1] + "," + val[2]
+                for val in self._get_channel_tuples_from_csv(experiment, ch.id)
+            ]
             for ch in metric_channels
         }
         values_count = max(len(values) for values in data.values())
         csv = StringIO()
-        csv.write(",".join(["x_{name},y_{name}".format(name=ch.name) for ch in metric_channels]))
+        csv.write(
+            ",".join(
+                ["x_{name},y_{name}".format(name=ch.name) for ch in metric_channels]
+            )
+        )
         csv.write("\n")
         for i in range(0, values_count):
-            csv.write(",".join([data[ch.name][i] if i < len(data[ch.name]) else "," for ch in metric_channels]))
+            csv.write(
+                ",".join(
+                    [
+                        data[ch.name][i] if i < len(data[ch.name]) else ","
+                        for ch in metric_channels
+                    ]
+                )
+            )
             csv.write("\n")
         csv.seek(0)
         return csv
@@ -1033,14 +1186,17 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
                 )
 
             return [
-                LeaderboardEntry(self._to_leaderboard_entry_dto(e)) for e in self._get_all_items(get_portion, step=100)
+                LeaderboardEntry(self._to_leaderboard_entry_dto(e))
+                for e in self._get_all_items(get_portion, step=100)
             ]
         except HTTPNotFound:
             raise ProjectNotFound(project_identifier=project.full_id)
 
     def websockets_factory(self, project_id, experiment_id):
         base_url = re.sub(r"^http", "ws", self.api_address) + "/api/notifications/v1"
-        return ReconnectingWebsocketFactory(backend=self, url=base_url + f"/runs/{project_id}/{experiment_id}/signal")
+        return ReconnectingWebsocketFactory(
+            backend=self, url=base_url + f"/runs/{project_id}/{experiment_id}/signal"
+        )
 
     @staticmethod
     def _to_leaderboard_entry_dto(experiment_attributes):
@@ -1053,7 +1209,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             )
 
         numeric_channels = [
-            HostedAlphaLeaderboardApiClient._float_series_to_channel_last_value_dto(attr)
+            HostedAlphaLeaderboardApiClient._float_series_to_channel_last_value_dto(
+                attr
+            )
             for attr in attributes
             if (
                 attr.type == AttributeType.FLOAT_SERIES.value
@@ -1062,7 +1220,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             )
         ]
         text_channels = [
-            HostedAlphaLeaderboardApiClient._string_series_to_channel_last_value_dto(attr)
+            HostedAlphaLeaderboardApiClient._string_series_to_channel_last_value_dto(
+                attr
+            )
             for attr in attributes
             if (
                 attr.type == AttributeType.STRING_SERIES.value
@@ -1077,7 +1237,9 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             projectName=experiment_attributes.projectName,
             shortId=system_attributes.shortId.value,
             name=system_attributes.name.value,
-            state="running" if system_attributes.state.value == "running" else "succeeded",
+            state="running"
+            if system_attributes.state.value == "running"
+            else "succeeded",
             timeOfCreation=system_attributes.creationTime.value,
             timeOfCompletion=None,
             runningTime=system_attributes.runningTime.value,
@@ -1086,8 +1248,16 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
             tags=system_attributes.tags.values,
             description=system_attributes.description.value,
             channelsLastValues=numeric_channels + text_channels,
-            parameters=[AlphaParameterDTO(attr) for attr in attributes if AlphaParameterDTO.is_valid_attribute(attr)],
-            properties=[AlphaPropertyDTO(attr) for attr in attributes if AlphaPropertyDTO.is_valid_attribute(attr)],
+            parameters=[
+                AlphaParameterDTO(attr)
+                for attr in attributes
+                if AlphaParameterDTO.is_valid_attribute(attr)
+            ],
+            properties=[
+                AlphaPropertyDTO(attr)
+                for attr in attributes
+                if AlphaPropertyDTO.is_valid_attribute(attr)
+            ],
         )
 
     @staticmethod
@@ -1132,9 +1302,13 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
 
         session = self.http_client.session
 
-        request = self.authenticator.apply(requests.Request(method="POST", url=url, data=data, headers=headers))
+        request = self.authenticator.apply(
+            requests.Request(method="POST", url=url, data=data, headers=headers)
+        )
 
-        return handle_server_raw_response_messages(session.send(session.prepare_request(request)))
+        return handle_server_raw_response_messages(
+            session.send(session.prepare_request(request))
+        )
 
     def _get_parameter_with_type(self, parameter):
         string_type = "string"
@@ -1168,6 +1342,10 @@ class HostedAlphaLeaderboardApiClient(HostedNeptuneMixin, LeaderboardApiClient):
 
         session = self.http_client.session
 
-        request = self.authenticator.apply(requests.Request(method="GET", url=url, headers=headers))
+        request = self.authenticator.apply(
+            requests.Request(method="GET", url=url, headers=headers)
+        )
 
-        return handle_server_raw_response_messages(session.send(session.prepare_request(request), stream=True))
+        return handle_server_raw_response_messages(
+            session.send(session.prepare_request(request), stream=True)
+        )

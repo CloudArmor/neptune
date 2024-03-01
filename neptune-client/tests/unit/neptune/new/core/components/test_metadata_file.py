@@ -15,11 +15,7 @@
 #
 from pathlib import Path
 
-from mock import (
-    MagicMock,
-    mock_open,
-    patch,
-)
+from mock import MagicMock, mock_open, patch
 
 from neptune.core.components.metadata_file import MetadataFile
 
@@ -109,7 +105,10 @@ def test_initial_metadata(mock_file):
     data_path = MagicMock(spec=Path, __truediv__=lambda self, key: file_path)
 
     # when
-    with MetadataFile(data_path=data_path, metadata={"version": 5, "dependencies": ["a==1.0", "b==2.0"]}):
+    with MetadataFile(
+        data_path=data_path,
+        metadata={"version": 5, "dependencies": ["a==1.0", "b==2.0"]},
+    ):
         # then
         mock_file.assert_called_with(resolved_path, "w")
 

@@ -17,10 +17,7 @@ __all__ = ("ReadOnlyOperationProcessor",)
 
 from typing import TYPE_CHECKING
 
-from neptune.common.warnings import (
-    NeptuneWarning,
-    warn_once,
-)
+from neptune.common.warnings import NeptuneWarning, warn_once
 from neptune.internal.operation_processors.operation_processor import OperationProcessor
 
 if TYPE_CHECKING:
@@ -29,4 +26,7 @@ if TYPE_CHECKING:
 
 class ReadOnlyOperationProcessor(OperationProcessor):
     def enqueue_operation(self, op: "Operation", *, wait: bool) -> None:
-        warn_once("Client in read-only mode, nothing will be saved to server.", exception=NeptuneWarning)
+        warn_once(
+            "Client in read-only mode, nothing will be saved to server.",
+            exception=NeptuneWarning,
+        )

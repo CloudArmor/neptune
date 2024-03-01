@@ -13,27 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from mock import (
-    MagicMock,
-    call,
-    patch,
-)
+from mock import MagicMock, call, patch
+from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
-from neptune.attributes.series.float_series import (
-    FloatSeries,
-    FloatSeriesVal,
-)
-from neptune.attributes.series.string_series import (
-    StringSeries,
-    StringSeriesVal,
-)
+from neptune.attributes.series.float_series import FloatSeries, FloatSeriesVal
+from neptune.attributes.series.string_series import StringSeries, StringSeriesVal
 from neptune.internal.operation import (
     ClearFloatLog,
     ClearStringLog,
     ConfigFloatSeries,
     LogFloats,
 )
-from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 
 @patch("time.time", new=TestAttributeBase._now)
@@ -75,7 +65,9 @@ class TestSeries(TestAttributeBase):
             )
             var = StringSeries(exp, path)
             var.assign(StringSeriesVal([]), wait=wait)
-            processor.enqueue_operation.assert_called_with(ClearStringLog(path), wait=wait)
+            processor.enqueue_operation.assert_called_with(
+                ClearStringLog(path), wait=wait
+            )
 
     @patch("neptune.metadata_containers.metadata_container.get_operation_processor")
     def test_log(self, get_operation_processor):
@@ -119,7 +111,9 @@ class TestSeries(TestAttributeBase):
                 )
                 var = FloatSeries(exp, path)
                 var.log(value, wait=wait)
-                processor.enqueue_operation.assert_called_with(LogFloats(path, expected), wait=wait)
+                processor.enqueue_operation.assert_called_with(
+                    LogFloats(path, expected), wait=wait
+                )
 
     @patch("neptune.metadata_containers.metadata_container.get_operation_processor")
     def test_log_with_step(self, get_operation_processor):
@@ -142,7 +136,9 @@ class TestSeries(TestAttributeBase):
                 )
                 var = FloatSeries(exp, path)
                 var.log(value, step=step, wait=wait)
-                processor.enqueue_operation.assert_called_with(LogFloats(path, [expected]), wait=wait)
+                processor.enqueue_operation.assert_called_with(
+                    LogFloats(path, [expected]), wait=wait
+                )
 
     @patch("neptune.metadata_containers.metadata_container.get_operation_processor")
     def test_log_with_timestamp(self, get_operation_processor):
@@ -162,7 +158,9 @@ class TestSeries(TestAttributeBase):
                 )
                 var = FloatSeries(exp, path)
                 var.log(value, timestamp=ts, wait=wait)
-                processor.enqueue_operation.assert_called_with(LogFloats(path, [expected]), wait=wait)
+                processor.enqueue_operation.assert_called_with(
+                    LogFloats(path, [expected]), wait=wait
+                )
 
     @patch("neptune.metadata_containers.metadata_container.get_operation_processor")
     def test_log_value_errors(self, get_operation_processor):
@@ -193,4 +191,6 @@ class TestSeries(TestAttributeBase):
             )
             var = FloatSeries(exp, path)
             var.clear(wait=wait)
-            processor.enqueue_operation.assert_called_with(ClearFloatLog(path), wait=wait)
+            processor.enqueue_operation.assert_called_with(
+                ClearFloatLog(path), wait=wait
+            )

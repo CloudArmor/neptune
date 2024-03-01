@@ -16,7 +16,9 @@
 
 from neptune.common.hardware.cgroup.cgroup_monitor import CGroupMonitor
 from neptune.common.hardware.gauges.gauge_mode import GaugeMode
-from neptune.common.hardware.resources.gpu_card_indices_provider import GPUCardIndicesProvider
+from neptune.common.hardware.resources.gpu_card_indices_provider import (
+    GPUCardIndicesProvider,
+)
 from neptune.common.hardware.resources.system_resource_info import SystemResourceInfo
 
 

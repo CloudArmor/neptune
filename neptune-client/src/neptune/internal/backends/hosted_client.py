@@ -23,10 +23,7 @@ __all__ = [
 
 import os
 import platform
-from typing import (
-    Dict,
-    Tuple,
-)
+from typing import Dict, Tuple
 
 import requests
 from bravado.http_client import HttpClient
@@ -68,7 +65,11 @@ DEFAULT_REQUEST_KWARGS = {
 
 def _close_connections_on_fork(session: requests.Session):
     try:
-        os.register_at_fork(before=session.close, after_in_child=session.close, after_in_parent=session.close)
+        os.register_at_fork(
+            before=session.close,
+            after_in_child=session.close,
+            after_in_parent=session.close,
+        )
     except AttributeError:
         pass
 
@@ -79,7 +80,9 @@ def _set_pool_size(http_client: RequestsClient) -> None:
 
 
 def create_http_client(ssl_verify: bool, proxies: Dict[str, str]) -> RequestsClient:
-    http_client = RequestsClient(ssl_verify=ssl_verify, response_adapter_class=NeptuneResponseAdapter)
+    http_client = RequestsClient(
+        ssl_verify=ssl_verify, response_adapter_class=NeptuneResponseAdapter
+    )
     http_client.session.verify = ssl_verify
 
     _set_pool_size(http_client)
@@ -88,10 +91,12 @@ def create_http_client(ssl_verify: bool, proxies: Dict[str, str]) -> RequestsCli
 
     update_session_proxies(http_client.session, proxies)
 
-    user_agent = "neptune-client/{lib_version} ({system}, python {python_version})".format(
-        lib_version=neptune_client_version,
-        system=platform.platform(),
-        python_version=platform.python_version(),
+    user_agent = (
+        "neptune-client/{lib_version} ({system}, python {python_version})".format(
+            lib_version=neptune_client_version,
+            system=platform.platform(),
+            python_version=platform.python_version(),
+        )
     )
     http_client.session.headers.update({"User-Agent": user_agent})
 
@@ -121,8 +126,12 @@ def _get_token_client(
 
 @cache
 @with_api_exceptions_handler
-def get_client_config(credentials: Credentials, ssl_verify: bool, proxies: Dict[str, str]) -> ClientConfig:
-    backend_client = _get_token_client(credentials=credentials, ssl_verify=ssl_verify, proxies=proxies)
+def get_client_config(
+    credentials: Credentials, ssl_verify: bool, proxies: Dict[str, str]
+) -> ClientConfig:
+    backend_client = _get_token_client(
+        credentials=credentials, ssl_verify=ssl_verify, proxies=proxies
+    )
 
     config = (
         backend_client.api.getClientConfig(
@@ -136,7 +145,9 @@ def get_client_config(credentials: Credentials, ssl_verify: bool, proxies: Dict[
 
     client_config = ClientConfig.from_api_response(config)
     if not client_config.version_info:
-        raise NeptuneClientUpgradeRequiredError(neptune_client_version, max_version="0.4.111")
+        raise NeptuneClientUpgradeRequiredError(
+            neptune_client_version, max_version="0.4.111"
+        )
     return client_config
 
 
@@ -144,7 +155,9 @@ def get_client_config(credentials: Credentials, ssl_verify: bool, proxies: Dict[
 def create_http_client_with_auth(
     credentials: Credentials, ssl_verify: bool, proxies: Dict[str, str]
 ) -> Tuple[RequestsClient, ClientConfig]:
-    client_config = get_client_config(credentials=credentials, ssl_verify=ssl_verify, proxies=proxies)
+    client_config = get_client_config(
+        credentials=credentials, ssl_verify=ssl_verify, proxies=proxies
+    )
 
     config_api_url = credentials.api_url_opt or credentials.token_origin_address
 
@@ -171,7 +184,9 @@ def create_http_client_with_auth(
 
 
 @cache
-def create_backend_client(client_config: ClientConfig, http_client: HttpClient) -> SwaggerClientWrapper:
+def create_backend_client(
+    client_config: ClientConfig, http_client: HttpClient
+) -> SwaggerClientWrapper:
     return SwaggerClientWrapper(
         create_swagger_client(
             build_operation_url(client_config.api_url, BACKEND_SWAGGER_PATH),
@@ -181,7 +196,9 @@ def create_backend_client(client_config: ClientConfig, http_client: HttpClient) 
 
 
 @cache
-def create_leaderboard_client(client_config: ClientConfig, http_client: HttpClient) -> SwaggerClientWrapper:
+def create_leaderboard_client(
+    client_config: ClientConfig, http_client: HttpClient
+) -> SwaggerClientWrapper:
     return SwaggerClientWrapper(
         create_swagger_client(
             build_operation_url(client_config.api_url, LEADERBOARD_SWAGGER_PATH),
@@ -191,7 +208,9 @@ def create_leaderboard_client(client_config: ClientConfig, http_client: HttpClie
 
 
 @cache
-def create_artifacts_client(client_config: ClientConfig, http_client: HttpClient) -> SwaggerClientWrapper:
+def create_artifacts_client(
+    client_config: ClientConfig, http_client: HttpClient
+) -> SwaggerClientWrapper:
     return SwaggerClientWrapper(
         create_swagger_client(
             build_operation_url(client_config.api_url, ARTIFACTS_SWAGGER_PATH),

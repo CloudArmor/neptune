@@ -20,32 +20,29 @@ import unittest
 import uuid
 
 import psutil
-from mock import (
-    ANY,
-    MagicMock,
-    call,
-)
+from mock import ANY, MagicMock, call
 
 from neptune.common.hardware.constants import BYTES_IN_ONE_GB
 from neptune.common.hardware.gauges.cpu import SystemCpuUsageGauge
 from neptune.common.hardware.gauges.gauge_factory import SystemMemoryUsageGauge
 from neptune.common.hardware.gauges.gauge_mode import GaugeMode
-from neptune.common.hardware.metrics.metric import (
-    Metric,
-    MetricResourceType,
-)
+from neptune.common.hardware.metrics.metric import Metric, MetricResourceType
 from neptune.common.hardware.metrics.reports.metric_reporter import (
     MetricReport,
     MetricValue,
 )
-from neptune.common.hardware.metrics.service.metric_service_factory import MetricServiceFactory
+from neptune.common.hardware.metrics.service.metric_service_factory import (
+    MetricServiceFactory,
+)
 from neptune.common.utils import IS_MACOS
 
 
 class TestMetricServiceIntegration(unittest.TestCase):
     def setUp(self):
         self.backend = MagicMock()
-        self.metric_service_factory = MetricServiceFactory(backend=self.backend, os_environ=os.environ)
+        self.metric_service_factory = MetricServiceFactory(
+            backend=self.backend, os_environ=os.environ
+        )
 
     @unittest.skipIf(IS_MACOS, "MacOS behaves strangely")
     def test_create_system_metrics(self):

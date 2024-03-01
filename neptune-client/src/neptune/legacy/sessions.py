@@ -139,7 +139,9 @@ class Session(object):
                 session = Session.with_default_backend()
 
         """
-        return cls(backend=HostedNeptuneBackendApiClient(api_token=api_token, proxies=proxies))
+        return cls(
+            backend=HostedNeptuneBackendApiClient(api_token=api_token, proxies=proxies)
+        )
 
     def get_project(self, project_qualified_name):
         """Get a project with given ``project_qualified_name``.
@@ -225,7 +227,9 @@ class Session(object):
         """
 
         projects = [
-            Project(self._backend.create_leaderboard_backend(p), p.id, namespace, p.name)
+            Project(
+                self._backend.create_leaderboard_backend(p), p.id, namespace, p.name
+            )
             for p in self._backend.get_projects(namespace)
         ]
         return OrderedDict((p.full_id, p) for p in projects)

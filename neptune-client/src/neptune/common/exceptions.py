@@ -15,10 +15,7 @@
 #
 import platform
 
-from neptune.common.envs import (
-    API_TOKEN_ENV_NAME,
-    PROJECT_ENV_NAME,
-)
+from neptune.common.envs import API_TOKEN_ENV_NAME, PROJECT_ENV_NAME
 
 UNIX_STYLES = {
     "h1": "\033[95m",
@@ -123,7 +120,9 @@ You may also want to check the following docs page:
 
 class UploadedFileChanged(NeptuneException):
     def __init__(self, filename: str):
-        super().__init__("File {} changed during upload, restarting upload.".format(filename))
+        super().__init__(
+            "File {} changed during upload, restarting upload.".format(filename)
+        )
 
 
 class InternalClientError(NeptuneException):
@@ -423,4 +422,6 @@ Set the project as active again or use mode="read-only" at initialization to fet
 
 {correct}Need help?{end}-> https://docs.neptune.ai/help/error_writing_to_archived_project/
 """
-        super(WritingToArchivedProjectException, self).__init__(message.format(**STYLES))
+        super(WritingToArchivedProjectException, self).__init__(
+            message.format(**STYLES)
+        )

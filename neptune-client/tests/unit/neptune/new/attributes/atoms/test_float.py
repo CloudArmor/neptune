@@ -14,20 +14,14 @@
 # limitations under the License.
 #
 import pytest
-from mock import (
-    MagicMock,
-    patch,
-)
+from mock import MagicMock, patch
+from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 from neptune import init_run
-from neptune.attributes.atoms.float import (
-    Float,
-    FloatVal,
-)
+from neptune.attributes.atoms.float import Float, FloatVal
 from neptune.common.warnings import NeptuneUnsupportedValue
 from neptune.exceptions import MetadataInconsistency
 from neptune.internal.operation import AssignFloat
-from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 
 class TestFloat(TestAttributeBase):
@@ -51,7 +45,9 @@ class TestFloat(TestAttributeBase):
             with self._exp() as run:
                 var = Float(run, path)
                 var.assign(value, wait=wait)
-                processor.enqueue_operation.assert_called_with(AssignFloat(path, expected), wait=wait)
+                processor.enqueue_operation.assert_called_with(
+                    AssignFloat(path, expected), wait=wait
+                )
 
     def test_assign_type_error(self):
         values = ["string", None]

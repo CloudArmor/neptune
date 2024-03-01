@@ -19,18 +19,14 @@ import unittest
 
 from mock import patch
 
-from neptune import (
-    ANONYMOUS_API_TOKEN,
-    init_run,
-)
-from neptune.envs import (
-    API_TOKEN_ENV_NAME,
-    PROJECT_ENV_NAME,
-)
+from neptune import ANONYMOUS_API_TOKEN, init_run
+from neptune.envs import API_TOKEN_ENV_NAME, PROJECT_ENV_NAME
 from neptune.integrations.python_logger import NeptuneHandler
 
 
-@patch("neptune.metadata_containers.run.generate_hash", lambda *vals, length: "some_hash")
+@patch(
+    "neptune.metadata_containers.run.generate_hash", lambda *vals, length: "some_hash"
+)
 class TestLogHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -54,11 +50,15 @@ class TestLogHandler(unittest.TestCase):
 
             self._log_messages(logger)
 
-            log_entries = list(exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value)
+            log_entries = list(
+                exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value
+            )
             self.assertListEqual(log_entries, ["error message", "test message"])
 
     def test_custom_monitoring_namespace(self):
-        with init_run(mode="debug", flush_period=0.5, monitoring_namespace="watching") as exp:
+        with init_run(
+            mode="debug", flush_period=0.5, monitoring_namespace="watching"
+        ) as exp:
             handler = NeptuneHandler(run=exp)
             logger = logging.getLogger()
             logger.addHandler(handler)
@@ -78,7 +78,9 @@ class TestLogHandler(unittest.TestCase):
 
             log_entries = list(exp["logging"]["my"]["logger"].fetch_values().value)
             self.assertListEqual(log_entries, ["error message", "test message"])
-            self.assertNotIn("python_logger", exp.get_structure()["monitoring"]["some_hash"])
+            self.assertNotIn(
+                "python_logger", exp.get_structure()["monitoring"]["some_hash"]
+            )
 
     def test_custom_level(self):
         with init_run(mode="debug", flush_period=0.5) as exp:
@@ -88,20 +90,28 @@ class TestLogHandler(unittest.TestCase):
 
             self._log_messages(logger)
 
-            log_entries = list(exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value)
+            log_entries = list(
+                exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value
+            )
             self.assertListEqual(log_entries, ["error message"])
 
     def test_formatter_works(self):
         with init_run(mode="debug", flush_period=0.5) as exp:
             handler = NeptuneHandler(run=exp)
-            handler.setFormatter(logging.Formatter("%(levelname)s|%(name)s: %(message)s"))
+            handler.setFormatter(
+                logging.Formatter("%(levelname)s|%(name)s: %(message)s")
+            )
             logger = logging.getLogger()
             logger.addHandler(handler)
 
             self._log_messages(logger)
 
-            log_entries = list(exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value)
-            self.assertListEqual(log_entries, ["ERROR|root: error message", "WARNING|root: test message"])
+            log_entries = list(
+                exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value
+            )
+            self.assertListEqual(
+                log_entries, ["ERROR|root: error message", "WARNING|root: test message"]
+            )
 
     def test_log_level_works(self):
         with init_run(mode="debug", flush_period=0.5) as exp:
@@ -112,8 +122,12 @@ class TestLogHandler(unittest.TestCase):
 
             self._log_messages(logger)
 
-            log_entries = list(exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value)
-            self.assertListEqual(log_entries, ["error message", "debug message", "test message"])
+            log_entries = list(
+                exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value
+            )
+            self.assertListEqual(
+                log_entries, ["error message", "debug message", "test message"]
+            )
 
             self._log_messages(logger)
 
@@ -126,12 +140,18 @@ class TestLogHandler(unittest.TestCase):
 
             self._log_messages(logger)
 
-            log_entries = list(exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value)
+            log_entries = list(
+                exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value
+            )
             self.assertListEqual(log_entries, ["error message", "test message"])
 
             handler.setLevel(logging.ERROR)
 
             self._log_messages(logger)
 
-            log_entries = list(exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value)
-            self.assertListEqual(log_entries, ["error message", "test message", "error message"])
+            log_entries = list(
+                exp["monitoring"]["some_hash"]["python_logger"].fetch_values().value
+            )
+            self.assertListEqual(
+                log_entries, ["error message", "test message", "error message"]
+            )

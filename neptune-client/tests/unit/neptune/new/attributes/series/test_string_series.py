@@ -13,13 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from mock import (
-    MagicMock,
-    patch,
-)
+from mock import MagicMock, patch
+from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 from neptune.attributes.series.string_series import StringSeries
-from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
 
 
 @patch("time.time", new=TestAttributeBase._now)

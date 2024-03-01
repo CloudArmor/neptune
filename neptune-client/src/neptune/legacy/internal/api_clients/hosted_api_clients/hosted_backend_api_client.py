@@ -26,26 +26,21 @@ from packaging import version
 
 from neptune.common.exceptions import STYLES
 from neptune.common.oauth import NeptuneAuthenticator
-from neptune.common.utils import (
-    NoopObject,
-    update_session_proxies,
-)
+from neptune.common.utils import NoopObject, update_session_proxies
 from neptune.internal.backends.hosted_client import NeptuneResponseAdapter
-from neptune.legacy.api_exceptions import (
-    ProjectNotFound,
-    WorkspaceNotFound,
-)
-from neptune.legacy.backend import (
-    BackendApiClient,
-    LeaderboardApiClient,
-)
+from neptune.legacy.api_exceptions import ProjectNotFound, WorkspaceNotFound
+from neptune.legacy.backend import BackendApiClient, LeaderboardApiClient
 from neptune.legacy.exceptions import UnsupportedClientVersion
 from neptune.legacy.internal.api_clients.credentials import Credentials
 from neptune.legacy.internal.api_clients.hosted_api_clients.hosted_alpha_leaderboard_api_client import (
     HostedAlphaLeaderboardApiClient,
 )
-from neptune.legacy.internal.api_clients.hosted_api_clients.mixins import HostedNeptuneMixin
-from neptune.legacy.internal.api_clients.hosted_api_clients.utils import legacy_with_api_exceptions_handler
+from neptune.legacy.internal.api_clients.hosted_api_clients.mixins import (
+    HostedNeptuneMixin,
+)
+from neptune.legacy.internal.api_clients.hosted_api_clients.utils import (
+    legacy_with_api_exceptions_handler,
+)
 from neptune.legacy.projects import Project
 
 _logger = logging.getLogger(__name__)
@@ -71,16 +66,20 @@ class HostedNeptuneBackendApiClient(HostedNeptuneMixin, BackendApiClient):
             urllib3.disable_warnings()
             ssl_verify = False
 
-        self._http_client = RequestsClient(ssl_verify=ssl_verify, response_adapter_class=NeptuneResponseAdapter)
+        self._http_client = RequestsClient(
+            ssl_verify=ssl_verify, response_adapter_class=NeptuneResponseAdapter
+        )
         # for session re-creation we need to keep an authenticator-free version of http client
         self._http_client_for_token = RequestsClient(
             ssl_verify=ssl_verify, response_adapter_class=NeptuneResponseAdapter
         )
 
-        user_agent = "neptune-client/{lib_version} ({system}, python {python_version})".format(
-            lib_version=self.client_lib_version,
-            system=platform.platform(),
-            python_version=platform.python_version(),
+        user_agent = (
+            "neptune-client/{lib_version} ({system}, python {python_version})".format(
+                lib_version=self.client_lib_version,
+                system=platform.platform(),
+                python_version=platform.python_version(),
+            )
         )
         self.http_client.session.headers.update({"User-Agent": user_agent})
         self._http_client_for_token.session.headers.update({"User-Agent": user_agent})
@@ -88,10 +87,14 @@ class HostedNeptuneBackendApiClient(HostedNeptuneMixin, BackendApiClient):
         update_session_proxies(self.http_client.session, proxies)
         update_session_proxies(self._http_client_for_token.session, proxies)
 
-        config_api_url = self.credentials.api_url_opt or self.credentials.token_origin_address
+        config_api_url = (
+            self.credentials.api_url_opt or self.credentials.token_origin_address
+        )
         # We don't need to be able to resolve Neptune host if we use proxy
         if proxies is None:
-            self._verify_host_resolution(config_api_url, self.credentials.token_origin_address)
+            self._verify_host_resolution(
+                config_api_url, self.credentials.token_origin_address
+            )
 
         # this backend client is used only for initial configuration and session re-creation
         self.backend_client = self._get_swagger_client(
@@ -145,7 +148,9 @@ class HostedNeptuneBackendApiClient(HostedNeptuneMixin, BackendApiClient):
     @legacy_with_api_exceptions_handler
     def get_project(self, project_qualified_name):
         try:
-            response = self.backend_swagger_client.api.getProject(projectIdentifier=project_qualified_name).response()
+            response = self.backend_swagger_client.api.getProject(
+                projectIdentifier=project_qualified_name
+            ).response()
             warning = response.metadata.headers.get("X-Server-Warning")
             if warning:
                 click.echo("{warning}{content}{end}".format(content=warning, **STYLES))
@@ -163,7 +168,9 @@ class HostedNeptuneBackendApiClient(HostedNeptuneMixin, BackendApiClient):
     @legacy_with_api_exceptions_handler
     def get_projects(self, namespace):
         try:
-            r = self.backend_swagger_client.api.listProjects(organizationIdentifier=namespace).response()
+            r = self.backend_swagger_client.api.listProjects(
+                organizationIdentifier=namespace
+            ).response()
             return r.result.entries
         except HTTPNotFound:
             raise WorkspaceNotFound(namespace_name=namespace)
@@ -173,7 +180,9 @@ class HostedNeptuneBackendApiClient(HostedNeptuneMixin, BackendApiClient):
 
     def get_new_leaderboard_client(self) -> HostedAlphaLeaderboardApiClient:
         if self._new_leaderboard_client is None:
-            self._new_leaderboard_client = HostedAlphaLeaderboardApiClient(backend_api_client=self)
+            self._new_leaderboard_client = HostedAlphaLeaderboardApiClient(
+                backend_api_client=self
+            )
         return self._new_leaderboard_client
 
     @legacy_with_api_exceptions_handler
@@ -183,7 +192,10 @@ class HostedNeptuneBackendApiClient(HostedNeptuneMixin, BackendApiClient):
     def _verify_version(self):
         parsed_version = version.parse(self.client_lib_version)
 
-        if self._client_config.min_compatible_version and self._client_config.min_compatible_version > parsed_version:
+        if (
+            self._client_config.min_compatible_version
+            and self._client_config.min_compatible_version > parsed_version
+        ):
             click.echo(
                 "ERROR: Minimal supported client version is {} (installed: {}). Please upgrade neptune-client".format(
                     self._client_config.min_compatible_version, self.client_lib_version
@@ -195,7 +207,10 @@ class HostedNeptuneBackendApiClient(HostedNeptuneMixin, BackendApiClient):
                 self._client_config.min_compatible_version,
                 self._client_config.max_compatible_version,
             )
-        if self._client_config.max_compatible_version and self._client_config.max_compatible_version < parsed_version:
+        if (
+            self._client_config.max_compatible_version
+            and self._client_config.max_compatible_version < parsed_version
+        ):
             click.echo(
                 "ERROR: Maximal supported client version is {} (installed: {}). Please downgrade neptune-client".format(
                     self._client_config.max_compatible_version, self.client_lib_version
@@ -207,7 +222,10 @@ class HostedNeptuneBackendApiClient(HostedNeptuneMixin, BackendApiClient):
                 self._client_config.min_compatible_version,
                 self._client_config.max_compatible_version,
             )
-        if self._client_config.min_recommended_version and self._client_config.min_recommended_version > parsed_version:
+        if (
+            self._client_config.min_recommended_version
+            and self._client_config.min_recommended_version > parsed_version
+        ):
             click.echo(
                 "WARNING: We recommend an upgrade to a new version of neptune-client - {} (installed - {}).".format(
                     self._client_config.min_recommended_version, self.client_lib_version

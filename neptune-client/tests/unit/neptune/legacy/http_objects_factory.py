@@ -15,7 +15,6 @@
 #
 
 from mock import MagicMock
-
 from tests.unit.neptune.legacy.random_utils import a_string
 
 

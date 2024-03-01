@@ -18,23 +18,15 @@ from unittest import mock
 
 import numpy
 import pytest
-from mock import (
-    MagicMock,
-    call,
-    patch,
-)
+from mock import MagicMock, call, patch
+from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
+from tests.unit.neptune.new.utils.file_helpers import create_file
 
 from neptune.attributes.series.file_series import FileSeries
 from neptune.exceptions import OperationNotSupported
-from neptune.internal.operation import (
-    ClearImageLog,
-    ImageValue,
-    LogImages,
-)
+from neptune.internal.operation import ClearImageLog, ImageValue, LogImages
 from neptune.internal.utils import base64_encode
 from neptune.types import File
-from tests.unit.neptune.new.attributes.test_attribute_base import TestAttributeBase
-from tests.unit.neptune.new.utils.file_helpers import create_file
 
 
 @patch("time.time", new=TestAttributeBase._now)
@@ -162,7 +154,9 @@ class TestFileSeries(TestAttributeBase):
                         path=path,
                         values=[
                             LogImages.ValueType(
-                                value=ImageValue(base64_encode(file.content), None, "something"),
+                                value=ImageValue(
+                                    base64_encode(file.content), None, "something"
+                                ),
                                 step=step,
                                 ts=self._now(),
                             )
@@ -236,10 +230,12 @@ class TestFileSeries(TestAttributeBase):
 
                 # when
                 with pytest.warns(
-                    expected_warning=UserWarning, match=".* Neptune supports logging images smaller than .*"
+                    expected_warning=UserWarning,
+                    match=".* Neptune supports logging images smaller than .*",
                 ):
                     attr.assign([file])
                 with pytest.warns(
-                    expected_warning=UserWarning, match=".* Neptune supports logging images smaller than .*"
+                    expected_warning=UserWarning,
+                    match=".* Neptune supports logging images smaller than .*",
                 ):
                     attr.assign([saved_file])

@@ -81,7 +81,8 @@ class DiskQueue(WithResources, Generic[T]):
         self._from_dict: Callable[[dict], T] = from_dict
         self._max_file_size: int = max_file_size
         self._max_batch_size_bytes: int = max_batch_size_bytes or int(
-            os.environ.get("NEPTUNE_MAX_BATCH_SIZE_BYTES") or str(DEFAULT_MAX_BATCH_SIZE_BYTES)
+            os.environ.get("NEPTUNE_MAX_BATCH_SIZE_BYTES")
+            or str(DEFAULT_MAX_BATCH_SIZE_BYTES)
         )
         self._extension: str = extension
 
@@ -111,7 +112,9 @@ class DiskQueue(WithResources, Generic[T]):
 
     def put(self, obj: T) -> int:
         version = self._last_put_file.read_local() + 1
-        serialized_obj = json.dumps(self._serialize(obj=obj, version=version, at=time()))
+        serialized_obj = json.dumps(
+            self._serialize(obj=obj, version=version, at=time())
+        )
 
         self._create_new_writer_if_file_size_exceeded(len(serialized_obj), version)
 
@@ -208,7 +211,9 @@ class DiskQueue(WithResources, Generic[T]):
     def _clean_log_files_up_to(self, version: int) -> None:
         log_versions = [log.min_version for log in self._log_files]
 
-        for current_min_version, next_min_version in zip(log_versions, log_versions[1:]):
+        for current_min_version, next_min_version in zip(
+            log_versions, log_versions[1:]
+        ):
             if next_min_version <= version:
                 self._log_files.popleft().cleanup()
 
@@ -250,12 +255,19 @@ def get_all_log_files(data_path: Path, extension: str) -> Deque[LogFile]:
         return deque([LogFile(data_path, 1, extension=extension)])
 
     sorted_local_data_files = sorted(
-        local_data_files, key=lambda file_path: extract_version_from_file_name(Path(file_path), extension)
+        local_data_files,
+        key=lambda file_path: extract_version_from_file_name(
+            Path(file_path), extension
+        ),
     )
 
     return deque(
         [
-            LogFile(data_path, extract_version_from_file_name(Path(file_path), extension), extension=extension)
+            LogFile(
+                data_path,
+                extract_version_from_file_name(Path(file_path), extension),
+                extension=extension,
+            )
             for file_path in sorted_local_data_files
         ]
     )

@@ -174,7 +174,9 @@ You may also want to check the following docs pages:
 
 {correct}Need help?{end}-> https://docs-legacy.neptune.ai/getting-started/getting-help.html
 """
-        super(InvalidApiKey, self).__init__(message.format(env_api_token=envs.API_TOKEN_ENV_NAME, **STYLES))
+        super(InvalidApiKey, self).__init__(
+            message.format(env_api_token=envs.API_TOKEN_ENV_NAME, **STYLES)
+        )
 
 
 class WorkspaceNotFound(NeptuneApiException):
@@ -187,7 +189,9 @@ Workspace {python}{workspace}{end} not found.
 
 Workspace is your username or a name of your team organization.
 """
-        super(WorkspaceNotFound, self).__init__(message.format(workspace=namespace_name, **STYLES))
+        super(WorkspaceNotFound, self).__init__(
+            message.format(workspace=namespace_name, **STYLES)
+        )
 
 
 class ProjectNotFound(NeptuneApiException):
@@ -200,7 +204,9 @@ Project {python}{project}{end} not found.
 
 Verify if your project's name was not misspelled. You can find proper name after logging into Neptune UI.
 """
-        super(ProjectNotFound, self).__init__(message.format(project=project_identifier, **STYLES))
+        super(ProjectNotFound, self).__init__(
+            message.format(project=project_identifier, **STYLES)
+        )
 
 
 class PathInProjectNotFound(NeptuneApiException):
@@ -222,7 +228,9 @@ class NotebookNotFound(NeptuneApiException):
                 "Notebook '{}' not found in project '{}'.".format(notebook_id, project)
             )
         else:
-            super(NotebookNotFound, self).__init__("Notebook '{}' not found.".format(notebook_id))
+            super(NotebookNotFound, self).__init__(
+                "Notebook '{}' not found.".format(notebook_id)
+            )
 
 
 class ExperimentNotFound(NeptuneApiException):
@@ -236,7 +244,9 @@ class ExperimentNotFound(NeptuneApiException):
 
 class ChannelNotFound(NeptuneApiException):
     def __init__(self, channel_id):
-        super(ChannelNotFound, self).__init__("Channel '{id}' not found.".format(id=channel_id))
+        super(ChannelNotFound, self).__init__(
+            "Channel '{id}' not found.".format(id=channel_id)
+        )
 
 
 class ExperimentAlreadyFinished(NeptuneApiException):
@@ -263,21 +273,27 @@ class ExperimentValidationError(NeptuneApiException):
 class ChannelAlreadyExists(NeptuneApiException):
     def __init__(self, experiment_short_id, channel_name):
         super(ChannelAlreadyExists, self).__init__(
-            "Channel with name '{}' already exists in experiment '{}'.".format(channel_name, experiment_short_id)
+            "Channel with name '{}' already exists in experiment '{}'.".format(
+                channel_name, experiment_short_id
+            )
         )
 
 
 class ChannelDoesNotExist(NeptuneApiException):
     def __init__(self, experiment_short_id, channel_name):
         super(ChannelDoesNotExist, self).__init__(
-            "Channel with name '{}' does not exist in experiment '{}'.".format(channel_name, experiment_short_id)
+            "Channel with name '{}' does not exist in experiment '{}'.".format(
+                channel_name, experiment_short_id
+            )
         )
 
 
 class ChannelsValuesSendBatchError(NeptuneApiException):
     @staticmethod
     def _format_error(error):
-        return "{msg} (metricId: '{channelId}', x: {x})".format(msg=error.error, channelId=error.channelId, x=error.x)
+        return "{msg} (metricId: '{channelId}', x: {x})".format(
+            msg=error.error, channelId=error.channelId, x=error.x
+        )
 
     def __init__(self, experiment_short_id, batch_errors):
         super(ChannelsValuesSendBatchError, self).__init__(

@@ -48,7 +48,9 @@ def extract_project_and_workspace(name: str, workspace: Optional[str] = None):
 
 
 def normalize_project_name(name: str, workspace: Optional[str] = None):
-    extracted_workspace_name, extracted_project_name = extract_project_and_workspace(name=name, workspace=workspace)
+    extracted_workspace_name, extracted_project_name = extract_project_and_workspace(
+        name=name, workspace=workspace
+    )
 
     return f"{extracted_workspace_name}/{extracted_project_name}"
 

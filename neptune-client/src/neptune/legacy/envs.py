@@ -13,7 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-__all__ = ["PROJECT_ENV_NAME", "API_TOKEN_ENV_NAME", "NOTEBOOK_ID_ENV_NAME", "NOTEBOOK_PATH_ENV_NAME", "BACKEND"]
+__all__ = [
+    "PROJECT_ENV_NAME",
+    "API_TOKEN_ENV_NAME",
+    "NOTEBOOK_ID_ENV_NAME",
+    "NOTEBOOK_PATH_ENV_NAME",
+    "BACKEND",
+]
 
 from neptune.common.envs import (
     API_TOKEN_ENV_NAME,

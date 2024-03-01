@@ -27,10 +27,7 @@ import io
 import os
 from functools import wraps
 from io import IOBase
-from typing import (
-    Optional,
-    Union,
-)
+from typing import Optional, Union
 
 from neptune.common.exceptions import NeptuneException
 from neptune.exceptions import StreamAlreadyUsedException
@@ -60,11 +57,15 @@ class FileComposite(abc.ABC):
 
     @property
     def path(self):
-        raise NeptuneException(f"`path` attribute is not supported for {self.file_type}")
+        raise NeptuneException(
+            f"`path` attribute is not supported for {self.file_type}"
+        )
 
     @property
     def content(self):
-        raise NeptuneException(f"`content` attribute is not supported for {self.file_type}")
+        raise NeptuneException(
+            f"`content` attribute is not supported for {self.file_type}"
+        )
 
     def save(self, path):
         raise NeptuneException(f"`save` method is not supported for {self.file_type}")
@@ -132,7 +133,9 @@ def read_once(f):
 class StreamComposite(FileComposite):
     file_type = FileType.STREAM
 
-    def __init__(self, stream: IOBase, seek: Optional[int] = 0, extension: Optional[str] = None):
+    def __init__(
+        self, stream: IOBase, seek: Optional[int] = 0, extension: Optional[str] = None
+    ):
         verify_type("stream", stream, (IOBase, type(None)))
         verify_type("extension", extension, (str, type(None)))
 

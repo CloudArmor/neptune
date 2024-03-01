@@ -19,25 +19,11 @@ import os
 import threading
 from pathlib import Path
 from queue import Queue
-from time import (
-    monotonic,
-    time,
-)
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-)
+from time import monotonic, time
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple
 
 from neptune.common.exceptions import NeptuneException
-from neptune.common.warnings import (
-    NeptuneWarning,
-    warn_once,
-)
+from neptune.common.warnings import NeptuneWarning, warn_once
 from neptune.constants import ASYNC_DIRECTORY
 from neptune.core.components.abstract import WithResources
 from neptune.core.components.metadata_file import MetadataFile
@@ -67,7 +53,9 @@ if TYPE_CHECKING:
     from neptune.internal.backends.neptune_backend import NeptuneBackend
     from neptune.internal.container_type import ContainerType
     from neptune.internal.id_formats import UniqueId
-    from neptune.internal.operation_processors.operation_logger import ProcessorStopSignal
+    from neptune.internal.operation_processors.operation_logger import (
+        ProcessorStopSignal,
+    )
     from neptune.internal.signals_processing.signals import Signal
 
 logger = get_logger()
@@ -78,7 +66,9 @@ serializer: Callable[[Operation], Dict[str, Any]] = lambda op: op.to_dict()
 
 class AsyncOperationProcessor(WithResources, OperationProcessor):
     STOP_QUEUE_STATUS_UPDATE_FREQ_SECONDS = 30.0
-    STOP_QUEUE_MAX_TIME_NO_CONNECTION_SECONDS = float(os.getenv(NEPTUNE_SYNC_AFTER_STOP_TIMEOUT, DEFAULT_STOP_TIMEOUT))
+    STOP_QUEUE_MAX_TIME_NO_CONNECTION_SECONDS = float(
+        os.getenv(NEPTUNE_SYNC_AFTER_STOP_TIMEOUT, DEFAULT_STOP_TIMEOUT)
+    )
 
     def __init__(
         self,
@@ -95,7 +85,9 @@ class AsyncOperationProcessor(WithResources, OperationProcessor):
         self._should_print_logs: bool = should_print_logs
 
         self._data_path = (
-            data_path if data_path else get_container_full_path(ASYNC_DIRECTORY, container_id, container_type)
+            data_path
+            if data_path
+            else get_container_full_path(ASYNC_DIRECTORY, container_id, container_type)
         )
 
         # Initialize directory
@@ -103,7 +95,9 @@ class AsyncOperationProcessor(WithResources, OperationProcessor):
 
         self._metadata_file = MetadataFile(
             data_path=self._data_path,
-            metadata=common_metadata(mode="async", container_id=container_id, container_type=container_type),
+            metadata=common_metadata(
+                mode="async", container_id=container_id, container_type=container_type
+            ),
         )
         self._operation_storage = OperationStorage(data_path=self._data_path)
         self._queue = DiskQueue(
@@ -170,7 +164,8 @@ class AsyncOperationProcessor(WithResources, OperationProcessor):
         # Probably reentering lock just for sure
         with self._waiting_cond:
             self._waiting_cond.wait_for(
-                lambda: self._consumed_version >= waiting_for_version or not self._consumer.is_running()
+                lambda: self._consumed_version >= waiting_for_version
+                or not self._consumer.is_running()
             )
         if not self._consumer.is_running():
             raise NeptuneSynchronizationAlreadyStoppedException()
@@ -186,7 +181,11 @@ class AsyncOperationProcessor(WithResources, OperationProcessor):
     ) -> None:
         waiting_start: float = monotonic()
         time_elapsed: float = 0.0
-        max_reconnect_wait_time: float = self.STOP_QUEUE_MAX_TIME_NO_CONNECTION_SECONDS if seconds is None else seconds
+        max_reconnect_wait_time: float = (
+            self.STOP_QUEUE_MAX_TIME_NO_CONNECTION_SECONDS
+            if seconds is None
+            else seconds
+        )
         op_logger = ProcessorStopLogger(
             processor_id=id(self),
             signal_queue=signal_queue,
@@ -216,13 +215,20 @@ class AsyncOperationProcessor(WithResources, OperationProcessor):
             self._queue.wait_for_empty(wait_time)
             size_remaining = self._queue.size()
             already_synced = initial_queue_size - size_remaining
-            already_synced_proc = (already_synced / initial_queue_size) * 100 if initial_queue_size else 100
+            already_synced_proc = (
+                (already_synced / initial_queue_size) * 100
+                if initial_queue_size
+                else 100
+            )
             if size_remaining == 0:
                 op_logger.log_success(ops_synced=initial_queue_size)
                 return
 
             time_elapsed = monotonic() - waiting_start
-            if self._consumer.last_backoff_time > 0 and time_elapsed >= max_reconnect_wait_time:
+            if (
+                self._consumer.last_backoff_time > 0
+                and time_elapsed >= max_reconnect_wait_time
+            ):
 
                 op_logger.log_reconnect_failure(
                     max_reconnect_wait_time=max_reconnect_wait_time,
@@ -231,7 +237,9 @@ class AsyncOperationProcessor(WithResources, OperationProcessor):
                 return
 
             if seconds is not None and wait_time == 0:
-                op_logger.log_sync_failure(seconds=seconds, size_remaining=size_remaining)
+                op_logger.log_sync_failure(
+                    seconds=seconds, size_remaining=size_remaining
+                )
                 return
 
             if not self._consumer.is_running():
@@ -246,7 +254,9 @@ class AsyncOperationProcessor(WithResources, OperationProcessor):
             )
 
     def stop(
-        self, seconds: Optional[float] = None, signal_queue: Optional["Queue[ProcessorStopSignal]"] = None
+        self,
+        seconds: Optional[float] = None,
+        signal_queue: Optional["Queue[ProcessorStopSignal]"] = None,
     ) -> None:
         ts = time()
         self.flush()
@@ -312,7 +322,9 @@ class AsyncOperationProcessor(WithResources, OperationProcessor):
                     return
 
                 signal_batch_started(queue=self._processor._signals_queue)
-                self.process_batch([element.obj for element in batch], batch[-1].ver, batch[-1].at)
+                self.process_batch(
+                    [element.obj for element in batch], batch[-1].ver, batch[-1].at
+                )
 
         # WARNING: Be careful when changing this function. It is used in the experimental package
         def _handle_errors(self, errors: List[NeptuneException]) -> None:
@@ -328,9 +340,16 @@ class AsyncOperationProcessor(WithResources, OperationProcessor):
                 " synced manually using `neptune sync` command."
             )
         )
-        def process_batch(self, batch: List[Operation], version: int, occurred_at: Optional[float] = None) -> None:
+        def process_batch(
+            self,
+            batch: List[Operation],
+            version: int,
+            occurred_at: Optional[float] = None,
+        ) -> None:
             if occurred_at is not None:
-                signal_batch_lag(queue=self._processor._signals_queue, lag=time() - occurred_at)
+                signal_batch_lag(
+                    queue=self._processor._signals_queue, lag=time() - occurred_at
+                )
 
             expected_count = len(batch)
             version_to_ack = version - expected_count

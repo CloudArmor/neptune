@@ -14,10 +14,7 @@
 # limitations under the License.
 #
 
-from abc import (
-    ABCMeta,
-    abstractmethod,
-)
+from abc import ABCMeta, abstractmethod
 
 
 class Gauge(object):

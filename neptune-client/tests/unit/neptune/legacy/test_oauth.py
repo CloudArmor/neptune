@@ -18,23 +18,20 @@ import time
 import unittest
 
 import jwt
-from mock import (
-    MagicMock,
-    patch,
-)
+from mock import MagicMock, patch
 from oauthlib.oauth2 import TokenExpiredError
+from tests.unit.neptune.legacy.http_objects_factory import a_request
+from tests.unit.neptune.legacy.oauth_objects_factory import (
+    SECRET,
+    a_refresh_token,
+    an_access_token,
+)
 
 from neptune.common.oauth import (
     NeptuneAuth,
     NeptuneAuthenticator,
     _decoding_options,
     _no_token_updater,
-)
-from tests.unit.neptune.legacy.http_objects_factory import a_request
-from tests.unit.neptune.legacy.oauth_objects_factory import (
-    SECRET,
-    a_refresh_token,
-    an_access_token,
 )
 
 
@@ -114,9 +111,13 @@ class TestNeptuneAuthenticator(unittest.TestCase):
         auth_tokens = MagicMock()
         auth_tokens.accessToken = an_access_token()
         auth_tokens.refreshToken = a_refresh_token()
-        decoded_access_token = jwt.decode(auth_tokens.accessToken, SECRET, options=_decoding_options)
+        decoded_access_token = jwt.decode(
+            auth_tokens.accessToken, SECRET, options=_decoding_options
+        )
 
-        backend_client.api.exchangeApiToken(X_Neptune_Api_Token=api_token).response().result = auth_tokens
+        backend_client.api.exchangeApiToken(
+            X_Neptune_Api_Token=api_token
+        ).response().result = auth_tokens
 
         # and
         now = time.time()
@@ -128,7 +129,9 @@ class TestNeptuneAuthenticator(unittest.TestCase):
         session.token = dict()
 
         # and
-        neptune_authenticator = NeptuneAuthenticator(api_token, backend_client, False, None)
+        neptune_authenticator = NeptuneAuthenticator(
+            api_token, backend_client, False, None
+        )
         request = a_request()
 
         # when

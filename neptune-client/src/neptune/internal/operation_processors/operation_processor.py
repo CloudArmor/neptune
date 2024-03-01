@@ -16,10 +16,7 @@
 __all__ = ("OperationProcessor",)
 
 import abc
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from neptune.core.components.operation_storage import OperationStorage

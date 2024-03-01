@@ -13,7 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-__all__ = ["Artifact", "Boolean", "Datetime", "File", "Float", "GitRef", "Integer", "NotebookRef", "RunState", "String"]
+__all__ = [
+    "Artifact",
+    "Boolean",
+    "Datetime",
+    "File",
+    "Float",
+    "GitRef",
+    "Integer",
+    "NotebookRef",
+    "RunState",
+    "String",
+]
 
 from .artifact import Artifact
 from .boolean import Boolean

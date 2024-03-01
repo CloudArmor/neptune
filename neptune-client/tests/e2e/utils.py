@@ -41,10 +41,10 @@ import numpy
 from attr import dataclass
 from PIL import Image
 from PIL.PngImagePlugin import PngImageFile
+from tests.e2e.exceptions import MissingEnvironmentVariable
 
 import neptune
 from neptune.internal.container_type import ContainerType
-from tests.e2e.exceptions import MissingEnvironmentVariable
 
 
 def _remove_file_if_exists(filepath):
@@ -170,7 +170,9 @@ def initialize_container(container_type, project, **extra_args):
         model_sys_id = model["sys/id"].fetch()
         model.stop()
 
-        return neptune.init_model_version(model=model_sys_id, project=project, **extra_args)
+        return neptune.init_model_version(
+            model=model_sys_id, project=project, **extra_args
+        )
 
     raise NotImplementedError(container_type)
 

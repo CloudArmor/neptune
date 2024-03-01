@@ -16,12 +16,7 @@
 __all__ = ["Model"]
 
 import os
-from typing import (
-    TYPE_CHECKING,
-    Iterable,
-    List,
-    Optional,
-)
+from typing import TYPE_CHECKING, Iterable, List, Optional
 
 from typing_extensions import Literal
 
@@ -59,10 +54,7 @@ from neptune.metadata_containers import MetadataContainer
 from neptune.metadata_containers.abstract import NeptuneObjectCallback
 from neptune.table import Table
 from neptune.types.mode import Mode
-from neptune.typing import (
-    ProgressBarCallback,
-    ProgressBarType,
-)
+from neptune.typing import ProgressBarCallback, ProgressBarType
 
 if TYPE_CHECKING:
     from neptune.internal.background_job import BackgroundJob
@@ -188,7 +180,9 @@ class Model(MetadataContainer):
 
         self._key: Optional[str] = key
         self._with_id: Optional[str] = with_id
-        self._name: Optional[str] = DEFAULT_NAME if with_id is None and name is None else name
+        self._name: Optional[str] = (
+            DEFAULT_NAME if with_id is None and name is None else name
+        )
 
         # make mode proper Enum instead of string
         mode = Mode(mode or os.getenv(CONNECTION_MODE) or Mode.ASYNC.value)
@@ -220,7 +214,9 @@ class Model(MetadataContainer):
             # with_id (resume existing model) has priority over key (creating a new model)
             #  additional creation parameters (e.g. name) are simply ignored in this scenario
             return self._backend.get_metadata_container(
-                container_id=QualifiedName(project_qualified_name + "/" + self._with_id),
+                container_id=QualifiedName(
+                    project_qualified_name + "/" + self._with_id
+                ),
                 expected_container_type=self.container_type,
             )
         elif self._key is not None:
@@ -228,7 +224,9 @@ class Model(MetadataContainer):
                 raise NeedExistingModelForReadOnlyMode()
 
             try:
-                return self._backend.create_model(project_id=self._project_api_object.id, key=self._key)
+                return self._backend.create_model(
+                    project_id=self._project_api_object.id, key=self._key
+                )
             except NeptuneObjectCreationConflict as e:
                 base_url = self._backend.get_display_address()
                 raise NeptuneModelKeyAlreadyExistsError(
@@ -309,10 +307,14 @@ class Model(MetadataContainer):
         verify_type("limit", limit, (int, type(None)))
         verify_type("sort_by", sort_by, str)
         verify_type("ascending", ascending, bool)
-        verify_type("progress_bar", progress_bar, (type(None), bool, type(ProgressBarCallback)))
+        verify_type(
+            "progress_bar", progress_bar, (type(None), bool, type(ProgressBarCallback))
+        )
 
         if isinstance(limit, int) and limit <= 0:
-            raise ValueError(f"Parameter 'limit' must be a positive integer or None. Got {limit}.")
+            raise ValueError(
+                f"Parameter 'limit' must be a positive integer or None. Got {limit}."
+            )
         return MetadataContainer._fetch_entries(
             self,
             child_type=ContainerType.MODEL_VERSION,

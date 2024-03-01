@@ -15,11 +15,7 @@
 #
 __all__ = ["ValueToAttributeVisitor"]
 
-from typing import (
-    TYPE_CHECKING,
-    List,
-    Type,
-)
+from typing import TYPE_CHECKING, List, Type
 
 from neptune.attributes.atoms.artifact import Artifact as ArtifactAttr
 from neptune.attributes.atoms.boolean import Boolean as BooleanAttr
@@ -36,10 +32,7 @@ from neptune.attributes.series.float_series import FloatSeries as FloatSeriesAtt
 from neptune.attributes.series.string_series import StringSeries as StringSeriesAttr
 from neptune.attributes.sets.string_set import StringSet as StringSetAttr
 from neptune.exceptions import OperationNotSupported
-from neptune.types import (
-    Boolean,
-    Integer,
-)
+from neptune.types import Boolean, Integer
 from neptune.types.atoms import GitRef
 from neptune.types.atoms.artifact import Artifact
 from neptune.types.atoms.datetime import Datetime
@@ -105,5 +98,7 @@ class ValueToAttributeVisitor(ValueVisitor[Attribute]):
     def visit_namespace(self, _: Namespace) -> Attribute:
         return NamespaceAttr(self._container, self._path)
 
-    def copy_value(self, source_type: Type[Attribute], source_path: List[str]) -> Attribute:
+    def copy_value(
+        self, source_type: Type[Attribute], source_path: List[str]
+    ) -> Attribute:
         return source_type(self._container, self._path)

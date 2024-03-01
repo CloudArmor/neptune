@@ -20,13 +20,7 @@ __all__ = [
     "list_artifact_files",
 ]
 
-from typing import (
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Type,
-)
+from typing import Dict, List, Optional, Tuple, Type
 
 from bravado.exception import HTTPNotFound
 
@@ -43,15 +37,9 @@ from neptune.internal.artifacts.types import (
     ArtifactDriversMap,
     ArtifactFileData,
 )
-from neptune.internal.backends.api_model import (
-    ArtifactAttribute,
-    ArtifactModel,
-)
+from neptune.internal.backends.api_model import ArtifactAttribute, ArtifactModel
 from neptune.internal.backends.swagger_client_wrapper import SwaggerClientWrapper
-from neptune.internal.operation import (
-    AssignArtifact,
-    Operation,
-)
+from neptune.internal.operation import AssignArtifact, Operation
 from neptune.internal.utils.paths import path_to_str
 
 
@@ -65,7 +53,9 @@ def _compute_artifact_size(artifact_file_list: List[ArtifactFileData]):
     return artifact_size
 
 
-def _filter_empty_directory_files(files: List[ArtifactFileData]) -> List[ArtifactFileData]:
+def _filter_empty_directory_files(
+    files: List[ArtifactFileData],
+) -> List[ArtifactFileData]:
     return list(filter(lambda x: not _is_s3_empty_directory_file(x), files))
 
 
@@ -92,7 +82,9 @@ def track_to_new_artifact(
         raise ArtifactUploadingError("Uploading an empty Artifact")
 
     artifact_hash = (
-        _compute_artifact_hash_without_metadata(files) if exclude_metadata_from_hash else _compute_artifact_hash(files)
+        _compute_artifact_hash_without_metadata(files)
+        if exclude_metadata_from_hash
+        else _compute_artifact_hash(files)
     )
 
     artifact = create_new_artifact(
@@ -154,15 +146,21 @@ def _compute_artifact_hash(files: List[ArtifactFileData]) -> str:
     return FileHasher.get_artifact_hash(files)
 
 
-def _extract_file_list(path: List[str], entries: List[Tuple[str, Optional[str]]]) -> List[ArtifactFileData]:
+def _extract_file_list(
+    path: List[str], entries: List[Tuple[str, Optional[str]]]
+) -> List[ArtifactFileData]:
     files: List[ArtifactFileData] = list()
 
     for entry_path, entry_destination in entries:
         driver: Type[ArtifactDriver] = ArtifactDriversMap.match_path(entry_path)
-        artifact_files = driver.get_tracked_files(path=entry_path, destination=entry_destination)
+        artifact_files = driver.get_tracked_files(
+            path=entry_path, destination=entry_destination
+        )
 
         if len(artifact_files) == 0:
-            raise NeptuneEmptyLocationException(location=entry_path, namespace="/".join(path))
+            raise NeptuneEmptyLocationException(
+                location=entry_path, namespace="/".join(path)
+            )
 
         files.extend(artifact_files)
 
@@ -211,7 +209,9 @@ def upload_artifact_files_metadata(
         **add_artifact_version_to_request_params(default_request_params),
     }
     try:
-        result = swagger_client.api.uploadArtifactFilesMetadata(**params).response().result
+        result = (
+            swagger_client.api.uploadArtifactFilesMetadata(**params).response().result
+        )
         return ArtifactModel(
             hash=result.artifactHash,
             size=result.size,

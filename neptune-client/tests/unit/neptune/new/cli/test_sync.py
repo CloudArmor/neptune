@@ -18,11 +18,6 @@ from unittest.mock import MagicMock
 
 import mock
 import pytest
-
-from neptune.cli.sync import SyncRunner
-from neptune.cli.utils import get_qualified_name
-from neptune.internal.container_type import ContainerType
-from neptune.internal.operation import Operation
 from tests.unit.neptune.new.cli.utils import (
     execute_operations,
     generate_get_metadata_container,
@@ -31,7 +26,17 @@ from tests.unit.neptune.new.cli.utils import (
     prepare_v2_container,
 )
 
-AVAILABLE_CONTAINERS = [ContainerType.RUN, ContainerType.MODEL_VERSION, ContainerType.MODEL, ContainerType.PROJECT]
+from neptune.cli.sync import SyncRunner
+from neptune.cli.utils import get_qualified_name
+from neptune.internal.container_type import ContainerType
+from neptune.internal.operation import Operation
+
+AVAILABLE_CONTAINERS = [
+    ContainerType.RUN,
+    ContainerType.MODEL_VERSION,
+    ContainerType.MODEL,
+    ContainerType.PROJECT,
+]
 
 
 @pytest.fixture(name="backend")
@@ -52,11 +57,17 @@ def test_sync_all_v2_containers(tmp_path, mocker, capsys, backend, container_typ
         key="a1b2c3",
     )
     synced_container = prepare_v2_container(
-        container_type=container_type, path=tmp_path, last_ack_version=3, pid=2502, key="d4e5f6"
+        container_type=container_type,
+        path=tmp_path,
+        last_ack_version=3,
+        pid=2502,
+        key="d4e5f6",
     )
 
     # and
-    get_container_impl = generate_get_metadata_container(registered_containers=(unsynced_container, synced_container))
+    get_container_impl = generate_get_metadata_container(
+        registered_containers=(unsynced_container, synced_container)
+    )
 
     # and
     mocker.patch.object(backend, "get_metadata_container", get_container_impl)
@@ -72,7 +83,8 @@ def test_sync_all_v2_containers(tmp_path, mocker, capsys, backend, container_typ
     # expect output for unsynced run
     assert f"Synchronising {get_qualified_name(unsynced_container)}" in captured.out
     assert (
-        f"Synchronization of {container_type.value} {get_qualified_name(unsynced_container)} completed." in captured.out
+        f"Synchronization of {container_type.value} {get_qualified_name(unsynced_container)} completed."
+        in captured.out
     )
 
     # expect NO output for synced run
@@ -96,7 +108,11 @@ def test_sync_all_v2_containers(tmp_path, mocker, capsys, backend, container_typ
 def test_sync_all_offline_v2_runs(tmp_path, mocker, capsys, backend):
     # given
     offline_run = prepare_v2_container(
-        container_type=ContainerType.RUN, path=tmp_path, last_ack_version=None, pid=2501, key="a1b2c3"
+        container_type=ContainerType.RUN,
+        path=tmp_path,
+        last_ack_version=None,
+        pid=2501,
+        key="a1b2c3",
     )
 
     # and
@@ -117,7 +133,9 @@ def test_sync_all_offline_v2_runs(tmp_path, mocker, capsys, backend):
     captured = capsys.readouterr()
     assert captured.err == ""
     assert (
-        "Offline container {} registered as {}".format(f"{offline_run.id}", get_qualified_name(offline_run))
+        "Offline container {} registered as {}".format(
+            f"{offline_run.id}", get_qualified_name(offline_run)
+        )
     ) in captured.out
 
     # and
@@ -137,13 +155,25 @@ def test_sync_all_offline_v2_runs(tmp_path, mocker, capsys, backend):
 def test_sync_selected_v2_runs(tmp_path, mocker, capsys, backend):
     # given
     unsync_exp = prepare_v2_container(
-        container_type=ContainerType.RUN, path=tmp_path, last_ack_version=1, pid=2501, key="a1b2c3"
+        container_type=ContainerType.RUN,
+        path=tmp_path,
+        last_ack_version=1,
+        pid=2501,
+        key="a1b2c3",
     )  # won't be synced, despite fact it's not synced yet
     sync_exp = prepare_v2_container(
-        container_type=ContainerType.RUN, path=tmp_path, last_ack_version=3, pid=2502, key="d4e5f6"
+        container_type=ContainerType.RUN,
+        path=tmp_path,
+        last_ack_version=3,
+        pid=2502,
+        key="d4e5f6",
     )  # will be synced despite fact that it's up to date
     offline_run = prepare_v2_container(
-        container_type=ContainerType.RUN, path=tmp_path, last_ack_version=None, pid=2503, key="g7h8j9"
+        container_type=ContainerType.RUN,
+        path=tmp_path,
+        last_ack_version=None,
+        pid=2503,
+        key="g7h8j9",
     )  # will be synced
 
     # and
@@ -181,12 +211,20 @@ def test_sync_selected_v2_runs(tmp_path, mocker, capsys, backend):
 
     # expected output for mentioned async exp
     assert "Synchronising {}".format(get_qualified_name(sync_exp)) in captured.out
-    assert "Synchronization of run {} completed.".format(get_qualified_name(sync_exp)) in captured.out
+    assert (
+        "Synchronization of run {} completed.".format(get_qualified_name(sync_exp))
+        in captured.out
+    )
 
     # expected output for offline container
-    assert (f"Offline container {offline_run.id} registered as {get_qualified_name(offline_run)}") in captured.out
+    assert (
+        f"Offline container {offline_run.id} registered as {get_qualified_name(offline_run)}"
+    ) in captured.out
     assert "Synchronising {}".format(get_qualified_name(offline_run)) in captured.out
-    assert "Synchronization of run {} completed.".format(get_qualified_name(offline_run)) in captured.out
+    assert (
+        "Synchronization of run {} completed.".format(get_qualified_name(offline_run))
+        in captured.out
+    )
 
     # expected NO output for not mentioned async container
     assert "Synchronising {}".format(get_qualified_name(unsync_exp)) not in captured.out
@@ -208,11 +246,17 @@ def test_sync_selected_v2_runs(tmp_path, mocker, capsys, backend):
 @pytest.mark.parametrize("container_type", AVAILABLE_CONTAINERS)
 def test_sync_all_v1_containers(tmp_path, mocker, capsys, backend, container_type):
     # given
-    unsynced_container = prepare_v1_container(container_type=container_type, path=tmp_path, last_ack_version=1)
-    synced_container = prepare_v1_container(container_type=container_type, path=tmp_path, last_ack_version=3)
+    unsynced_container = prepare_v1_container(
+        container_type=container_type, path=tmp_path, last_ack_version=1
+    )
+    synced_container = prepare_v1_container(
+        container_type=container_type, path=tmp_path, last_ack_version=3
+    )
 
     # and
-    get_container_impl = generate_get_metadata_container(registered_containers=(unsynced_container, synced_container))
+    get_container_impl = generate_get_metadata_container(
+        registered_containers=(unsynced_container, synced_container)
+    )
 
     # and
     mocker.patch.object(backend, "get_metadata_container", get_container_impl)
@@ -228,7 +272,8 @@ def test_sync_all_v1_containers(tmp_path, mocker, capsys, backend, container_typ
     # expect output for unsynced run
     assert f"Synchronising {get_qualified_name(unsynced_container)}" in captured.out
     assert (
-        f"Synchronization of {container_type.value} {get_qualified_name(unsynced_container)} completed." in captured.out
+        f"Synchronization of {container_type.value} {get_qualified_name(unsynced_container)} completed."
+        in captured.out
     )
 
     # expect NO output for synced run
@@ -251,7 +296,9 @@ def test_sync_all_v1_containers(tmp_path, mocker, capsys, backend, container_typ
 
 def test_sync_all_offline_v1_runs(tmp_path, mocker, capsys, backend):
     # given
-    offline_run = prepare_v1_container(container_type=ContainerType.RUN, path=tmp_path, last_ack_version=None)
+    offline_run = prepare_v1_container(
+        container_type=ContainerType.RUN, path=tmp_path, last_ack_version=None
+    )
 
     # and
     get_run_impl = generate_get_metadata_container(registered_containers=(offline_run,))
@@ -271,7 +318,9 @@ def test_sync_all_offline_v1_runs(tmp_path, mocker, capsys, backend):
     captured = capsys.readouterr()
     assert captured.err == ""
     assert (
-        "Offline container {} registered as {}".format(f"{offline_run.id}", get_qualified_name(offline_run))
+        "Offline container {} registered as {}".format(
+            f"{offline_run.id}", get_qualified_name(offline_run)
+        )
     ) in captured.out
 
     # and
@@ -335,14 +384,22 @@ def test_sync_selected_v1_runs(tmp_path, mocker, capsys, backend):
 
     # expected output for mentioned async exp
     assert "Synchronising {}".format(get_qualified_name(sync_exp)) in captured.out
-    assert "Synchronization of run {} completed.".format(get_qualified_name(sync_exp)) in captured.out
+    assert (
+        "Synchronization of run {} completed.".format(get_qualified_name(sync_exp))
+        in captured.out
+    )
 
     # expected output for offline container
     assert (
-        "Offline container {} registered as {}".format(f"{offline_run.id}", get_qualified_name(offline_run))
+        "Offline container {} registered as {}".format(
+            f"{offline_run.id}", get_qualified_name(offline_run)
+        )
     ) in captured.out
     assert "Synchronising {}".format(get_qualified_name(offline_run)) in captured.out
-    assert "Synchronization of run {} completed.".format(get_qualified_name(offline_run)) in captured.out
+    assert (
+        "Synchronization of run {} completed.".format(get_qualified_name(offline_run))
+        in captured.out
+    )
 
     # expected NO output for not mentioned async container
     assert "Synchronising {}".format(get_qualified_name(unsync_exp)) not in captured.out
@@ -387,13 +444,30 @@ def test_sync_v0_runs(tmp_path, mocker, capsys, backend):
     assert captured.err == ""
 
     assert (
-        "Offline container {} registered as {}".format(f"{offline_old_run.id}", get_qualified_name(offline_old_run))
+        "Offline container {} registered as {}".format(
+            f"{offline_old_run.id}", get_qualified_name(offline_old_run)
+        )
     ) in captured.out
 
-    assert "Synchronising {}".format(get_qualified_name(deprecated_unsynced_run)) in captured.out
-    assert "Synchronization of run {} completed.".format(get_qualified_name(deprecated_unsynced_run)) in captured.out
-    assert "Synchronising {}".format(get_qualified_name(offline_old_run)) in captured.out
-    assert "Synchronization of run {} completed.".format(get_qualified_name(offline_old_run)) in captured.out
+    assert (
+        "Synchronising {}".format(get_qualified_name(deprecated_unsynced_run))
+        in captured.out
+    )
+    assert (
+        "Synchronization of run {} completed.".format(
+            get_qualified_name(deprecated_unsynced_run)
+        )
+        in captured.out
+    )
+    assert (
+        "Synchronising {}".format(get_qualified_name(offline_old_run)) in captured.out
+    )
+    assert (
+        "Synchronization of run {} completed.".format(
+            get_qualified_name(offline_old_run)
+        )
+        in captured.out
+    )
 
     # and
     backend.execute_operations.assert_has_calls(
@@ -417,9 +491,17 @@ def test_sync_v0_runs(tmp_path, mocker, capsys, backend):
 
 def test_sync_non_existent_offline_containers(tmp_path, capsys, backend):
     # when
-    SyncRunner.sync_selected(backend=backend, base_path=tmp_path, project_name="foo", object_names=["offline/foo__bar"])
     SyncRunner.sync_selected(
-        backend=backend, base_path=tmp_path, project_name="foo", object_names=["offline/model__bar"]
+        backend=backend,
+        base_path=tmp_path,
+        project_name="foo",
+        object_names=["offline/foo__bar"],
+    )
+    SyncRunner.sync_selected(
+        backend=backend,
+        base_path=tmp_path,
+        project_name="foo",
+        object_names=["offline/model__bar"],
     )
 
     # then

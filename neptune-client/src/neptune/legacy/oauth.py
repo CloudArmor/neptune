@@ -14,7 +14,4 @@
 # limitations under the License.
 #
 # flake8: noqa
-from neptune.common.oauth import (
-    NeptuneAuth,
-    NeptuneAuthenticator,
-)
+from neptune.common.oauth import NeptuneAuth, NeptuneAuthenticator

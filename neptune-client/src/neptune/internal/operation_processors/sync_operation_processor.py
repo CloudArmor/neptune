@@ -16,11 +16,7 @@
 __all__ = ("SyncOperationProcessor",)
 
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-    Tuple,
-)
+from typing import TYPE_CHECKING, Optional, Tuple
 
 from neptune.constants import SYNC_DIRECTORY
 from neptune.core.components.abstract import WithResources
@@ -42,19 +38,28 @@ if TYPE_CHECKING:
 
 
 class SyncOperationProcessor(WithResources, OperationProcessor):
-    def __init__(self, container_id: "UniqueId", container_type: "ContainerType", backend: "NeptuneBackend"):
+    def __init__(
+        self,
+        container_id: "UniqueId",
+        container_type: "ContainerType",
+        backend: "NeptuneBackend",
+    ):
         self._container_id: "UniqueId" = container_id
         self._container_type: "ContainerType" = container_type
         self._backend: "NeptuneBackend" = backend
 
-        self._data_path = get_container_full_path(SYNC_DIRECTORY, container_id, container_type)
+        self._data_path = get_container_full_path(
+            SYNC_DIRECTORY, container_id, container_type
+        )
 
         # Initialize directory
         self._data_path.mkdir(parents=True, exist_ok=True)
 
         self._metadata_file = MetadataFile(
             data_path=self._data_path,
-            metadata=common_metadata(mode="sync", container_id=container_id, container_type=container_type),
+            metadata=common_metadata(
+                mode="sync", container_id=container_id, container_type=container_type
+            ),
         )
         self._operation_storage = OperationStorage(data_path=self._data_path)
 

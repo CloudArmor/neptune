@@ -15,7 +15,4 @@
 #
 __all__ = ["version", "__version__"]
 
-from neptune.version import (
-    __version__,
-    version,
-)
+from neptune.version import __version__, version

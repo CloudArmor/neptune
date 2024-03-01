@@ -14,10 +14,7 @@
 # limitations under the License.
 #
 from neptune.common.hardware.constants import BYTES_IN_ONE_GB
-from neptune.common.hardware.metrics.metric import (
-    Metric,
-    MetricResourceType,
-)
+from neptune.common.hardware.metrics.metric import Metric, MetricResourceType
 from neptune.common.hardware.metrics.metrics_container import MetricsContainer
 
 
@@ -59,7 +56,8 @@ class MetricsFactory(object):
             resource_type=MetricResourceType.RAM,
             unit="GB",
             min_value=0.0,
-            max_value=self.__system_resource_info.memory_amount_bytes / float(BYTES_IN_ONE_GB),
+            max_value=self.__system_resource_info.memory_amount_bytes
+            / float(BYTES_IN_ONE_GB),
             gauges=[self.__gauge_factory.create_memory_usage_gauge()],
         )
 
@@ -84,7 +82,8 @@ class MetricsFactory(object):
             resource_type=MetricResourceType.GPU_RAM,
             unit="GB",
             min_value=0.0,
-            max_value=self.__system_resource_info.gpu_memory_amount_bytes / float(BYTES_IN_ONE_GB),
+            max_value=self.__system_resource_info.gpu_memory_amount_bytes
+            / float(BYTES_IN_ONE_GB),
             gauges=[
                 self.__gauge_factory.create_gpu_memory_gauge(card_index=card_index)
                 for card_index in self.__system_resource_info.gpu_card_indices

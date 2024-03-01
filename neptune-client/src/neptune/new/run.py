@@ -44,10 +44,7 @@ from neptune.exceptions import (
 from neptune.handler import Handler
 from neptune.internal.state import ContainerState as RunState
 from neptune.metadata_containers import Run
-from neptune.types import (
-    Boolean,
-    Integer,
-)
+from neptune.types import Boolean, Integer
 from neptune.types.atoms.datetime import Datetime
 from neptune.types.atoms.float import Float
 from neptune.types.atoms.string import String

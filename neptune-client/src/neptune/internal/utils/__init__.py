@@ -42,16 +42,7 @@ import base64
 import os
 from glob import glob
 from io import IOBase
-from typing import (
-    Any,
-    Iterable,
-    List,
-    Mapping,
-    Optional,
-    Set,
-    TypeVar,
-    Union,
-)
+from typing import Any, Iterable, List, Mapping, Optional, Set, TypeVar, Union
 
 from neptune.internal.types.stringify_value import StringifyValue
 from neptune.internal.utils.logger import get_logger
@@ -76,10 +67,14 @@ def verify_type(var_name: str, var, expected_type: Union[type, tuple]):
         raise TypeError("Incorrect type of {}".format(var_name)) from e
 
     if not isinstance(var, expected_type):
-        raise TypeError("{} must be a {} (was {})".format(var_name, type_name, type(var)))
+        raise TypeError(
+            "{} must be a {} (was {})".format(var_name, type_name, type(var))
+        )
 
     if isinstance(var, IOBase) and not hasattr(var, "read"):
-        raise TypeError("{} is a stream, which does not implement read method".format(var_name))
+        raise TypeError(
+            "{} is a stream, which does not implement read method".format(var_name)
+        )
 
 
 def verify_value(var_name: str, var: Any, expected_values: Iterable[T]) -> None:
@@ -138,7 +133,9 @@ def get_type_name(_type: Union[type, tuple]):
 def verify_collection_type(var_name: str, var, expected_type: Union[type, tuple]):
     verify_type(var_name, var, (list, set, tuple))
     for value in var:
-        verify_type("elements of collection '{}'".format(var_name), value, expected_type)
+        verify_type(
+            "elements of collection '{}'".format(var_name), value, expected_type
+        )
 
 
 def verify_optional_callable(var_name: str, var):

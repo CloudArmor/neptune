@@ -2,9 +2,9 @@ from contextlib import contextmanager
 from functools import partial
 
 import pytest
+from tests.unit.neptune.new.utils.logging import format_log
 
 from neptune.internal.utils.logger import get_logger
-from tests.unit.neptune.new.utils.logging import format_log
 
 
 @contextmanager

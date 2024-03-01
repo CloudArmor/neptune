@@ -29,7 +29,9 @@ from neptune.internal.utils.logger import get_logger
 _logger = get_logger()
 
 
-def project_name_lookup(backend: NeptuneBackend, name: Optional[QualifiedName] = None) -> Project:
+def project_name_lookup(
+    backend: NeptuneBackend, name: Optional[QualifiedName] = None
+) -> Project:
     verify_type("name", name, (str, type(None)))
 
     if not name:
