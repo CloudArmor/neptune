@@ -1,0 +1,6 @@
+lightning
+neptune[prophet,xgboost]
+plotly
+scikit-learn
+seaborn
+torch

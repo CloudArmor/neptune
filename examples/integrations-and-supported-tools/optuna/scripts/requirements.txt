@@ -1,0 +1,4 @@
+lightgbm
+neptune[optuna]
+optuna
+plotly

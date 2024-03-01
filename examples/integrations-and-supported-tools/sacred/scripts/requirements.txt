@@ -1,0 +1,4 @@
+neptune[sacred]
+sacred
+torch
+torchvision

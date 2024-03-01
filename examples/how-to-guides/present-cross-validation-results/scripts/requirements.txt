@@ -1,0 +1,5 @@
+neptune
+scikit-learn
+torch
+torchvision
+tqdm

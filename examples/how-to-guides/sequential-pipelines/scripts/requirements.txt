@@ -1,0 +1,6 @@
+matplotlib
+neptune
+neptune-sklearn
+numpy
+scikit-learn
+simplejson<3.19

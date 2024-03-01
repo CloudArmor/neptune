@@ -1,0 +1,5 @@
+datasets
+evaluate
+neptune
+scipy
+transformers[torch,sklearn]
